@@ -4,6 +4,7 @@ import harlequinmettle.finance.tickerset.TickerSet;
 import harlequinmettle.utils.TimeRecord;
 import harlequinmettle.utils.debugtools.InstanceCounter;
 import harlequinmettle.utils.numbertools.math.statistics.StatInfo;
+import harlequinmettle.utils.systemtools.SystemMemoryUsage;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -18,7 +19,7 @@ import org.apache.commons.io.FileUtils;
 public class TechnicalDatabase {
 	public static final SimpleDateFormat REPORT_DATE_FORMAT = new SimpleDateFormat(
 			"yyyy-MM-dd");
-	//String ticker maps to time series map daynumber->value
+	// String ticker maps to time series map daynumber->value
 	public static final TreeMap<String, TreeMap<Float, Float>> OPEN = new TreeMap<String, TreeMap<Float, Float>>();
 	public static final TreeMap<String, TreeMap<Float, Float>> HIGH = new TreeMap<String, TreeMap<Float, Float>>();
 	public static final TreeMap<String, TreeMap<Float, Float>> LOW = new TreeMap<String, TreeMap<Float, Float>>();
@@ -36,9 +37,9 @@ public class TechnicalDatabase {
 	public static final InstanceCounter VOLUME_COUNTER = new InstanceCounter();
 	public static final InstanceCounter ADJCLOSE_COUNTER = new InstanceCounter();
 	public static final InstanceCounter DIVIDEND_COUNTER = new InstanceCounter();
-	
+
 	public static final ArrayList<Float> DATE_VALUES = new ArrayList<Float>();
-	
+
 	public static final ArrayList<Float> OPEN_VALUES = new ArrayList<Float>();
 	public static final ArrayList<Float> HIGH_VALUES = new ArrayList<Float>();
 	public static final ArrayList<Float> LOW_VALUES = new ArrayList<Float>();
@@ -47,16 +48,16 @@ public class TechnicalDatabase {
 	public static final ArrayList<Float> ADJCLOSE_VALUES = new ArrayList<Float>();
 	public static final ArrayList<Float> DIVIDEND_VALUES = new ArrayList<Float>();
 	public static final ArrayList<ArrayList<Float>> DB_VALUES = new ArrayList<ArrayList<Float>>();
-	
-//	public static final StatInfo DATE_STATS = new StatInfo();
-//	public static final StatInfo OPEN_STATS = new StatInfo();
-//	public static final StatInfo HIGH_STATS = new StatInfo();
-//	public static final StatInfo LOW_STATS = new StatInfo();
-//	public static final StatInfo CLOSE_STATS = new StatInfo();
-//	public static final StatInfo VOLUME_STATS = new StatInfo();
-//	public static final StatInfo ADJCLOSE_STATS = new StatInfo();
-//	public static final StatInfo DIVIDEND_STATS = new StatInfo();
-	
+
+	// public static final StatInfo DATE_STATS = new StatInfo();
+	// public static final StatInfo OPEN_STATS = new StatInfo();
+	// public static final StatInfo HIGH_STATS = new StatInfo();
+	// public static final StatInfo LOW_STATS = new StatInfo();
+	// public static final StatInfo CLOSE_STATS = new StatInfo();
+	// public static final StatInfo VOLUME_STATS = new StatInfo();
+	// public static final StatInfo ADJCLOSE_STATS = new StatInfo();
+	// public static final StatInfo DIVIDEND_STATS = new StatInfo();
+
 	public static final ArrayList<TreeMap<String, TreeMap<Float, Float>>> TECHNICAL_DB_DATA_POINTS = new ArrayList<TreeMap<String, TreeMap<Float, Float>>>();
 
 	long time = System.currentTimeMillis();
@@ -85,11 +86,13 @@ public class TechnicalDatabase {
 	}
 
 	public TechnicalDatabase(String root) {
+		int count = 0;
 		while (root == null || root.length() < 1) {
 			root = dbRootPathChooser();
 		}
 		File[] files = new File(root).listFiles();
 		for (File file : files) {
+			System.out.println(count++ + "     "+file.getName());
 			if (file.isDirectory()) {
 				loadDividends(file);
 			} else {
@@ -99,7 +102,9 @@ public class TechnicalDatabase {
 	}
 
 	private void loadTechnicalData(File file) {
-		String ticker = file.getName().replace("\\.csv", "");
+		// break off the .csv from the filename
+		String ticker = file.getName()
+				.substring(0, file.getName().length() - 4);
 		try {
 			String data = FileUtils.readFileToString(file);
 			for (String dayData : data.split(System.lineSeparator())) {
@@ -126,13 +131,13 @@ public class TechnicalDatabase {
 			OPEN_VALUES.add(open);
 			OPEN.get(ticker).put(date, open);
 			float high = numbers.get(2);
-			HIGH_VALUES.add( high);
+			HIGH_VALUES.add(high);
 			HIGH.get(ticker).put(date, high);
 			float low = numbers.get(3);
-			LOW_VALUES.add( low);
+			LOW_VALUES.add(low);
 			LOW.get(ticker).put(date, low);
 			float close = numbers.get(4);
-			CLOSE_VALUES.add( close);
+			CLOSE_VALUES.add(close);
 			CLOSE.get(ticker).put(date, close);
 			float volume = numbers.get(5);
 			VOLUME_VALUES.add(volume);
@@ -151,13 +156,13 @@ public class TechnicalDatabase {
 			numbers.add(daynumber);
 			DATE_COUNTER.add(daynumber);
 		} catch (Exception e) {
-			//e.printStackTrace();
+			// e.printStackTrace();
 		}
 		// if its a number addit
 		try {
 			numbers.add(Float.valueOf(numString));
 		} catch (Exception e) {
-			//e.printStackTrace();
+			// e.printStackTrace();
 		}
 	}
 
@@ -167,17 +172,18 @@ public class TechnicalDatabase {
 	}
 
 	public static void main(String[] arg) {
+		SystemMemoryUsage smu = new SystemMemoryUsage();
 		TechnicalDatabase quotes = new TechnicalDatabase(null);
-for(ArrayList<Float> valueset: DB_VALUES){
-	new StatInfo(valueset);
-}
-	//	DATE_COUNTER.printlnCount();
+		for (ArrayList<Float> valueset : DB_VALUES) {
+			new StatInfo(valueset);
+		}
+		// DATE_COUNTER.printlnCount();
 		DATE_COUNTER.printlnSize();
-		
+
 		System.out.println("time: "
 				+ (System.currentTimeMillis() - quotes.time));
 		for (TreeMap<String, TreeMap<Float, Float>> dataset : TECHNICAL_DB_DATA_POINTS) {
-			 
+
 		}
 		System.out.println("time: "
 				+ (System.currentTimeMillis() - quotes.time));

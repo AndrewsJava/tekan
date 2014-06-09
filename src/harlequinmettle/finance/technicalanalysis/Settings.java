@@ -1,6 +1,8 @@
 package harlequinmettle.finance.technicalanalysis;
 
-public class Settings {
+import java.io.Serializable;
+
+public class Settings implements Serializable{
 
 String rootPath = null;
  

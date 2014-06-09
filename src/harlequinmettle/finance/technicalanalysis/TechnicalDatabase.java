@@ -17,24 +17,22 @@ import javax.swing.JFrame;
 
 import org.apache.commons.io.FileUtils;
 
-public class TechnicalDatabase {
+public   class TechnicalDatabase {
 	public static final SimpleDateFormat REPORT_DATE_FORMAT = new SimpleDateFormat(
 			"yyyy-MM-dd");
-	public static final int NUMBER_OF_DAYS = 365 * 20;
+	public static final int NUM_YRS= 15;
+	public static final int NUMBER_OF_DAYS = 365 * NUM_YRS;
 	public static final int TODAY = (int) TimeRecord.dayNumber(System
 			.currentTimeMillis());
 	public static String settingsFileName = ".technical_database_settings";
-	public static Settings settings;
+	private static Settings settings;
 	// String ticker maps to time series map daynumber->value
 	// public static final TreeMap<String, TreeMap<Float, float[]>>
 	// PER_TICKER_PER_DAY_TECHNICAL_DATA = new TreeMap<String, TreeMap<Float,
 	// float[]>>();
 	// <ticker, [day][technical data]>
 	public static final TreeMap<String, float[][]> PER_TICKER_PER_DAY_TECHNICAL_DATA = new TreeMap<String, float[][]>();
-
-	public static final InstanceCounter DATE_COUNTER = new InstanceCounter();
-
-	public static final ArrayList<Float> DATE_VALUES = new ArrayList<Float>();
+ 
 
 	long time = System.currentTimeMillis();
 	static {
@@ -45,18 +43,17 @@ public class TechnicalDatabase {
 					new float[NUMBER_OF_DAYS][]);
 		}
 
-		restoreSettings();
 		System.out.println("time: " + (System.currentTimeMillis() - time));
 	}
 
-	public TechnicalDatabase(String root) {
+	public TechnicalDatabase() {
 		int count = 0;
-		 settings.rootPath = root;
-			while (settings.rootPath == null || settings.rootPath.length() < 1) {
-				settings.rootPath = dbRootPathChooser();
-				SerializationTool.serialize(settings, settingsFileName);
-			} 
-	 
+		restoreSettings();
+		while (settings.rootPath == null || settings.rootPath.length() < 1) {
+			settings.rootPath = dbRootPathChooser();
+			SerializationTool.serialize(settings, settingsFileName);
+		}
+
 		File[] files = new File(settings.rootPath).listFiles();
 		for (File file : files) {
 			System.out.println(count++ + "     " + file.getName());
@@ -66,9 +63,10 @@ public class TechnicalDatabase {
 				loadTechnicalData(file);
 			}
 		}
+		System.out.println("technical database successfully created with: "+NUM_YRS+"  years of data");
 	}
 
-	private static void restoreSettings() {
+	private void restoreSettings() {
 		settings = SerializationTool.deserialize(Settings.class,
 				settingsFileName);
 		if (settings == null)
@@ -98,7 +96,7 @@ public class TechnicalDatabase {
 		}
 		// csv daily data is seven columns: Date Open High Low Close Volume Adj
 		// Close
-
+		// System.out.println(numbers);
 		if (numbers.size() == 7) {
 			float date = numbers.get(0);
 			if (date < TODAY - NUMBER_OF_DAYS)
@@ -121,20 +119,14 @@ public class TechnicalDatabase {
 		// if its a date parse it and add it
 		try {
 			float daynumber = TimeRecord.dayNumber(REPORT_DATE_FORMAT.parse(
-					numString).getTime());
-			// DATE_VALUES.add(daynumber);
-			// numbers.add(daynumber);
-			DATE_COUNTER.add(daynumber);
-		} catch (Exception e) {
-			// e.printStackTrace();
-		}
-		// if (true)
-		// return;
+					numString).getTime()); 
+			numbers.add(daynumber); 
+		} catch (Exception e) { 
+		} 
 		// if its a number valueof and add it
 		try {
 			numbers.add(Float.valueOf(numString));
-		} catch (Exception e) {
-			// e.printStackTrace();
+		} catch (Exception e) { 
 		}
 	}
 
@@ -145,11 +137,8 @@ public class TechnicalDatabase {
 
 	public static void main(String[] arg) {
 		SystemMemoryUsage smu = new SystemMemoryUsage();
-		TechnicalDatabase quotes = new TechnicalDatabase(null);
-
-		DATE_COUNTER.printlnCounts(0.1f);
-		DATE_COUNTER.printlnSize();
-		new StatInfo(DATE_VALUES);
+		TechnicalDatabase quotes = new TechnicalDatabase();
+ 
 		System.out.println("time: "
 				+ (System.currentTimeMillis() - quotes.time));
 	}

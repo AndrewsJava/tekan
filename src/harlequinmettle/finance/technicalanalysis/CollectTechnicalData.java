@@ -4,6 +4,7 @@ import harlequinmettle.finance.tickerset.TickerSet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.commons.io.FileUtils;
 
@@ -15,29 +16,51 @@ public class CollectTechnicalData {
 
 	public static void main(String[] args) {
 		CollectTechnicalData ctd = new CollectTechnicalData();
-		//daily price data
-		ctd.collectTechnicalData(TECHNICAL_DATA,""); 
-		//daily price data
-		ctd.collectTechnicalData(TECHNICAL_DATA+DIVIDENDS_SUBFOLDER,dividendSuffix); 
-
+		// daily price data
+		ctd.collectTechnicalData(TickerSet.TICKERS,TECHNICAL_DATA, "");
+		// daily price data
+		ctd.collectTechnicalData(TickerSet.TICKERS,TECHNICAL_DATA + DIVIDENDS_SUBFOLDER,
+				dividendSuffix);
+		ctd.validateDataDownload(TickerSet.TICKERS,TECHNICAL_DATA);
+		ctd.validateDataDownload(TickerSet.TICKERS,TECHNICAL_DATA + DIVIDENDS_SUBFOLDER);
 	}
- 
-	private void collectTechnicalData(String filePath, String suffix) {
+
+	private void validateDataDownload(ArrayList<String> tickers, String filePath) {
+		boolean success = false;
+		for (String ticker : tickers) {
+			File collectedData = new File(filePath, ticker + ".csv");
+			if (collectedData.exists()) {
+
+				try {
+					String data = FileUtils.readFileToString(new File(filePath,
+							ticker + ".csv"));
+
+					if (data.startsWith("Date,Open,High,Low,Close,Volume,Adj Close")
+							&& (data.split(",").length > 13))
+						success = true;
+					else
+						success = false;
+				} catch (IOException e) {
+				}
+			} else {
+				success = false;
+			}
+			if(!success)System.out.println("data fail");
+		}
+		
+	}
+
+	private void collectTechnicalData(ArrayList<String> tickers, String filePath, String suffix) {
 		int i = 0;
 		ensureDirectory(filePath);
-		for (String ticker : TickerSet.TICKERS) {
+		for (String ticker : tickers) {
 			i++;
 			// if (i > 20)
 			// break;
 			try {
-				HttpDownloadUtility.downloadFile(urlbase + ticker+suffix,
+				HttpDownloadUtility.downloadFile(urlbase + ticker + suffix,
 						filePath, ticker + ".csv");
-				//File collectedData = new File(filePath, ticker + ".csv");
-				// if (collectedData.exists()) {
-				// String data = FileUtils.readFileToString(new File(
-				// filePath, ticker + ".csv"));
-				// System.out.println(data.substring(0, 250));
-				//	}
+
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

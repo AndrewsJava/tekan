@@ -1,6 +1,7 @@
 *.class
 *~
 TECHNICAL_DATA
+.technical_database_settings
 #eclipse project files
 .classpath
 .project

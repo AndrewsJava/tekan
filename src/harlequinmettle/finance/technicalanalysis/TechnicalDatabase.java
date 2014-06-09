@@ -3,6 +3,7 @@ package harlequinmettle.finance.technicalanalysis;
 import harlequinmettle.finance.tickerset.TickerSet;
 import harlequinmettle.utils.TimeRecord;
 import harlequinmettle.utils.debugtools.InstanceCounter;
+import harlequinmettle.utils.filetools.SerializationTool;
 import harlequinmettle.utils.numbertools.math.statistics.StatInfo;
 import harlequinmettle.utils.systemtools.SystemMemoryUsage;
 
@@ -19,8 +20,11 @@ import org.apache.commons.io.FileUtils;
 public class TechnicalDatabase {
 	public static final SimpleDateFormat REPORT_DATE_FORMAT = new SimpleDateFormat(
 			"yyyy-MM-dd");
-	public static final int NUMBER_OF_DAYS = 365*25;
-	public static final int TODAY = (int)TimeRecord.dayNumber(System.currentTimeMillis());
+	public static final int NUMBER_OF_DAYS = 365 * 20;
+	public static final int TODAY = (int) TimeRecord.dayNumber(System
+			.currentTimeMillis());
+	public static String settingsFileName = ".technical_database_settings";
+	public static Settings settings;
 	// String ticker maps to time series map daynumber->value
 	// public static final TreeMap<String, TreeMap<Float, float[]>>
 	// PER_TICKER_PER_DAY_TECHNICAL_DATA = new TreeMap<String, TreeMap<Float,
@@ -38,17 +42,22 @@ public class TechnicalDatabase {
 
 		for (String ticker : TickerSet.TICKERS) {
 			PER_TICKER_PER_DAY_TECHNICAL_DATA.put(ticker,
-					new  float[NUMBER_OF_DAYS][] );
+					new float[NUMBER_OF_DAYS][]);
 		}
+
+		restoreSettings();
 		System.out.println("time: " + (System.currentTimeMillis() - time));
 	}
 
 	public TechnicalDatabase(String root) {
 		int count = 0;
-		while (root == null || root.length() < 1) {
-			root = dbRootPathChooser();
-		}
-		File[] files = new File(root).listFiles();
+		 settings.rootPath = root;
+			while (settings.rootPath == null || settings.rootPath.length() < 1) {
+				settings.rootPath = dbRootPathChooser();
+				SerializationTool.serialize(settings, settingsFileName);
+			} 
+	 
+		File[] files = new File(settings.rootPath).listFiles();
 		for (File file : files) {
 			System.out.println(count++ + "     " + file.getName());
 			if (file.isDirectory()) {
@@ -57,6 +66,13 @@ public class TechnicalDatabase {
 				loadTechnicalData(file);
 			}
 		}
+	}
+
+	private static void restoreSettings() {
+		settings = SerializationTool.deserialize(Settings.class,
+				settingsFileName);
+		if (settings == null)
+			settings = new Settings();
 	}
 
 	private void loadTechnicalData(File file) {
@@ -83,9 +99,9 @@ public class TechnicalDatabase {
 		// csv daily data is seven columns: Date Open High Low Close Volume Adj
 		// Close
 
-		if ( numbers.size() == 7) {
+		if (numbers.size() == 7) {
 			float date = numbers.get(0);
-			if (date < TODAY-NUMBER_OF_DAYS)
+			if (date < TODAY - NUMBER_OF_DAYS)
 				return;
 			float open = numbers.get(1);
 			float high = numbers.get(2);
@@ -96,7 +112,8 @@ public class TechnicalDatabase {
 
 			float[] dataForDay = { date, open, high, low, close, volume,
 					adjclose };
-			PER_TICKER_PER_DAY_TECHNICAL_DATA.get(ticker)[ (int)date - ( TODAY-NUMBER_OF_DAYS)] = dataForDay;
+			PER_TICKER_PER_DAY_TECHNICAL_DATA.get(ticker)[(int) date
+					- (TODAY - NUMBER_OF_DAYS)] = dataForDay;
 		}
 	}
 
@@ -111,8 +128,8 @@ public class TechnicalDatabase {
 		} catch (Exception e) {
 			// e.printStackTrace();
 		}
-		if (true)
-			return;
+		// if (true)
+		// return;
 		// if its a number valueof and add it
 		try {
 			numbers.add(Float.valueOf(numString));

@@ -19,8 +19,14 @@ import org.apache.commons.io.FileUtils;
 public class TechnicalDatabase {
 	public static final SimpleDateFormat REPORT_DATE_FORMAT = new SimpleDateFormat(
 			"yyyy-MM-dd");
+	public static final int NUMBER_OF_DAYS = 365*25;
+	public static final int TODAY = (int)TimeRecord.dayNumber(System.currentTimeMillis());
 	// String ticker maps to time series map daynumber->value
-	public static final TreeMap<String, TreeMap<Float, float[]>> PER_TICKER_PER_DAY_TECHNICAL_DATA = new TreeMap<String, TreeMap<Float, float[]>>();
+	// public static final TreeMap<String, TreeMap<Float, float[]>>
+	// PER_TICKER_PER_DAY_TECHNICAL_DATA = new TreeMap<String, TreeMap<Float,
+	// float[]>>();
+	// <ticker, [day][technical data]>
+	public static final TreeMap<String, float[][]> PER_TICKER_PER_DAY_TECHNICAL_DATA = new TreeMap<String, float[][]>();
 
 	public static final InstanceCounter DATE_COUNTER = new InstanceCounter();
 
@@ -32,7 +38,7 @@ public class TechnicalDatabase {
 
 		for (String ticker : TickerSet.TICKERS) {
 			PER_TICKER_PER_DAY_TECHNICAL_DATA.put(ticker,
-					new TreeMap<Float, float[]>());
+					new  float[NUMBER_OF_DAYS][] );
 		}
 		System.out.println("time: " + (System.currentTimeMillis() - time));
 	}
@@ -77,9 +83,9 @@ public class TechnicalDatabase {
 		// csv daily data is seven columns: Date Open High Low Close Volume Adj
 		// Close
 
-		if (false && numbers.size() == 7) {
+		if ( numbers.size() == 7) {
 			float date = numbers.get(0);
-			if (date < 15000)
+			if (date < TODAY-NUMBER_OF_DAYS)
 				return;
 			float open = numbers.get(1);
 			float high = numbers.get(2);
@@ -90,7 +96,7 @@ public class TechnicalDatabase {
 
 			float[] dataForDay = { date, open, high, low, close, volume,
 					adjclose };
-			PER_TICKER_PER_DAY_TECHNICAL_DATA.get(ticker).put(date, dataForDay);
+			PER_TICKER_PER_DAY_TECHNICAL_DATA.get(ticker)[ (int)date - ( TODAY-NUMBER_OF_DAYS)] = dataForDay;
 		}
 	}
 
@@ -99,9 +105,9 @@ public class TechnicalDatabase {
 		try {
 			float daynumber = TimeRecord.dayNumber(REPORT_DATE_FORMAT.parse(
 					numString).getTime());
-			DATE_VALUES.add(daynumber);
-		//	numbers.add(daynumber);
-		//	DATE_COUNTER.add(daynumber);
+			// DATE_VALUES.add(daynumber);
+			// numbers.add(daynumber);
+			DATE_COUNTER.add(daynumber);
 		} catch (Exception e) {
 			// e.printStackTrace();
 		}
@@ -124,7 +130,7 @@ public class TechnicalDatabase {
 		SystemMemoryUsage smu = new SystemMemoryUsage();
 		TechnicalDatabase quotes = new TechnicalDatabase(null);
 
-		DATE_COUNTER.printlnCounts();
+		DATE_COUNTER.printlnCounts(0.1f);
 		DATE_COUNTER.printlnSize();
 		new StatInfo(DATE_VALUES);
 		System.out.println("time: "

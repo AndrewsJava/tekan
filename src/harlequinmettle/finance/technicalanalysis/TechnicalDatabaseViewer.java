@@ -11,6 +11,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
@@ -18,7 +19,8 @@ import javax.swing.JTabbedPane;
 public class TechnicalDatabaseViewer extends JTabbedPane {
 
 	TechnicalDatabase db = new TechnicalDatabase();
-
+	CurrentFundamentalsDatabase fdb = new CurrentFundamentalsDatabase();
+	
 	public static void main(String[] arg) {
 		TechnicalDatabaseViewer tdbviewer = new TechnicalDatabaseViewer();
 
@@ -35,6 +37,9 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		JSearchPanel searchPanel = new JSearchPanel();
 		searchPanel.addSearchAction(doSearchActionListener(searchPanel));
 		controls.addComp(searchPanel);
+		for(int i = 0; i<20; i++)
+			System.out.println(Arrays.toString(fdb.data[(int)(4000*Math.random())]));
+	 
 	}
 
 	private ActionListener doSearchActionListener(final JSearchPanel searchPanel) {

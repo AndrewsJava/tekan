@@ -48,17 +48,20 @@ public class TickerTechView extends JPanel {
 	private Point2D.Float minMaxVolume;
 	private float x, y, day;
 	float[] days;
+	private float scalex = 1, scaley = 1;
+
+
 	final MouseAdapter dateDisplayer = new MouseAdapter() {
 
 		public void mouseClicked(MouseEvent e) {
 			x = e.getX();
 			y = e.getY();
 			int scrollValue = 0;
-			if(viewport!=null)
-			  scrollValue = viewport.getX();
-			int index = 1+(int) ((x - margins-scrollValue) / (BAR_W + INTERBARMARGINS));
-			if(index<days.length)
-			day = days[index];
+			if (viewport != null)
+				scrollValue = viewport.getX();
+			int index = 1 + (int) ((x - margins - scrollValue) / (BAR_W + INTERBARMARGINS));
+			if (index < days.length)
+				day = days[index];
 			repaint();
 		}
 	};
@@ -72,9 +75,14 @@ public class TickerTechView extends JPanel {
 		init(ticker);
 	}
 
+	public void updateSizePreferrence() { 
+		setPreferredSize(new Dimension((int) (scalex * W),
+				(int) (scaley * H + 40)));
+	}
+
 	private void init(String ticker) {
-		setPreferredSize(new Dimension(W, H + 40));
-this.addMouseListener(dateDisplayer);
+		updateSizePreferrence();
+		this.addMouseListener(dateDisplayer);
 		TreeMap<Float, Float> high = TechnicalDatabase.makeGetDataToDateMap(
 				ticker, TechnicalDatabase.HIGH);
 		TreeMap<Float, Float> low = TechnicalDatabase.makeGetDataToDateMap(
@@ -117,14 +125,13 @@ this.addMouseListener(dateDisplayer);
 	}
 
 	private float[] calculateDaysFromMap(TreeMap<Float, Float> volume) {
-		
-		 
+
 		float dayone = volume.firstKey();
 		float lastday = volume.lastKey();
-		int numberdays = (int) (lastday-dayone);
-		float[] daystobe = new float[numberdays ];
-		for (int i = 0; i<numberdays; i++) {
-			daystobe[i] = dayone+i; 
+		int numberdays = (int) (lastday - dayone);
+		float[] daystobe = new float[numberdays];
+		for (int i = 0; i < numberdays; i++) {
+			daystobe[i] = dayone + i;
 		}
 		return daystobe;
 	}
@@ -189,10 +196,16 @@ this.addMouseListener(dateDisplayer);
 		float pixels = (value - minMaxPrice.x) * factor;
 		return margins + eH - pixels;
 	}
-
+//	@Override
+//	public void update(Graphics g) { 
+//		super.update(g);
+//	}
 	@Override
 	public void paint(Graphics g1) {
+		updateSizePreferrence();
 		Graphics2D g = (Graphics2D) g1;
+
+		g.scale(scalex,scaley);
 		drawBackground(g);
 		drawVolumeLines(g);
 		drawHighLowLines(g);
@@ -206,7 +219,7 @@ this.addMouseListener(dateDisplayer);
 		g.setFont(BIG_FONT);
 		String date = DATE_FORMAT
 				.format(new Date((long) day * 24 * 3600 * 1000));
-		if (x > W-100) {
+		if (x > W - 100) {
 			g.drawString(date, x - 200, y - 15);
 		} else {
 			g.drawString(date, x, y - 15);
@@ -280,6 +293,6 @@ this.addMouseListener(dateDisplayer);
 	}
 
 	public void setScrollBar(JViewport jViewport) {
-	viewport = jViewport;
+		viewport = jViewport;
 	}
 }

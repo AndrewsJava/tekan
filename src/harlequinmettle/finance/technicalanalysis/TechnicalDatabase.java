@@ -29,7 +29,7 @@ public class TechnicalDatabase {
 	public static final int VOLUME = 5;
 	public static final int ADJCLOSE = 6;
 	
-	public static final int NUM_YRS = 1;
+	public static final int NUM_YRS = 2;
 	public static final int NUM_DAYS = 365 * NUM_YRS;
 	public static final int TODAY = (int) TimeRecord.dayNumber(System
 			.currentTimeMillis());

@@ -32,26 +32,29 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		container.setVisible(true);
 		JScrollPanelledPane controls = new JScrollPanelledPane();
 		this.add("controls", controls);
-		  JSearchPanel searchPanel = new JSearchPanel();
+		JSearchPanel searchPanel = new JSearchPanel();
 		searchPanel.addSearchAction(doSearchActionListener(searchPanel));
 		controls.addComp(searchPanel);
 	}
 
 	private ActionListener doSearchActionListener(final JSearchPanel searchPanel) {
-		return new ActionListener(){
+		return new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-			//getParent()
-
-				showChartInNewWindow(searchPanel.getSearchText().trim().toUpperCase());
+				// getParent()
+				String text_from_search_panel_text_box = searchPanel
+						.getSearchText();
+				showChartInNewWindow(text_from_search_panel_text_box.trim()
+						.toUpperCase());
 			}
-			
+
 		};
 	}
 
 	private void showChartInNewWindow(String ticker) {
-		final JFrame container = new JFrame(ticker+"   "+TechnicalDatabase.NUM_DAYS+ "  days");
+		final JFrame container = new JFrame(ticker + "   "
+				+ TechnicalDatabase.NUM_DAYS + "  days");
 
 		container.setSize(900, 550);
 		container.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -60,6 +63,8 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		JScrollPanelledPane chart = new JScrollPanelledPane();
 		TickerTechView tv = new TickerTechView(ticker);
 		PreferredJScrollPane tickerTechScroll = new PreferredJScrollPane(tv);
+		tv.setScrollBar(tickerTechScroll.getViewport());
+	 
 		chart.addComp(tickerTechScroll);
 
 		container.add(chart);

@@ -29,7 +29,7 @@ public class TechnicalDatabase {
 	public static final int VOLUME = 5;
 	public static final int ADJCLOSE = 6;
 	
-	public static final int NUM_YRS = 1;
+	public static final int NUM_YRS = 5;
 	public static final int NUM_DAYS = 365 * NUM_YRS;
 	public static final int TODAY = (int) TimeRecord.dayNumber(System
 			.currentTimeMillis());
@@ -155,6 +155,7 @@ public static TreeMap<Float,Float> makeGetDataToDateMap(String ticker,int datapo
 	TreeMap<Float,Float> map = new TreeMap<Float,Float>();
 	float[][] tickerdata = PER_TICKER_PER_DAY_TECHNICAL_DATA.get(ticker);
 	for(float[] day: tickerdata){
+		if(day!=null)
 		map.put(day[0], day[datapoint]);
 	}
 	return map;

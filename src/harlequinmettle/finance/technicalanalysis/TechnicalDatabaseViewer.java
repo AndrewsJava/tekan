@@ -5,6 +5,7 @@ import harlequinmettle.utils.guitools.JButtonWithEnterKeyAction;
 import harlequinmettle.utils.guitools.JScrollPanelledPane;
 import harlequinmettle.utils.guitools.JSearchPanel;
 import harlequinmettle.utils.guitools.PreferredJScrollPane;
+import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,6 +34,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 
 	private void init() {
 
+		SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
 		TechnicalDatabase db = new TechnicalDatabase();
 		CurrentFundamentalsDatabase fdb = new CurrentFundamentalsDatabase();
 

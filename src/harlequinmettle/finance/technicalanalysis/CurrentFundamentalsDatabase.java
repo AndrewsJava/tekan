@@ -2,19 +2,21 @@ package harlequinmettle.finance.technicalanalysis;
 
 import harlequinmettle.finance.database.DataUtil;
 import harlequinmettle.finance.tickerset.TickerSet;
-import harlequinmettle.utils.filetools.ChooseFilePrompter;
+import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.guitools.FilterPanel;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeMap;
 
 public class CurrentFundamentalsDatabase {
 	int nancount = 0;
-
+	String pathToObj = ".path_to_small_database";
+String pathtodata = "path to small database";
 	public CurrentFundamentalsDatabase() {
-		root = ChooseFilePrompter.directoryPathChooser();
+		ChooseFilePrompterPathSaved settingssaver = new ChooseFilePrompterPathSaved(pathToObj);
+				root = settingssaver.getSetting(pathtodata);
+	//	root = ChooseFilePrompter.directoryPathChooser();
 		loadCurrentDataFromFiles();
 		System.out.println("total:  "
 				+ (TickerSet.TICKERS.size() * labels.length) + "   nan:  "

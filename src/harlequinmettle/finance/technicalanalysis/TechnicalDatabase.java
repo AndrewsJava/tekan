@@ -175,6 +175,7 @@ public static TreeMap<Float,Float> makeGetDataToDateMap(String ticker,int datapo
 
 	public static void main(String[] arg) {
 		SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
+		smu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		TechnicalDatabase quotes = new TechnicalDatabase();
 
 		System.out.println("time: "

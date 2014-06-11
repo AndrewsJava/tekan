@@ -55,6 +55,8 @@ public class TickerTechView extends JPanel {
 	//TODO: PERCENT
 	//TODO: R-VALUE
 	//TODO: LEAST SQUARES FIT
+	//TODO: SEARCH RESULTS LIST
+	//TODO: DIVIDENDS
 	private ArrayList<String> dailyRecord = new ArrayList<String>();
 
 
@@ -70,14 +72,22 @@ public class TickerTechView extends JPanel {
 			int index = 1 + (int) ((x - margins - scrollValue) / (BAR_W + INTERBARMARGINS));
 			if (index < days.length)
 				day = days[index];
+			if(index>0){
+				boolean first = true;
 			float[] dayData = technicalData[index];
 			if(dayData!=null)
 				for(float f : dayData){
+					if(first){
+						first = false;
+						dailyRecord.add( DATE_FORMAT
+				.format(new Date((long) f * 24 * 3600 * 1000)));
+					}else
 					if(f<1e5)
 					dailyRecord.add(""+f);
 					else
 					dailyRecord.add(""+new BigDecimal(f).toPlainString());
 				}
+			}
 			repaint();
 		}
 	};

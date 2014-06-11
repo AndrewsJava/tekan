@@ -3,17 +3,50 @@ package harlequinmettle.finance.technicalanalysis;
 import harlequinmettle.finance.database.DataUtil;
 import harlequinmettle.finance.tickerset.TickerSet;
 import harlequinmettle.utils.filetools.ChooseFilePrompter;
+import harlequinmettle.utils.guitools.FilterPanel;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeMap;
 
 public class CurrentFundamentalsDatabase {
-int nancount = 0;
+	int nancount = 0;
+
 	public CurrentFundamentalsDatabase() {
 		root = ChooseFilePrompter.directoryPathChooser();
 		loadCurrentDataFromFiles();
-		System.out.println("total:  "+(TickerSet.TICKERS.size()*labels.length)+ "   nan:  "+nancount);
+		System.out.println("total:  "
+				+ (TickerSet.TICKERS.size() * labels.length) + "   nan:  "
+				+ nancount);
+	}
+
+	public TreeMap<String, String> getFilterResults(FilterPanel[] searchFilters) {
+		TreeMap<String, String> results = new TreeMap<String, String>();
+		int i = 0;
+		for (String ticker : TickerSet.TICKERS) {
+			boolean qualifies = true;
+			String reasonForQualification = "";
+			for (FilterPanel filter : searchFilters) {
+				if (!filter.shouldFilterBeApplied())
+					continue;
+				int id = filter.getId();
+				float low = filter.getLow();
+				float high = filter.getHigh();
+				float dataPoint = data[i][id];
+				if (dataPoint != dataPoint || dataPoint > high
+						|| dataPoint < low)
+					qualifies = false;
+				else
+					reasonForQualification += "  " + labels[id] + "  :  ["
+							+ dataPoint + "] ";
+			}
+
+			if (qualifies)
+				results.put(ticker, reasonForQualification);
+			i++;
+		}
+		return results;
 	}
 
 	public void loadCurrentDataFromFiles() {
@@ -24,19 +57,20 @@ int nancount = 0;
 		for (float[] f : data) {
 			Arrays.fill(f, Float.NaN);
 		}
-		
+
 		String[] smallDBFiles = new File(root + File.separator + "q").list();
+		String[] smallDBFiles2 = new File(root + File.separator + "y").list();
 		Arrays.sort(smallDBFiles);
-		
-		System.out.println(Arrays.toString(smallDBFiles));
+		Arrays.sort(smallDBFiles2);
+
 		for (int x = smallDBFiles.length - 4; x < smallDBFiles.length; x++) {
 			TreeMap<String, String> textData = new TreeMap<String, String>();
 
 			DataUtil.loadStringData(root + File.separator + "q"
 					+ File.separator + smallDBFiles[x], textData);
 			DataUtil.loadStringData(root + File.separator + "y"
-					+ File.separator + smallDBFiles[x], textData);
-			 
+					+ File.separator + smallDBFiles2[x], textData);
+
 			int nullcount = 0;
 			// ASSUMES A 1 TO 1 EXISTENCE OF NAS AND NY FILES - TRUE SO FAR
 			for (int j = 0; j < TickerSet.TICKERS.size(); j++) {
@@ -49,12 +83,12 @@ int nancount = 0;
 				if (textdata != null) {
 
 					float[] rawData = DataUtil.validSmallDataSet(textdata,
-							sizes); 
+							sizes);
 					if (rawData.length != 175)
-						continue; 
-					fillFundamentalData(data[j], rawData); 
-nancount += badDataCount(data[j]);
-				}else{
+						continue;
+					fillFundamentalData(data[j], rawData);
+					nancount += badDataCount(data[j]);
+				} else {
 					System.out.println("NULL TEXT");
 				}
 
@@ -64,8 +98,9 @@ nancount += badDataCount(data[j]);
 
 	private int badDataCount(float[] fs) {
 		int badcount = 0;
-		for(float f: fs){
-			if(f!=f)badcount++;
+		for (float f : fs) {
+			if (f != f)
+				badcount++;
 		}
 		return badcount;
 	}
@@ -194,5 +229,5 @@ nancount += badDataCount(data[j]);
 	public String root = "";
 
 	public float[][] data = new float[TickerSet.TICKERS.size()][labels.length];
-	
+
 }

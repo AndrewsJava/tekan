@@ -20,7 +20,7 @@ import org.apache.commons.io.FileUtils;
 public class TechnicalDatabase {
 	public static final SimpleDateFormat REPORT_DATE_FORMAT = new SimpleDateFormat(
 			"yyyy-MM-dd");
-	
+
 	public static final int DATE = 0;
 	public static final int OPEN = 1;
 	public static final int HIGH = 2;
@@ -29,6 +29,14 @@ public class TechnicalDatabase {
 	public static final int VOLUME = 5;
 	public static final int ADJCLOSE = 6;
 	
+	public static final String d = "date";
+	public static final String o = "open";
+	public static final String h = "high";
+	public static final String l = "low";
+	public static final String c = "close";
+	public static final String v = "vol";
+	public static final String a = "adjcls";
+	public static final String[] elements = {d,o,h,l,c,v,a};
 	public static final int NUM_YRS = 2;
 	public static final int NUM_DAYS = 365 * NUM_YRS;
 	public static final int TODAY = (int) TimeRecord.dayNumber(System

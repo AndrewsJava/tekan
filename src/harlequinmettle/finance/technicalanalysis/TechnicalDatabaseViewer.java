@@ -1,5 +1,7 @@
 package harlequinmettle.finance.technicalanalysis;
 
+import harlequinmettle.utils.guitools.FilterPanel;
+import harlequinmettle.utils.guitools.JButtonWithEnterKeyAction;
 import harlequinmettle.utils.guitools.JScrollPanelledPane;
 import harlequinmettle.utils.guitools.JSearchPanel;
 import harlequinmettle.utils.guitools.PreferredJScrollPane;
@@ -11,22 +13,37 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Arrays;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 
 public class TechnicalDatabaseViewer extends JTabbedPane {
 
-	TechnicalDatabase db = new TechnicalDatabase();
-	CurrentFundamentalsDatabase fdb = new CurrentFundamentalsDatabase();
-	
+
 	public static void main(String[] arg) {
 		TechnicalDatabaseViewer tdbviewer = new TechnicalDatabaseViewer();
-
 	}
 
 	public TechnicalDatabaseViewer() {
+		init();
+
+	}
+
+	private void init() {
+
+		TechnicalDatabase db = new TechnicalDatabase();
+		CurrentFundamentalsDatabase fdb = new CurrentFundamentalsDatabase();
+
+		final FilterPanel filter_one = new FilterPanel(fdb.labels);
+		final FilterPanel filter_two = new FilterPanel(fdb.labels);
+		final FilterPanel filter_three = new FilterPanel(fdb.labels);
+		final FilterPanel[] filters = { filter_one, filter_two, filter_three };
+		JButtonWithEnterKeyAction submit = new JButtonWithEnterKeyAction(
+				"apply filters for results");
+		 
+		submit.addActionListener(doFilterListener(fdb,filters));
 		JFrame container = new JFrame();
 		container.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		container.setSize(800, 500);
@@ -37,9 +54,25 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		JSearchPanel searchPanel = new JSearchPanel();
 		searchPanel.addSearchAction(doSearchActionListener(searchPanel));
 		controls.addComp(searchPanel);
-		for(int i = 0; i<20; i++)
-			System.out.println(Arrays.toString(fdb.data[(int)(4000*Math.random())]));
-	 
+		for (FilterPanel fp : filters) {
+			controls.addComp(fp);
+		}
+		controls.addComp(submit);
+	}
+
+	private ActionListener doFilterListener(final CurrentFundamentalsDatabase fdb,
+			final FilterPanel[] filters) { 
+	//	public TreeMap<String, String> getFilterResults(FilterPanel[] searchFilters) {
+			return new ActionListener() { 
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					TreeMap<String, String> filterResults = fdb.getFilterResults(filters);
+					for(Entry<String,String> ent: filterResults.entrySet()){
+						System.out.println(ent);
+					}
+				}
+
+			};
 	}
 
 	private ActionListener doSearchActionListener(final JSearchPanel searchPanel) {
@@ -69,7 +102,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		TickerTechView tv = new TickerTechView(ticker);
 		PreferredJScrollPane tickerTechScroll = new PreferredJScrollPane(tv);
 		tv.setScrollBar(tickerTechScroll.getViewport());
-	 
+
 		chart.addComp(tickerTechScroll);
 
 		container.add(chart);

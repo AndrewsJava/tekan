@@ -13,6 +13,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,7 +22,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JViewport;
 
 public class TickerTechView extends JPanel {
@@ -32,8 +33,8 @@ public class TickerTechView extends JPanel {
 	public static int W = 2 * margins + eW;
 	public static int eH = 1000;
 	public static int H = 1000;
-	public static final int FONT_SIZE = 15;
-	public static final Font BIG_FONT = new Font("Sans-Serif", Font.BOLD,
+	public static final int FONT_SIZE = 18;
+	public static final Font BIG_FONT = new Font("Bitstream", Font.PLAIN,
 			FONT_SIZE);
 	public static final SmoothStroke SMOOTH_STROKE = new SmoothStroke(3);
 	public static final SquareStroke SQUARE_STROKE = new SquareStroke(8);
@@ -42,13 +43,19 @@ public class TickerTechView extends JPanel {
 
 	private ArrayList<Line2D.Float> volumeBars;
 	private ArrayList<Line2D.Float> openClose;
-	private ArrayList<Boolean> openToCloseGains;
 	private ArrayList<Line2D.Float> highLow;
 	private Point2D.Float minMaxPrice;
 	private Point2D.Float minMaxVolume;
 	private float x, y, day;
 	float[] days;
+	float[][] technicalData;
 	private float scalex = 1, scaley = 1;
+	//TODO: VOLUME AVG LINE(S)
+	//TODO: AVERAGE LINES
+	//TODO: PERCENT
+	//TODO: R-VALUE
+	//TODO: LEAST SQUARES FIT
+	private ArrayList<String> dailyRecord = new ArrayList<String>();
 
 
 	final MouseAdapter dateDisplayer = new MouseAdapter() {
@@ -56,12 +63,21 @@ public class TickerTechView extends JPanel {
 		public void mouseClicked(MouseEvent e) {
 			x = e.getX();
 			y = e.getY();
+			dailyRecord.clear();
 			int scrollValue = 0;
 			if (viewport != null)
 				scrollValue = viewport.getX();
 			int index = 1 + (int) ((x - margins - scrollValue) / (BAR_W + INTERBARMARGINS));
 			if (index < days.length)
 				day = days[index];
+			float[] dayData = technicalData[index];
+			if(dayData!=null)
+				for(float f : dayData){
+					if(f<1e5)
+					dailyRecord.add(""+f);
+					else
+					dailyRecord.add(""+new BigDecimal(f).toPlainString());
+				}
 			repaint();
 		}
 	};
@@ -102,7 +118,7 @@ public class TickerTechView extends JPanel {
 		minMaxVolume = calcMinMax(volume);
 		days = calculateDaysFromMap(volume);
 		volumeBars = generateDisplayableLines(volume, minMaxVolume);
-
+technicalData = TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA.get(ticker);
 	}
 
 	private ArrayList<java.awt.geom.Line2D.Float> generateDisplayableLines(
@@ -210,19 +226,34 @@ public class TickerTechView extends JPanel {
 		drawVolumeLines(g);
 		drawHighLowLines(g);
 		drawOpenCloseLines(g);
-		drawDate(g);
+		drawDatesData(g);
 	}
 
-	private void drawDate(Graphics2D g) {
+	private void drawDatesData(Graphics2D g) {
 		Font original = g.getFont();
 		g.setColor(Color.black);
 		g.setFont(BIG_FONT);
 		String date = DATE_FORMAT
 				.format(new Date((long) day * 24 * 3600 * 1000));
 		if (x > W - 100) {
-			g.drawString(date, x - 200, y - 15);
+			float left = x-200;
+			float top = y - 150;
+			g.setColor(CommonColors.REGION_HIGHLIGHT);
+			g.fill(new Rectangle2D.Float(left,top,200,150));
+			g.setColor(Color.black);
+			g.drawString(date,left+5, top+FONT_SIZE+5);
 		} else {
-			g.drawString(date, x, y - 15);
+			float left = x ;
+			float top = y - 150;
+			g.setColor(CommonColors.REGION_HIGHLIGHT);
+			g.fill(new Rectangle2D.Float(left,top,200,150));
+			g.setColor(Color.black);
+			g.drawString(date,left+5, top+FONT_SIZE+5);
+			for(int i = 1;i<dailyRecord.size();i++){
+
+				g.drawString(TechnicalDatabase.elements[i],left+5, top+FONT_SIZE+5+FONT_SIZE*(1+i));
+				g.drawString(dailyRecord.get(i   ),80+left+5, top+FONT_SIZE+5+FONT_SIZE*(1+i));
+			}
 		}
 	}
 

@@ -1,8 +1,9 @@
-package harlequinmettle.finance.technicalanalysis;
+package harlequinmettle.finance.technicalanalysis.model;
 
 import harlequinmettle.finance.database.DataUtil;
 import harlequinmettle.finance.tickerset.TickerSet;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
+import harlequinmettle.utils.finance.TickerSetWithETFs;
 import harlequinmettle.utils.guitools.FilterPanel;
 
 import java.io.File;
@@ -12,11 +13,13 @@ import java.util.TreeMap;
 public class CurrentFundamentalsDatabase {
 	int nancount = 0;
 	String pathToObj = ".path_to_small_database";
-String pathtodata = "path to small database";
-	public CurrentFundamentalsDatabase() {
-		ChooseFilePrompterPathSaved settingssaver = new ChooseFilePrompterPathSaved(pathToObj);
-				root = settingssaver.getSetting(pathtodata);
-	//	root = ChooseFilePrompter.directoryPathChooser();
+	String pathtodata = "path to small database";
+
+	public CurrentFundamentalsDatabase() { 
+		ChooseFilePrompterPathSaved settingssaver = new ChooseFilePrompterPathSaved(
+				pathToObj );
+		root = settingssaver.getSetting(pathtodata);
+		// root = ChooseFilePrompter.directoryPathChooser();
 		loadCurrentDataFromFiles();
 		System.out.println("total:  "
 				+ (TickerSet.TICKERS.size() * labels.length) + "   nan:  "
@@ -64,8 +67,14 @@ String pathtodata = "path to small database";
 		String[] smallDBFiles2 = new File(root + File.separator + "y").list();
 		Arrays.sort(smallDBFiles);
 		Arrays.sort(smallDBFiles2);
-
-		for (int x = smallDBFiles.length - 4; x < smallDBFiles.length; x++) {
+		// get some data from 1year ago
+		boolean isOneYearAgo = true;	
+		for (int x = smallDBFiles.length - 54; x < smallDBFiles.length; x++) {
+			// skip ahead 44 weeks worth
+			if (x == smallDBFiles.length - 48){
+				x += 44;
+			  isOneYearAgo = false;	
+			}
 			TreeMap<String, String> textData = new TreeMap<String, String>();
 
 			DataUtil.loadStringData(root + File.separator + "q"
@@ -88,10 +97,10 @@ String pathtodata = "path to small database";
 							sizes);
 					if (rawData.length != 175)
 						continue;
-					fillFundamentalData(data[j], rawData);
+					fillFundamentalData(data[j], rawData,isOneYearAgo);
 					nancount += badDataCount(data[j]);
 				} else {
-					System.out.println("NULL TEXT");
+					System.out.println(++nullcount+ "   NULL TEXT");
 				}
 
 			}
@@ -107,9 +116,14 @@ String pathtodata = "path to small database";
 		return badcount;
 	}
 
-	private void fillFundamentalData(float[] values, float[] rawData) {
+	private void fillFundamentalData(float[] values, float[] rawData,
+			boolean isOlderThan1Year) {
 		for (int k = 0; k < 82; k++) {
-			values[k] = betterOf(values[k], rawData[k]);
+			// k==1 cnn analyst 1 year forecast
+			if (k == 1 && isOlderThan1Year)
+				values[k] = betterOf(values[k], rawData[k]);
+			else if (k != 1)
+				values[k] = betterOf(values[k], rawData[k]);
 		}
 		values[82] = betterOf(values[82], rawData[172]);
 		values[83] = betterOf(values[83], rawData[173]);
@@ -129,7 +143,7 @@ String pathtodata = "path to small database";
 
 	}
 
-	String[] labels = { "CNN analysts",// cnn - 0
+	public static String[] labels = { "CNN analysts",// cnn - 0
 			"1-yr forcast",// cnn - 1
 			// /////////////////////////////
 			"Avg. Estimate Current Qt",// these 5 use
@@ -228,8 +242,68 @@ String pathtodata = "path to small database";
 	// ////////////////////////////
 	};
 
+	public static String[] forDisplaying = { //
+			"CNN analysts",// cnn - 0
+			"1-yr forcast",// cnn - 1
+
+
+			// ////////////////////////////
+			"Market Cap", // 0 
+			"Trailing P/E",//  
+			"Forward P/E",//  
+			"PEG Ratio", //  
+			"Price/Sales", //
+			"Price/Book",// 
+			"Profit Margin",//
+			"Operating Margin",//
+			"Return on Assets", //
+			"Return on Equity",//
+			"Revenue", //  
+			"Revenue Per Share",//
+			"Qtrly Revenue Growth",//
+			"Gross Profit",//  
+			"Net Income Avl to Common", //
+			"Diluted EPS",//  
+			"Qtrly Earnings Growth",//
+			"Total Cash",//
+			"Total Cash Per Share",//  
+			"Total Debt",//
+			"Total Debt/Equity",//
+			"Current Ratio", //  
+			"Book Value Per Share",//
+			"Operating Cash Flow",//  
+			"Levered Free Cash Flow", //
+			"Beta",//
+			"52-Week Change",//  
+			"50-Day Moving Average",// ///////------ 
+			"200-Day Moving Average",// 
+			"Avg Vol (3 month)",// --------------------- 
+			"Avg Vol (10 day)",// --------------------- 
+			"Shares Outstanding",//  
+			"Float",//
+			"% Held by Insiders",//
+			"% Held by Institutions",//  
+			"Payout Ratio", //  
+			// ///////////////////////////////////
+			"Dividends",//
+			"Split",//
+			"Options",//			// /////////////////////////////
+			"Avg. Estimate Current Qt",// these 5 use
+			"Avg. Estimate Next Qt",// these 5 use
+			"Avg. Estimate Current Yr",// these 5 use
+			"Avg. Estimate Next Yr",// these 5 use
+		  
+			"EPS Est 3 Mo Ago",// these 4 use 
+			"EPS Actual 3 Mo Ago", // 
+			"Difference 3 Mo Ago", // 
+			"Surprise % 9 Mo Ago",//
+			"Surprise % 6 Mo Ago", // /
+			"Surprise % 3 Mo Ago",// ///////---- 
+	// ////////////////////////////
+	};
+
 	public String root = "";
 
-	public float[][] data = new float[TickerSet.TICKERS.size()][labels.length];
+	public static float[][] data = new float[TickerSetWithETFs.TICKERS.size()][labels.length];
 
 }

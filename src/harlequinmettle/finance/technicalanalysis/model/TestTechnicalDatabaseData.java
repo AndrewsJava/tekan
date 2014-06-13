@@ -1,4 +1,4 @@
-package harlequinmettle.finance.technicalanalysis;
+package harlequinmettle.finance.technicalanalysis.model;
 
 import harlequinmettle.utils.numbertools.math.statistics.StatInfo;
 import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;

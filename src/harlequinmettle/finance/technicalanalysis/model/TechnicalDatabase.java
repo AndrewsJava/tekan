@@ -1,12 +1,11 @@
-package harlequinmettle.finance.technicalanalysis;
+package harlequinmettle.finance.technicalanalysis.model;
 
-import harlequinmettle.finance.tickerset.TickerSet;
 import harlequinmettle.utils.TimeRecord;
-import harlequinmettle.utils.debugtools.InstanceCounter;
 import harlequinmettle.utils.filetools.SerializationTool;
-import harlequinmettle.utils.numbertools.math.statistics.StatInfo;
+import harlequinmettle.utils.finance.TickerSetWithETFs;
 import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,16 +48,17 @@ public class TechnicalDatabase {
 	// float[]>>();
 	// <ticker, [day][technical data]>
 	public static TreeMap<String, float[][]> PER_TICKER_PER_DAY_TECHNICAL_DATA = new TreeMap<String, float[][]>();
+	public static TreeMap<String,TreeMap<String,String>> PER_TICKER_DIVIDEND_DAY_MAP = new TreeMap<String,TreeMap<String,String>>();
 
 	long time = System.currentTimeMillis();
 	static {
 		long time = System.currentTimeMillis();
 
-		for (String ticker : TickerSet.TICKERS) {
+		for (String ticker : TickerSetWithETFs.TICKERS) {
 			PER_TICKER_PER_DAY_TECHNICAL_DATA.put(ticker,
 					new float[NUM_DAYS][]);
-		}
-
+			PER_TICKER_DIVIDEND_DAY_MAP.put(ticker, new TreeMap<String,String>());
+		} 
 		System.out.println("time: " + (System.currentTimeMillis() - time));
 	}
 
@@ -66,6 +66,10 @@ public class TechnicalDatabase {
 		int count = 0;
 		restoreSettings();
 		while (settings.rootPath == null || settings.rootPath.length() < 1) {
+			JFrame pathToDB = new JFrame("set path to ticker technical csv files");
+			pathToDB.setSize(new Dimension(600,100));
+			pathToDB.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			pathToDB.setVisible(true);
 			settings.rootPath = dbRootPathChooser();
 			SerializationTool.serialize(settings, settingsFileName);
 		}

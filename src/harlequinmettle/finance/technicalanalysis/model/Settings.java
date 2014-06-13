@@ -1,4 +1,4 @@
-package harlequinmettle.finance.technicalanalysis;
+package harlequinmettle.finance.technicalanalysis.model;
 
 import java.io.Serializable;
 

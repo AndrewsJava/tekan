@@ -30,14 +30,13 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 	}
 
 	public TechnicalDatabaseViewer() {
-		init();
-
+		init(); 
 	}
 
 	private void init() {
 
 		SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
-		TechnicalDatabase db = new TechnicalDatabase();
+		TechnicalDatabase db = new TechnicalDatabase(17);
 		CurrentFundamentalsDatabase fdb = new CurrentFundamentalsDatabase();
 
 		final FilterPanel filter_one = new FilterPanel(fdb.labels);

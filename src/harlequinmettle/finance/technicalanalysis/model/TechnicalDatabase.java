@@ -2,7 +2,7 @@ package harlequinmettle.finance.technicalanalysis.model;
 
 import harlequinmettle.utils.TimeRecord;
 import harlequinmettle.utils.filetools.SerializationTool;
-import harlequinmettle.utils.finance.TickerSetWithETFs;
+import harlequinmettle.utils.finance.TickerSetWithETFsOptimized;
 import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;
 
 import java.awt.Dimension;
@@ -36,11 +36,11 @@ public class TechnicalDatabase {
 	public static final String v = "vol";
 	public static final String a = "adjcls";
 	public static final String[] elements = {d,o,h,l,c,v,a};
-	public static final int NUM_YRS = 2;
-	public static final int NUM_DAYS = 365 * NUM_YRS;
+	public static   int NUM_YRS = 5;
+	public static   int NUM_DAYS = 365 * NUM_YRS;
 	public static final int TODAY = (int) TimeRecord.dayNumber(System
 			.currentTimeMillis());
-	public static String settingsFileName = ".technical_database_settings";
+	public static String settingsFileName = "technical_database_settings";
 	private static Settings settings;
 	// String ticker maps to time series map daynumber->value
 	// public static final TreeMap<String, TreeMap<Float, float[]>>
@@ -48,21 +48,16 @@ public class TechnicalDatabase {
 	// float[]>>();
 	// <ticker, [day][technical data]>
 	public static TreeMap<String, float[][]> PER_TICKER_PER_DAY_TECHNICAL_DATA = new TreeMap<String, float[][]>();
-	public static TreeMap<String,TreeMap<String,String>> PER_TICKER_DIVIDEND_DAY_MAP = new TreeMap<String,TreeMap<String,String>>();
+	public static TreeMap<String,TreeMap<String,Float>> PER_TICKER_DIVIDEND_DAY_MAP = new TreeMap<String,TreeMap<String,Float>>();
 
 	long time = System.currentTimeMillis();
-	static {
-		long time = System.currentTimeMillis();
+ 
 
-		for (String ticker : TickerSetWithETFs.TICKERS) {
-			PER_TICKER_PER_DAY_TECHNICAL_DATA.put(ticker,
-					new float[NUM_DAYS][]);
-			PER_TICKER_DIVIDEND_DAY_MAP.put(ticker, new TreeMap<String,String>());
-		} 
-		System.out.println("time: " + (System.currentTimeMillis() - time));
-	}
+	public TechnicalDatabase(int numberYears) {
 
-	public TechnicalDatabase() {
+		  NUM_YRS = 5;
+	     NUM_DAYS = 365 * NUM_YRS;
+	     allocateMemory();
 		int count = 0;
 		restoreSettings();
 		while (settings.rootPath == null || settings.rootPath.length() < 1) {
@@ -97,7 +92,20 @@ public class TechnicalDatabase {
 				.println("technical database successfully created with up to: "
 						+ NUM_YRS + "  years of data");
 		System.out.println("in : " + (System.currentTimeMillis() - time));
+		System.out.println("memory used : " + (Runtime.getRuntime().totalMemory()/1000000)+ "   MB");
 
+	}
+
+	private void allocateMemory() {
+		long time = System.currentTimeMillis();
+long maxMemory = Runtime.getRuntime().maxMemory();
+long proposedMemoryUse = 32*NUM_DAYS*
+		for (String ticker : TickerSetWithETFsOptimized.TICKERS) {
+			PER_TICKER_PER_DAY_TECHNICAL_DATA.put(ticker,
+					new float[NUM_DAYS][]);
+			PER_TICKER_DIVIDEND_DAY_MAP.put(ticker, new TreeMap<String,Float>());
+		} 
+		System.out.println("time: " + (System.currentTimeMillis() - time));
 	}
 
 	private void restoreSettings() {
@@ -110,7 +118,7 @@ public class TechnicalDatabase {
 	private void loadTechnicalData(File file) {
 		// break off the .csv from the filename
 		String ticker = file.getName()
-				.substring(0, file.getName().length() - 4);
+				.replaceAll(".csv","");
 		try {
 			String data = FileUtils.readFileToString(file);
 			for (String dayData : data.split(System.lineSeparator())) {
@@ -128,9 +136,7 @@ public class TechnicalDatabase {
 		for (String numString : data) {
 			tryToAddData(numString, numbers);
 		}
-		// csv daily data is seven columns: Date Open High Low Close Volume Adj
-		// Close
-		// System.out.println(numbers);
+		// csv daily data is seven columns: Date Open High Low Close Volume Adj 
 		if (numbers.size() == 7) {
 			float date = numbers.get(0);
 			if (date < TODAY - NUM_DAYS)
@@ -170,6 +176,7 @@ public static TreeMap<Float,Float> makeGetDataToDateMap(String ticker,int datapo
 		if(day!=null)
 		map.put(day[0], day[datapoint]);
 	}
+	System.out.println("data point count for ticker  "+ticker + "    "+map.size());
 	return map;
 }
 	private void loadDividends(File file) {

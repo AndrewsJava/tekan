@@ -1,6 +1,6 @@
 package harlequinmettle.finance.technicalanalysis.model;
 
-import harlequinmettle.utils.finance.TickerSetWithETFs;
+import harlequinmettle.utils.finance.TickerSetWithETFsOptimized;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,12 +19,12 @@ public class CollectTechnicalData {
 	public static void main(String[] args) {
 		CollectTechnicalData ctd = new CollectTechnicalData();
 		// daily price data
-		ctd.collectTechnicalData(TickerSetWithETFs.TICKERS, TECHNICAL_DATA, "");
+		ctd.collectTechnicalData(TickerSetWithETFsOptimized.TICKERS, TECHNICAL_DATA, "");
 		// daily price data
-		ctd.collectTechnicalData(TickerSetWithETFs.TICKERS, TECHNICAL_DATA
+		ctd.collectTechnicalData(TickerSetWithETFsOptimized.TICKERS, TECHNICAL_DATA
 				+ DIVIDENDS_SUBFOLDER, dividendSuffix);
-		ctd.validateDataDownload(TickerSetWithETFs.TICKERS, TECHNICAL_DATA);
-		ctd.validateDataDownload(TickerSetWithETFs.TICKERS, TECHNICAL_DATA
+		ctd.validateDataDownload(TickerSetWithETFsOptimized.TICKERS, TECHNICAL_DATA);
+		ctd.validateDataDownload(TickerSetWithETFsOptimized.TICKERS, TECHNICAL_DATA
 				+ DIVIDENDS_SUBFOLDER);
 	}
 

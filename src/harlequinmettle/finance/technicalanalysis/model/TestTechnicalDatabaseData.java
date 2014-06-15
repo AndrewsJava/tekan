@@ -13,7 +13,7 @@ public class TestTechnicalDatabaseData {
 
 	public static void main(String[] args) {
 		SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
-		TechnicalDatabase techDatabase = new TechnicalDatabase();
+		TechnicalDatabase techDatabase = new TechnicalDatabase(5);
 
 		testData(techDatabase);
 	}
@@ -30,6 +30,7 @@ public class TestTechnicalDatabaseData {
 		for (int i = 0; i < 7; i++) {
 			statArray.clear();
 			for (Entry<String, float[][]> ent : DB.entrySet()) {
+				String ticker = ent.getKey();
 				float[][] individualTrackRecord = ent.getValue();
 				emptyArraysCounterTotal+=emptyArrayCounter;
 				emptyArrayCounter = 0;
@@ -55,7 +56,7 @@ public class TestTechnicalDatabaseData {
 			}
 		if (i == 1) {
 				StatInfo nullStats = new StatInfo(emptyArrayStat);
-				System.out.println(emptyArraysCounterTotal+"  empty , valid:  "+validArraysCounterTotal);
+				System.out.println(emptyArraysCounterTotal/1000000+" M  empty , valid:  "+validArraysCounterTotal/1000000 +"  M");
 				System.out.println(emptyArrayStat);
 				System.out.println(nullStats);
 				new Scanner(System.in).nextLine();

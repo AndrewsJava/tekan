@@ -13,6 +13,7 @@ import harlequinmettle.utils.guitools.SquareStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ComponentAdapter;
@@ -47,12 +48,15 @@ public class TickerTechView extends JPanel {
 	public static final int margins = 20;
 	public static int eW = TechnicalDatabase.NUM_DAYS
 			* (BAR_W + INTERBARMARGINS);
-	public static int W = 2 * margins + eW;
+	public static float W = 2 * margins + eW;
 	public static int eH = 1000;
 	public static int H = 1000;
 	public static final int FONT_SIZE = 18;
+	public static final int REAL_BIG_FONT_SIZE = 24;
 	public static final Font BIG_FONT = new Font("Bitstream", Font.PLAIN,
 			FONT_SIZE);
+	public static final Font REAL_BIG_FONT = new Font("Bitstream", Font.PLAIN,
+			REAL_BIG_FONT_SIZE);
 	public static final SmoothStroke SMOOTH_STROKE = new SmoothStroke(3);
 	public static final SquareStroke SQUARE_STROKE = new SquareStroke(8);
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
@@ -68,6 +72,7 @@ public class TickerTechView extends JPanel {
 	float[][] technicalData;
 	private float scalex = 1, scaley = 1;
 	boolean toggleVisible = false;
+	String profile = "no profile on record";
 	// TODO: VOLUME AVG LINE(S)
 	// TODO: AVERAGE LINES
 	// TODO: PERCENT
@@ -97,11 +102,8 @@ public class TickerTechView extends JPanel {
 	}
 
 	private void init(String ticker) {
-		ChooseFilePrompterPathSaved profileDatabasePathSaver = new ChooseFilePrompterPathSaved(
-				profilePathKey);
-		String profilePath = profileDatabasePathSaver
-				.getSetting(profilePathKey);
-		String profile = getProfile(profilePath, ticker);
+		String profilePath = establishPathToProfilesText();
+		profile = getProfile(profilePath, ticker);
 		updateSizePreferrence();
 		setFundamentalData(ticker);
 		this.addMouseListener(dateDisplayer);
@@ -129,6 +131,14 @@ public class TickerTechView extends JPanel {
 		showChartInNewWindow(ticker);
 	}
 
+	private String establishPathToProfilesText() {
+		ChooseFilePrompterPathSaved profileDatabasePathSaver = new ChooseFilePrompterPathSaved(
+				profilePathKey);
+		String profilePath = profileDatabasePathSaver
+				.getSetting(profilePathKey);
+		return profilePath;
+	}
+
 	private String getProfile(String profilePath, String ticker) {
 		try {
 			String[] files = { "NASDAQ_PROFILES_I.txt", "NYSE_PROFILES_I.txt" };
@@ -137,13 +147,21 @@ public class TickerTechView extends JPanel {
 			for (String fileName : files) {
 				File indexFile = new File(profilePath + File.separator
 						+ fileName);
-				if (!indexFile.exists())
-					continue;
-
-				try (BufferedReader br = new BufferedReader(
-						new FileReader(indexFile))) {
+				System.out.println("file: " + indexFile.getAbsolutePath()
+						+ "    exists:  " + indexFile.exists());
+				int tries = 0;
+				while (!indexFile.exists()) {
+					profilePath = establishPathToProfilesText();
+					indexFile = new File(profilePath + File.separator
+							+ fileName);
+					if (tries++ > 4)
+						break;
+				}
+				try (BufferedReader br = new BufferedReader(new FileReader(
+						indexFile))) {
 					for (String line; (line = br.readLine()) != null;) {
-						// process the line.
+						if (line.startsWith(ticker + "^"))
+							return line.replaceAll("_", " ");
 					}
 					// line is not visible here.
 				}
@@ -159,6 +177,9 @@ public class TickerTechView extends JPanel {
 			int tickerIndex = TickerSetWithETFs.TICKERS.indexOf(ticker);
 			float[] tickersFundamentals = CurrentFundamentalsDatabase.data[tickerIndex];
 			for (int i = 0; i < CurrentFundamentalsDatabase.labels.length; i++) {
+				if (tickersFundamentals[i] != tickersFundamentals[i]
+						|| Float.isInfinite(tickersFundamentals[i]))
+					continue;
 				BigDecimal readableNumber = new BigDecimal(
 						tickersFundamentals[i]).round(new MathContext(2));
 
@@ -203,20 +224,23 @@ public class TickerTechView extends JPanel {
 
 	private java.awt.geom.Point2D.Float calcMinMax(
 			TreeMap<Float, Float>... values) {
+		float lastmax = 0;
 		float min = Float.MAX_VALUE;
 		float max = Float.MIN_VALUE;
 
 		for (TreeMap<Float, Float> individual : values) {
 			for (float f : individual.values()) {
 				if (f == f && !Float.isInfinite(f)) {
-					if (f > max)
+					if (f > max) {
+						lastmax = max;
 						max = f;
+					}
 					if (f < min)
 						min = f;
 				}
 			}
 		}
-		return new Point2D.Float(min, max);
+		return new Point2D.Float(min, lastmax);
 
 	}
 
@@ -273,12 +297,31 @@ public class TickerTechView extends JPanel {
 
 		g.scale(scalex, scaley);
 		drawBackground(g);
+
 		drawVolumeLines(g);
+		drawProfileDescription(g);
 		drawHighLowLines(g);
 		drawOpenCloseLines(g);
 		drawDatesData(g);
 		if (toggleVisible)
 			drawFundamentalsData(g);
+	}
+
+	private void drawProfileDescription(Graphics2D g) {
+		g.setFont(REAL_BIG_FONT);
+		g.setColor(CommonColors.FAINT_RED);
+		FontMetrics fontMetrics = g.getFontMetrics();
+		int width = fontMetrics.stringWidth(profile);
+		float lineCount = width / (W / 2);
+		int substringSize = (int) (profile.length() / lineCount);
+		for (int i = 0; i < lineCount; i++) {
+			int substringStart = i * substringSize;
+			int substringEnd = (i + 1) * substringSize > profile.length() ? profile
+					.length() : (i + 1) * substringSize;
+			int x = 50;
+			int y = 20 + (i + 2) * REAL_BIG_FONT_SIZE;
+			g.drawString(profile.substring(substringStart, substringEnd), x, y);
+		}
 	}
 
 	private void drawFundamentalsData(Graphics2D g) {
@@ -296,8 +339,9 @@ public class TickerTechView extends JPanel {
 		for (String key : CurrentFundamentalsDatabase.forDisplaying) {
 
 			g.drawString(key, xf + 5, yf + FONT_SIZE + 5 + FONT_SIZE * (2 + i));
-			g.drawString(currentFundamentals.get(key).toString(), xf + 355, yf
-					+ FONT_SIZE + 5 + FONT_SIZE * (2 + i));
+			if (currentFundamentals.containsKey(key))
+				g.drawString(currentFundamentals.get(key).toString(), xf + 355,
+						yf + FONT_SIZE + 5 + FONT_SIZE * (2 + i));
 			i++;
 
 		}
@@ -342,7 +386,7 @@ public class TickerTechView extends JPanel {
 	private void drawBackground(Graphics2D g) {
 		Color bg = new Color(100, 120, 170);
 		g.setColor(bg);
-		g.fillRect(0, 0, W, H + 100);
+		g.fillRect(0, 0, (int) W, H + 100);
 		// g.setColor(Color.DARK_GRAY);
 		// g.drawRect(margins,margins,eW,eH);
 		g.setColor(Color.LIGHT_GRAY);
@@ -350,16 +394,16 @@ public class TickerTechView extends JPanel {
 			g.drawLine(i, margins, i, margins + H);
 		}
 		for (int i = margins; i < H - margins; i += 25) {
-			g.drawLine(margins, i, margins + W, i);
+			g.drawLine(margins, i, margins + (int) W, i);
 		}
 	}
 
 	private void drawVolumeLines(Graphics2D g) {
 		g.setStroke(SQUARE_STROKE);
+		g.setColor(CommonColors.COLOR_HISTOGRAM_BAR_VOL);
 
 		for (Line2D.Float vol : volumeBars) {
 
-			g.setColor(CommonColors.DARK_ORANGE);
 			g.draw(vol);
 
 		}

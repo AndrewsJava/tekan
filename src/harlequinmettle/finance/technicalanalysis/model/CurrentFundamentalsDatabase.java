@@ -3,7 +3,7 @@ package harlequinmettle.finance.technicalanalysis.model;
 import harlequinmettle.finance.database.DataUtil;
 import harlequinmettle.finance.tickerset.TickerSet;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
-import harlequinmettle.utils.finance.TickerSetWithETFs;
+import harlequinmettle.utils.finance.TickerSetWithETFsOptimized;
 import harlequinmettle.utils.guitools.FilterPanel;
 
 import java.io.File;
@@ -304,6 +304,6 @@ public class CurrentFundamentalsDatabase {
 
 	public String root = "";
 
-	public static float[][] data = new float[TickerSetWithETFs.TICKERS.size()][labels.length];
+	public static float[][] data = new float[TickerSetWithETFsOptimized.TICKERS.size()][labels.length];
 
 }

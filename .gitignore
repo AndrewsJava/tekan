@@ -3,6 +3,8 @@
 TECHNICAL_DATA
 .path_to_small_database
 .technical_database_settings
+technical_database_settings
+
 #eclipse project files
 .classpath
 .project

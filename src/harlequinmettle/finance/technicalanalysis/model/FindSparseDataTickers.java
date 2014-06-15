@@ -25,44 +25,54 @@ public class FindSparseDataTickers {
 		ArrayList<String> fullTickerList = new ArrayList<String>();
 		fullTickerList.addAll(TickerSetWithETFs.TICKERS);
 		ArrayList<String> limitedData = collectAllTickersWithData(4800);
-	//	fullTickerList.removeAll(collectAllTickersWithData(0));
+		// fullTickerList.removeAll(collectAllTickersWithData(0));
 		// 300 in TickerSet.Tickers with no file associated
 		// System.out.println(fullTickerList.size() + "   ->" + fullTickerList);
-//		int i = 0;
-//		for (String s : fullTickerList) {
-//			System.out.println("\"" + s + "\",//" + i++);
-//
-//		}
+		// int i = 0;
+		// for (String s : fullTickerList) {
+		// System.out.println("\"" + s + "\",//" + i++);
+		//
+		// }
 	}
 
 	private static ArrayList<String> collectAllTickersWithData(
 			int overDaysOfData) {
 		ArrayList<String> fileTickerList = new ArrayList<String>();
 		InstanceCounter ic = new InstanceCounter();
-
-		File[] files = new File(
-				"/home/andrew/Desktop/GAEm/TechnicalAnalysis/TECHNICAL_DATA")
-				.listFiles();
+		String history = "";
+		File datalocation = new File(
+				"/home/andrew/Desktop/GAEm/TechnicalAnalysis/TECHNICAL_DATA");
+		File[] files = datalocation.listFiles();
 		int i = 0;
 		for (File s : files) {
 
 			if (!s.isFile())
 				continue;
-
+			String ticker = s.getName().replace(".csv", "");
 			String record = tryToReadFileToString(s);
 			// int recent = record.split(("2014-\\d{2}-\\d{2}")).length;
 			int total = record.split(System.lineSeparator()).length;
+			if (total > 1)
+				history += ticker + " " + total + "\n";
 			// ic.add(total);
 			// if (total >100)
 			// System.out.println(i++ + "    " + s.getName() + "      "
 			// + total);
-//			if (total > overDaysOfData)
-//				fileTickerList.add(s.getName().replace(".csv", ""));
-			if (total > overDaysOfData)
-				System.out.println(i++ + "    " + s.getName() + "      "
-						+ total);
+			// if (total > overDaysOfData)
+			// fileTickerList.add(s.getName().replace(".csv", ""));
+			// if (total > overDaysOfData)
+			// System.out.println(i++ + "    " + s.getName() + "      "
+			// + total);
 		}
-
+		File writeTo = new File(datalocation.getAbsolutePath()
+				+ File.pathSeparator
+				+ "tickerhistorysize/tickerhistorysize.txt");
+		try {
+			FileUtils.writeStringToFile(writeTo, history);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// ic.printlnCounts(1);
 		return fileTickerList;
 	}

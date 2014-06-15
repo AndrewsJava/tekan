@@ -27,7 +27,7 @@ public class TechnicalDatabase {
 	public static final int CLOSE = 4;
 	public static final int VOLUME = 5;
 	public static final int ADJCLOSE = 6;
-	
+
 	public static final String d = "date";
 	public static final String o = "open";
 	public static final String h = "high";
@@ -35,9 +35,9 @@ public class TechnicalDatabase {
 	public static final String c = "close";
 	public static final String v = "vol";
 	public static final String a = "adjcls";
-	public static final String[] elements = {d,o,h,l,c,v,a};
-	public static   int NUM_YRS = 5;
-	public static   int NUM_DAYS = 365 * NUM_YRS;
+	public static final String[] elements = { d, o, h, l, c, v, a };
+	public static int NUM_YRS = 5;
+	public static int NUM_DAYS = 365 * NUM_YRS;
 	public static final int TODAY = (int) TimeRecord.dayNumber(System
 			.currentTimeMillis());
 	public static String settingsFileName = "technical_database_settings";
@@ -48,28 +48,27 @@ public class TechnicalDatabase {
 	// float[]>>();
 	// <ticker, [day][technical data]>
 	public static TreeMap<String, float[][]> PER_TICKER_PER_DAY_TECHNICAL_DATA = new TreeMap<String, float[][]>();
-	public static TreeMap<String,TreeMap<String,Float>> PER_TICKER_DIVIDEND_DAY_MAP = new TreeMap<String,TreeMap<String,Float>>();
+	public static TreeMap<String, TreeMap<String, Float>> PER_TICKER_DIVIDEND_DAY_MAP = new TreeMap<String, TreeMap<String, Float>>();
 
 	long time = System.currentTimeMillis();
- 
 
 	public TechnicalDatabase(int numberYears) {
 
-		  NUM_YRS = 5;
-	     NUM_DAYS = 365 * NUM_YRS;
-	     allocateMemory();
+		NUM_YRS = numberYears;
+		NUM_DAYS = 365 * NUM_YRS;
+		allocateMemory();
 		int count = 0;
 		restoreSettings();
 		while (settings.rootPath == null || settings.rootPath.length() < 1) {
-			JFrame pathToDB = new JFrame("set path to ticker technical csv files");
-			pathToDB.setSize(new Dimension(600,100));
+			JFrame pathToDB = new JFrame(
+					"set path to ticker technical csv files");
+			pathToDB.setSize(new Dimension(600, 100));
 			pathToDB.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			pathToDB.setVisible(true);
 			settings.rootPath = dbRootPathChooser();
 			SerializationTool.serialize(settings, settingsFileName);
 		}
-		if (new File("TECHNICAL_DATA/OBJECTS/TECHDATAOBJ" + NUM_DAYS)
-				.exists()) {
+		if (new File("TECHNICAL_DATA/OBJECTS/TECHDATAOBJ" + NUM_DAYS).exists()) {
 			PER_TICKER_PER_DAY_TECHNICAL_DATA = SerializationTool.deserialize(
 					PER_TICKER_PER_DAY_TECHNICAL_DATA.getClass(),
 					"TECHNICAL_DATA/OBJECTS/TECHDATAOBJ" + NUM_DAYS);
@@ -92,19 +91,29 @@ public class TechnicalDatabase {
 				.println("technical database successfully created with up to: "
 						+ NUM_YRS + "  years of data");
 		System.out.println("in : " + (System.currentTimeMillis() - time));
-		System.out.println("memory used : " + (Runtime.getRuntime().totalMemory()/1000000)+ "   MB");
+		System.out.println("memory used : "
+				+ (Runtime.getRuntime().totalMemory() / 1000000) + "   MB");
 
 	}
 
 	private void allocateMemory() {
+		long F = 1000000;
 		long time = System.currentTimeMillis();
-long maxMemory = Runtime.getRuntime().maxMemory();
-long proposedMemoryUse = 32*NUM_DAYS*
+		long maxMemory = Runtime.getRuntime().maxMemory()  ;
+		long proposedMemoryUse = 32 * NUM_DAYS
+				* TickerSetWithETFsOptimized.TICKERS.size() * 7  ;
+
+		System.out.println("max memory available: " + (maxMemory));
+		System.out.println("    " + (TickerSetWithETFsOptimized.TICKERS.size()));
+		System.out.println("    " + (NUM_DAYS));
+		System.out.println("database with " + NUM_DAYS + " days will require: "
+				+ proposedMemoryUse);
 		for (String ticker : TickerSetWithETFsOptimized.TICKERS) {
-			PER_TICKER_PER_DAY_TECHNICAL_DATA.put(ticker,
-					new float[NUM_DAYS][]);
-			PER_TICKER_DIVIDEND_DAY_MAP.put(ticker, new TreeMap<String,Float>());
-		} 
+			PER_TICKER_PER_DAY_TECHNICAL_DATA
+					.put(ticker, new float[NUM_DAYS][]);
+			PER_TICKER_DIVIDEND_DAY_MAP.put(ticker,
+					new TreeMap<String, Float>());
+		}
 		System.out.println("time: " + (System.currentTimeMillis() - time));
 	}
 
@@ -117,8 +126,7 @@ long proposedMemoryUse = 32*NUM_DAYS*
 
 	private void loadTechnicalData(File file) {
 		// break off the .csv from the filename
-		String ticker = file.getName()
-				.replaceAll(".csv","");
+		String ticker = file.getName().replaceAll(".csv", "");
 		try {
 			String data = FileUtils.readFileToString(file);
 			for (String dayData : data.split(System.lineSeparator())) {
@@ -136,7 +144,7 @@ long proposedMemoryUse = 32*NUM_DAYS*
 		for (String numString : data) {
 			tryToAddData(numString, numbers);
 		}
-		// csv daily data is seven columns: Date Open High Low Close Volume Adj 
+		// csv daily data is seven columns: Date Open High Low Close Volume Adj
 		if (numbers.size() == 7) {
 			float date = numbers.get(0);
 			if (date < TODAY - NUM_DAYS)
@@ -169,16 +177,20 @@ long proposedMemoryUse = 32*NUM_DAYS*
 		} catch (Exception e) {
 		}
 	}
-public static TreeMap<Float,Float> makeGetDataToDateMap(String ticker,int datapoint){
-	TreeMap<Float,Float> map = new TreeMap<Float,Float>();
-	float[][] tickerdata = PER_TICKER_PER_DAY_TECHNICAL_DATA.get(ticker);
-	for(float[] day: tickerdata){
-		if(day!=null)
-		map.put(day[0], day[datapoint]);
+
+	public static TreeMap<Float, Float> makeGetDataToDateMap(String ticker,
+			int datapoint) {
+		TreeMap<Float, Float> map = new TreeMap<Float, Float>();
+		float[][] tickerdata = PER_TICKER_PER_DAY_TECHNICAL_DATA.get(ticker);
+		for (float[] day : tickerdata) {
+			if (day != null)
+				map.put(day[0], day[datapoint]);
+		}
+		System.out.println("data point count for ticker  " + ticker + "    "
+				+ map.size());
+		return map;
 	}
-	System.out.println("data point count for ticker  "+ticker + "    "+map.size());
-	return map;
-}
+
 	private void loadDividends(File file) {
 		File[] files = file.listFiles();
 		// TODO: LOAD DIVIDNED DATA FOR EACH FILE
@@ -187,7 +199,7 @@ public static TreeMap<Float,Float> makeGetDataToDateMap(String ticker,int datapo
 	public static void main(String[] arg) {
 		SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
 		smu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		TechnicalDatabase quotes = new TechnicalDatabase();
+		TechnicalDatabase quotes = new TechnicalDatabase(20);
 
 		System.out.println("time: "
 				+ (System.currentTimeMillis() - quotes.time));

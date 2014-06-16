@@ -65,8 +65,9 @@ public class FindSparseDataTickers {
 			// + total);
 		}
 		File writeTo = new File(datalocation.getAbsolutePath()
-				+ File.pathSeparator
+				+ File.separatorChar
 				+ "tickerhistorysize/tickerhistorysize.txt");
+	 
 		try {
 			FileUtils.writeStringToFile(writeTo, history);
 		} catch (IOException e) {

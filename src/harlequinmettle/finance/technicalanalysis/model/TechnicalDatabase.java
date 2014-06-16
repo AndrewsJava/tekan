@@ -7,6 +7,7 @@ import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -97,24 +98,52 @@ public class TechnicalDatabase {
 	}
 
 	private void allocateMemory() {
-		long F = 1000000;
-		long time = System.currentTimeMillis();
-		long maxMemory = Runtime.getRuntime().maxMemory()  ;
-		long proposedMemoryUse = 32 * NUM_DAYS
-				* TickerSetWithETFsOptimized.TICKERS.size() * 7  ;
+		// long F = 1000000;
+		// long time = System.currentTimeMillis();
+		// long maxMemory = Runtime.getRuntime().maxMemory() ;
+		// long proposedMemoryUse = 32 * NUM_DAYS
+		// * TickerSetWithETFsOptimized.TICKERS.size() * 7 ;
+		//
+		// System.out.println("max memory available: " + (maxMemory));
+		// System.out.println("    " +
+		// (TickerSetWithETFsOptimized.TICKERS.size()));
+		// System.out.println("    " + (NUM_DAYS));
+		// System.out.println("database with " + NUM_DAYS +
+		// " days will require: "
+		// + proposedMemoryUse);
 
-		System.out.println("max memory available: " + (maxMemory));
-		System.out.println("    " + (TickerSetWithETFsOptimized.TICKERS.size()));
-		System.out.println("    " + (NUM_DAYS));
-		System.out.println("database with " + NUM_DAYS + " days will require: "
-				+ proposedMemoryUse);
+		TreeMap<String, Float> maxDays = readNumbersFromFile();
 		for (String ticker : TickerSetWithETFsOptimized.TICKERS) {
+			float numDays = maxDays.get(ticker);
+			if (numDays < 2500)
+				continue;
 			PER_TICKER_PER_DAY_TECHNICAL_DATA
 					.put(ticker, new float[NUM_DAYS][]);
 			PER_TICKER_DIVIDEND_DAY_MAP.put(ticker,
 					new TreeMap<String, Float>());
 		}
+		System.out.println("size: " + PER_TICKER_DIVIDEND_DAY_MAP.size());
 		System.out.println("time: " + (System.currentTimeMillis() - time));
+	}
+
+	private TreeMap<String, Float> readNumbersFromFile() {
+		TreeMap<String, Float> maxDays = new TreeMap<String, Float>();
+		File sizes = new File(
+				"/home/andrew/Desktop/GAEm/TechnicalAnalysis/TECHNICAL_DATA"
+						+ File.separatorChar
+						+ "tickerhistorysize/tickerhistorysize.txt");
+
+		try {
+			String tickersDays = FileUtils.readFileToString(sizes);
+			String[] perTicker = tickersDays.split(System.lineSeparator());
+			for (String pair : perTicker) {
+				String[] p = pair.split(" ");
+				maxDays.put(p[0], Float.valueOf(p[1]));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return maxDays;
 	}
 
 	private void restoreSettings() {
@@ -127,6 +156,8 @@ public class TechnicalDatabase {
 	private void loadTechnicalData(File file) {
 		// break off the .csv from the filename
 		String ticker = file.getName().replaceAll(".csv", "");
+		if (!PER_TICKER_PER_DAY_TECHNICAL_DATA.containsKey(ticker))
+			return;
 		try {
 			String data = FileUtils.readFileToString(file);
 			for (String dayData : data.split(System.lineSeparator())) {

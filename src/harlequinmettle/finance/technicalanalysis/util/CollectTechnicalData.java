@@ -1,4 +1,4 @@
-package harlequinmettle.finance.technicalanalysis.model;
+package harlequinmettle.finance.technicalanalysis.util;
 
 import harlequinmettle.utils.finance.TickerSetWithETFsOptimized;
 

@@ -1,4 +1,4 @@
-package harlequinmettle.finance.technicalanalysis.model;
+package harlequinmettle.finance.technicalanalysis.util;
 
 import java.io.File;
 import java.io.FileOutputStream;

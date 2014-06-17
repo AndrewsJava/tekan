@@ -1,5 +1,6 @@
 package harlequinmettle.finance.technicalanalysis.model;
 
+import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
 import harlequinmettle.utils.numbertools.math.statistics.StatInfo;
 import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;
 
@@ -13,7 +14,7 @@ public class TestTechnicalDatabaseData {
 
 	public static void main(String[] args) {
 		SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
-		TechnicalDatabase techDatabase = new TechnicalDatabase(5);
+		TechnicalDatabase techDatabase = new TechnicalDatabase(5,0);
 
 		testData(techDatabase);
 	}

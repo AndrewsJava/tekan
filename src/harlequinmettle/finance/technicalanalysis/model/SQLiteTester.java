@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class TechnicalDatabaseSQLite {
+public class SQLiteTester {
 	public static void main(String[] args) throws Exception {
 		// 1M = 35MB disk (entry = random float)
 		// 1K = 40kb disk ( 10 char string)

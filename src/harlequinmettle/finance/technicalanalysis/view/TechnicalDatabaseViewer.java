@@ -1,9 +1,8 @@
-package harlequinmettle.finance.technicalanalysis;
+package harlequinmettle.finance.technicalanalysis.view;
 
-import harlequinmettle.finance.technicalanalysis.model.CurrentFundamentalsDatabase;
-import harlequinmettle.finance.technicalanalysis.model.TechnicalDatabase;
-import harlequinmettle.finance.technicalanalysis.view.TickerButtonsScrollingPanel;
-import harlequinmettle.finance.technicalanalysis.view.TickerTechView;
+import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsDatabase;
+import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
+import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
 import harlequinmettle.utils.finance.ETFs;
 import harlequinmettle.utils.guitools.FilterPanel;
 import harlequinmettle.utils.guitools.HorizontalJPanel;
@@ -14,6 +13,7 @@ import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -25,20 +25,27 @@ import javax.swing.JTabbedPane;
 
 public class TechnicalDatabaseViewer extends JTabbedPane {
 
+	public static final DividendDatabase ddb = new DividendDatabase();
+
 	public static void main(String[] arg) {
 		TechnicalDatabaseViewer tdbviewer = new TechnicalDatabaseViewer();
 	}
 
 	public TechnicalDatabaseViewer() {
-		init(); 
+		init();
 	}
 
 	private void init() {
 
 		SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
-		TechnicalDatabase db = new TechnicalDatabase(17);
-		CurrentFundamentalsDatabase fdb = new CurrentFundamentalsDatabase();
+		TechnicalDatabase db = new TechnicalDatabase(2, 0);
+		CurrentFundamentalsDatabase fdb = new CurrentFundamentalsDatabase(
+			);
 
+		// new ArrayList<String>(
+		// TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA
+		//			.keySet())
+		
 		final FilterPanel filter_one = new FilterPanel(fdb.labels);
 		final FilterPanel filter_two = new FilterPanel(fdb.labels);
 		final FilterPanel filter_three = new FilterPanel(fdb.labels);

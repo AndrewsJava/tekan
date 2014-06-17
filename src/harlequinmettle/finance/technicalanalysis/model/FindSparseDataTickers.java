@@ -1,5 +1,6 @@
 package harlequinmettle.finance.technicalanalysis.model;
 
+import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
 import harlequinmettle.utils.debugtools.InstanceCounter;
 import harlequinmettle.utils.finance.TickerSetWithETFs;
 

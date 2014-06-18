@@ -185,22 +185,27 @@ public class TickerTechView extends JPanel {
 	}
 
 	private void setFundamentalData(String ticker) {
-		try {
-			float[] tickersFundamentals = CurrentFundamentalsDatabase.data
+	
+			 TreeMap<String, Float>tickersFundamentals = CurrentFundamentalsDatabase.data
 					.get(ticker);
-			for (int i = 0; i < CurrentFundamentalsDatabase.labels.length; i++) {
-				if (tickersFundamentals[i] != tickersFundamentals[i]
-						|| Float.isInfinite(tickersFundamentals[i]))
+			for (int i = 0; i < CurrentFundamentalsDatabase.forDisplaying.length; i++) {
+				String  readabledata = "NAN";
+				try {
+				
+				 float data = tickersFundamentals.get(CurrentFundamentalsDatabase.forDisplaying[i]);
+				if (data != data
+						|| Float.isInfinite(data))
 					continue;
 				BigDecimal readableNumber = new BigDecimal(
-						tickersFundamentals[i]).round(new MathContext(2));
-
-				currentFundamentals.put(CurrentFundamentalsDatabase.labels[i],
-						"" + readableNumber.toPlainString());
+						data).round(new MathContext(2));
+				readabledata =  readableNumber.toPlainString();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				currentFundamentals.put(CurrentFundamentalsDatabase.forDisplaying[i],
+						readabledata);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	
 	}
 
 	private ArrayList<java.awt.geom.Line2D.Float> generateDisplayableLines(

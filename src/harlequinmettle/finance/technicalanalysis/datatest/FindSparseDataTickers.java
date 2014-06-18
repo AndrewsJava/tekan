@@ -1,4 +1,4 @@
-package harlequinmettle.finance.technicalanalysis.model;
+package harlequinmettle.finance.technicalanalysis.datatest;
 
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
 import harlequinmettle.utils.debugtools.InstanceCounter;

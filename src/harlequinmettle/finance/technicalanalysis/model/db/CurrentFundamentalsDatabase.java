@@ -3,6 +3,7 @@ package harlequinmettle.finance.technicalanalysis.model.db;
 import harlequinmettle.finance.database.DataUtil;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.filetools.SerializationTool;
+import harlequinmettle.utils.filetools.SerializationToolExplicit;
 import harlequinmettle.utils.finance.TickerSetWithETFsOptimized;
 import harlequinmettle.utils.guitools.FilterPanel;
 
@@ -36,26 +37,28 @@ public class CurrentFundamentalsDatabase {
 	}
 
 	private void init() {
-
-		if (new File("TECHNICAL_DATA/OBJECTS/FUNDAMENTALDATAOBJ_"
-				+ tickersForDatabase.size()).exists()) {
-			data = SerializationTool.deserialize(data.getClass(),
-					"TECHNICAL_DATA/OBJECTS/DIVDATAOBJ_");
-		} else {
+//TODO SQLITE DB BECAUSE SERIALIZATION DOESN'T WORK FOR NESTED MIXED VARIABLE MAPS
+//		if (new File("TECHNICAL_DATA/OBJECTS/FUNDAMENTALDATAOBJ_"
+//				+ tickersForDatabase.size()).exists()) {
+//			data = SerializationToolExplicit.deserializeCurrentFundamentalsDatabase(
+//					"TECHNICAL_DATA/OBJECTS/DIVDATAOBJ_");
+//		} else {
 
 			for (String ticker : tickersForDatabase) {
-				float[] noNumber = new float[labels.length];
-				Arrays.fill(noNumber, Float.NaN);
-				data.put(ticker, noNumber);
-			}
+				  TreeMap<String,Float> nanInitMap = new TreeMap<String,Float>();
+				  for(String label: labels){
+					  nanInitMap.put(label, Float.NaN);
+				  }
+				data.put(ticker, nanInitMap	);
+		 	}
 
 			loadFundamentalData();
 
-			SerializationTool.serialize(data,
-					"TECHNICAL_DATA/OBJECTS/FUNDAMENTALDATAOBJ_"
-							+ tickersForDatabase.size());
+//			SerializationTool.serialize(data,
+//					"TECHNICAL_DATA/OBJECTS/FUNDAMENTALDATAOBJ_"
+//							+ tickersForDatabase.size());
 
-		}
+		//}
 	}
 
 	public TreeMap<String, String> getFilterResults(FilterPanel[] searchFilters) {
@@ -70,12 +73,12 @@ public class CurrentFundamentalsDatabase {
 				int id = filter.getId();
 				float low = filter.getLow();
 				float high = filter.getHigh();
-				float dataPoint = data.get(ticker)[id];
+				float dataPoint = data.get(ticker).get(forDisplaying[id]);
 				if (dataPoint != dataPoint || dataPoint > high
 						|| dataPoint < low)
 					qualifies = false;
 				else
-					reasonForQualification += "  " + labels[id] + "  :  ["
+					reasonForQualification += "  " + forDisplaying[id] + "  :  ["
 							+ dataPoint + "] ";
 			}
 
@@ -125,6 +128,7 @@ public class CurrentFundamentalsDatabase {
 							sizes);
 					if (rawData.length != 175)
 						continue;
+					
 					fillFundamentalData(data.get(ticker), rawData, isOneYearAgo);
 					nancount += badDataCount(data.get(ticker));
 				} else {
@@ -135,27 +139,27 @@ public class CurrentFundamentalsDatabase {
 		}
 	}
 
-	private int badDataCount(float[] fs) {
+	private int badDataCount(TreeMap<String, Float> fs) {
 		int badcount = 0;
-		for (float f : fs) {
+		for (float f : fs.values()) {
 			if (f != f)
 				badcount++;
 		}
 		return badcount;
 	}
 
-	private void fillFundamentalData(float[] values, float[] rawData,
+	private void fillFundamentalData( TreeMap<String, Float> values, float[] rawData,
 			boolean isOlderThan1Year) {
 		for (int k = 0; k < 82; k++) {
 			// k==1 cnn analyst 1 year forecast
 			if (k == 1 && isOlderThan1Year)
-				values[k] = betterOf(values[k], rawData[k]);
+				values.put(labels[k],betterOf(values.get(labels[k]), rawData[k]));
 			else if (k != 1)
-				values[k] = betterOf(values[k], rawData[k]);
+				values.put(labels[k], betterOf(values.get(labels[k]), rawData[k]));
 		}
-		values[82] = betterOf(values[82], rawData[172]);
-		values[83] = betterOf(values[83], rawData[173]);
-		values[84] = betterOf(values[84], rawData[174]);
+		values.put(labels[82], betterOf(values.get(labels[82]), rawData[172]));
+		values.put(labels[83], betterOf(values.get(labels[83]), rawData[173]));
+		values.put(labels[84], betterOf(values.get(labels[84]), rawData[174]));
 	}
 
 	private float betterOf(float originally, float newdata) {
@@ -171,7 +175,7 @@ public class CurrentFundamentalsDatabase {
 
 	}
 
-	public static String[] labels = { "CNN analysts",// cnn - 0
+	private static String[] labels = { "CNN analysts",// cnn - 0
 			"1-yr forcast",// cnn - 1
 			// /////////////////////////////
 			"Avg. Estimate Current Qt",// these 5 use
@@ -278,59 +282,59 @@ public class CurrentFundamentalsDatabase {
 			"Market Cap", // 0
 			"Trailing P/E",//
 			"Forward P/E",//
-			"PEG Ratio", //
+			"PEG Ratio", //5
 			"Price/Sales", //
 			"Price/Book",//
 			"Profit Margin",//
 			"Operating Margin",//
-			"Return on Assets", //
+			"Return on Assets", //10
 			"Return on Equity",//
 			"Revenue", //
 			"Revenue Per Share",//
 			"Qtrly Revenue Growth",//
-			"Gross Profit",//
+			"Gross Profit",//15
 			"Net Income Avl to Common", //
 			"Diluted EPS",//
 			"Qtrly Earnings Growth",//
 			"Total Cash",//
-			"Total Cash Per Share",//
+			"Total Cash Per Share",//20
 			"Total Debt",//
 			"Total Debt/Equity",//
 			"Current Ratio", //
 			"Book Value Per Share",//
 			"Operating Cash Flow",//
-			"Levered Free Cash Flow", //
+			"Levered Free Cash Flow", //25
 			"Beta",//
 			"52-Week Change",//
 			"50-Day Moving Average",// ///////------
 			"200-Day Moving Average",//
-			"Avg Vol (3 month)",// ---------------------
+			"Avg Vol (3 month)",// ---------------------30
 			"Avg Vol (10 day)",// ---------------------
 			"Shares Outstanding",//
 			"Float",//
 			"% Held by Insiders",//
-			"% Held by Institutions",//
+			"% Held by Institutions",//35
 			"Payout Ratio", //
 			// ///////////////////////////////////
 			"Dividends",//
 			"Split",//
 			"Options",// // /////////////////////////////
-			"Avg. Estimate Current Qt",// these 5 use
+			"Avg. Estimate Current Qt",// these 5 use 40
 			"Avg. Estimate Next Qt",// these 5 use
 			"Avg. Estimate Current Yr",// these 5 use
 			"Avg. Estimate Next Yr",// these 5 use
 
 			"EPS Est 3 Mo Ago",// these 4 use
-			"EPS Actual 3 Mo Ago", //
+			"EPS Actual 3 Mo Ago", //45
 			"Difference 3 Mo Ago", //
 			"Surprise % 9 Mo Ago",//
 			"Surprise % 6 Mo Ago", // /
-			"Surprise % 3 Mo Ago",// ///////----
+			"Surprise % 3 Mo Ago",// ///////----49
 	// ////////////////////////////
 	};
 
 	public String root = "no path is set";
 
-	public static TreeMap<String, float[]> data = new TreeMap<String, float[]>();
+	public static TreeMap<String, TreeMap<String, Float>> data = new TreeMap<String, TreeMap<String, Float>>();
 
 }

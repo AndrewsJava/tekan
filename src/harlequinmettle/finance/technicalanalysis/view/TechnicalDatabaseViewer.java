@@ -1,8 +1,10 @@
 package harlequinmettle.finance.technicalanalysis.view;
 
+import harlequinmettle.finance.technicalanalysis.datatest.DividendForecaster;
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
+import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.finance.ETFs;
 import harlequinmettle.utils.guitools.FilterPanel;
 import harlequinmettle.utils.guitools.HorizontalJPanel;
@@ -13,7 +15,8 @@ import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -22,6 +25,8 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+
+import org.apache.commons.io.FileUtils;
 
 public class TechnicalDatabaseViewer extends JTabbedPane {
 
@@ -46,9 +51,9 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		// TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA
 		//			.keySet())
 		
-		final FilterPanel filter_one = new FilterPanel(fdb.labels);
-		final FilterPanel filter_two = new FilterPanel(fdb.labels);
-		final FilterPanel filter_three = new FilterPanel(fdb.labels);
+		final FilterPanel filter_one = new FilterPanel(fdb.forDisplaying);
+		final FilterPanel filter_two = new FilterPanel(fdb.forDisplaying);
+		final FilterPanel filter_three = new FilterPanel(fdb.forDisplaying);
 		final FilterPanel[] filters = { filter_one, filter_two, filter_three };
 		JButtonWithEnterKeyAction submit = new JButtonWithEnterKeyAction(
 				"apply filters for results");
@@ -59,16 +64,109 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		container.setSize(800, 500);
 		container.add(this);
 		container.setVisible(true);
+		
+		
 		JScrollPanelledPane controls = new JScrollPanelledPane();
 		this.add("controls", controls);
+		
+		
 		JSearchPanel searchPanel = new JSearchPanel();
 		searchPanel.addSearchAction(doSearchActionListener(searchPanel));
 		controls.addComp(searchPanel);
+
+		controls.addComp(makeUpcomingDividendsPanel());
+		
 		controls.addComp(makeFreeTradeETFPanel());
+		
+		controls.addComp(makeRecentEarningsPanel());
+		
 		for (FilterPanel fp : filters) {
 			controls.addComp(fp);
 		}
 		controls.addComp(submit);
+	}
+
+	private JComponent makeRecentEarningsPanel() {
+		HorizontalJPanel tickerPanel = new HorizontalJPanel();
+
+		JButton tickerTechOpener = new JButton("Recent Earnings (in Downloads folder)");
+		tickerPanel.add(tickerTechOpener);
+		tickerTechOpener
+				.addActionListener(makeFreeRecentEarningsActionListener());
+		return tickerPanel;
+	}
+
+	private ActionListener makeFreeRecentEarningsActionListener() {
+		return new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+			    String pathToObj = "technical_database_settings";
+			    String key = "path to downloads folder";
+				ChooseFilePrompterPathSaved downloads = new ChooseFilePrompterPathSaved( pathToObj );
+				String root = downloads.getSetting(key);
+				
+				new TickerButtonsScrollingPanel(  getRecentEarningsFromHtmlFile(root ));
+
+			}
+
+			private TreeMap<String, String> getRecentEarningsFromHtmlFile(String root) {
+
+				TreeMap<String, String> results = new TreeMap<String, String>();
+ 
+				File mostCurrent = null;
+				long modified = 0;
+				File[] downloadedFiles  = new File(root).listFiles();
+				for(File f : downloadedFiles){
+					if(f.getName().contains("EARNINGS")){
+						if(f.lastModified()>modified){
+							modified = f.lastModified();
+							mostCurrent = f;
+						}
+					}
+				}
+				if(mostCurrent==null)
+					return results;
+				try {
+					String html = FileUtils.readFileToString(mostCurrent);
+					String ticker = html.substring(html.indexOf("[")+1,html.indexOf("]"));
+					String[] tickers = ticker.split(",");
+				    for(String t: tickers){
+				    	results.put(t.trim(), t.trim());
+				    }
+				} catch (IOException e) { 
+					e.printStackTrace();
+				}
+				
+				
+				return results;
+			}
+
+		};
+	}
+ 
+
+	private JComponent makeUpcomingDividendsPanel() {
+		HorizontalJPanel tickerPanel = new HorizontalJPanel();
+
+		JButton tickerTechOpener = new JButton("with upcoming dividnes");
+		tickerPanel.add(tickerTechOpener);
+		tickerTechOpener
+				.addActionListener(makeUpcomingDividendsActionListener());
+		return tickerPanel;
+	}
+
+	private ActionListener makeUpcomingDividendsActionListener() {
+		return new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				new TickerButtonsScrollingPanel(
+						new DividendForecaster().scannForUpcommingDividends());
+
+			}
+
+		};
 	}
 
 	private JComponent makeFreeTradeETFPanel() {

@@ -1,4 +1,4 @@
-package harlequinmettle.finance.technicalanalysis.model;
+package harlequinmettle.finance.technicalanalysis.datatest;
 
 import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;
 
@@ -28,6 +28,7 @@ public class SQLiteTester {
 
 		Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
 		//initPragmas(conn, true, true, true);
+	
 		Statement stat = reinitializeTable(conn);
 		PreparedStatement prep = conn
 				.prepareStatement("insert into people values (?, ?);");

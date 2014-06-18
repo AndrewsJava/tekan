@@ -4,6 +4,7 @@ import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
 import harlequinmettle.utils.guitools.HorizontalJPanel;
 import harlequinmettle.utils.guitools.JScrollPanelledPane;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -75,7 +76,10 @@ public class TickerButtonsScrollingPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				new TickerTechView(ticker.toUpperCase().replaceAll(".*\\W+.*", ""));
+				JButton source = (JButton) arg0.getSource();
+				source.setBackground(Color.blue);
+			//	new TickerTechView(ticker.toUpperCase().replaceAll(".*\\W+.*", ""));
+				new TickerTechView(ticker.toUpperCase().replaceAll("[^A-Z]", ""));
 			}
 
 		};

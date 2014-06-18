@@ -44,13 +44,12 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 
 		SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
 		TechnicalDatabase db = new TechnicalDatabase(2, 0);
-		CurrentFundamentalsDatabase fdb = new CurrentFundamentalsDatabase(
-			);
+		CurrentFundamentalsDatabase fdb = new CurrentFundamentalsDatabase();
 
 		// new ArrayList<String>(
 		// TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA
-		//			.keySet())
-		
+		// .keySet())
+
 		final FilterPanel filter_one = new FilterPanel(fdb.forDisplaying);
 		final FilterPanel filter_two = new FilterPanel(fdb.forDisplaying);
 		final FilterPanel filter_three = new FilterPanel(fdb.forDisplaying);
@@ -64,87 +63,52 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		container.setSize(800, 500);
 		container.add(this);
 		container.setVisible(true);
-		
-		
+
 		JScrollPanelledPane controls = new JScrollPanelledPane();
 		this.add("controls", controls);
-		
-		
+
 		JSearchPanel searchPanel = new JSearchPanel();
 		searchPanel.addSearchAction(doSearchActionListener(searchPanel));
 		controls.addComp(searchPanel);
 
 		controls.addComp(makeUpcomingDividendsPanel());
-		
+
 		controls.addComp(makeFreeTradeETFPanel());
-		
-		controls.addComp(makeRecentEarningsPanel());
-		
+
+		controls.addComp(makeRecentReportsPanel());
+
 		for (FilterPanel fp : filters) {
 			controls.addComp(fp);
 		}
 		controls.addComp(submit);
 	}
 
-	private JComponent makeRecentEarningsPanel() {
+	private JComponent makeRecentReportsPanel() {
 		HorizontalJPanel tickerPanel = new HorizontalJPanel();
 
-		JButton tickerTechOpener = new JButton("Recent Earnings (in Downloads folder)");
+		JButton tickerTechOpener = new JButton("Recent Reports (in Downloads)");
 		tickerPanel.add(tickerTechOpener);
-		tickerTechOpener
-				.addActionListener(makeFreeRecentEarningsActionListener());
+		tickerTechOpener.addActionListener(makeRecentReportsActionListener());
 		return tickerPanel;
 	}
 
-	private ActionListener makeFreeRecentEarningsActionListener() {
+	private ActionListener makeRecentReportsActionListener() {
 		return new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-			    String pathToObj = "technical_database_settings";
-			    String key = "path to downloads folder";
-				ChooseFilePrompterPathSaved downloads = new ChooseFilePrompterPathSaved( pathToObj );
+				String pathToObj = "technical_database_settings";
+				String key = "path to downloads folder";
+				ChooseFilePrompterPathSaved downloads = new ChooseFilePrompterPathSaved(
+						pathToObj);
 				String root = downloads.getSetting(key);
-				
-				new TickerButtonsScrollingPanel(  getRecentEarningsFromHtmlFile(root ));
 
-			}
+				new FilePathButtonsScrollingPanel((root));
 
-			private TreeMap<String, String> getRecentEarningsFromHtmlFile(String root) {
-
-				TreeMap<String, String> results = new TreeMap<String, String>();
- 
-				File mostCurrent = null;
-				long modified = 0;
-				File[] downloadedFiles  = new File(root).listFiles();
-				for(File f : downloadedFiles){
-					if(f.getName().contains("EARNINGS")){
-						if(f.lastModified()>modified){
-							modified = f.lastModified();
-							mostCurrent = f;
-						}
-					}
-				}
-				if(mostCurrent==null)
-					return results;
-				try {
-					String html = FileUtils.readFileToString(mostCurrent);
-					String ticker = html.substring(html.indexOf("[")+1,html.indexOf("]"));
-					String[] tickers = ticker.split(",");
-				    for(String t: tickers){
-				    	results.put(t.trim(), t.trim());
-				    }
-				} catch (IOException e) { 
-					e.printStackTrace();
-				}
-				
-				
-				return results;
 			}
 
 		};
 	}
- 
 
 	private JComponent makeUpcomingDividendsPanel() {
 		HorizontalJPanel tickerPanel = new HorizontalJPanel();

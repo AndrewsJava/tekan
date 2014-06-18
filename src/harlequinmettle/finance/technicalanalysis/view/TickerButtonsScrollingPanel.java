@@ -19,13 +19,15 @@ import javax.swing.JFrame;
 
 public class TickerButtonsScrollingPanel {
 
+	public TickerButtonsScrollingPanel( ) { 
+	}
 	public TickerButtonsScrollingPanel(TreeMap<String, String> results) {
-		JFrame display = init();
+		JFrame display = init("tickers");
 		display.add(makeScrollingTickerButtonList(results));
 	}
 
-	private JFrame init() { 
-		JFrame display = new JFrame("tickers");
+	protected JFrame init(String title) { 
+		JFrame display = new JFrame(title);
 		display.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		display.setSize(400, 800);
 		display.setVisible(true);
@@ -33,7 +35,7 @@ public class TickerButtonsScrollingPanel {
 	}
 
 	public TickerButtonsScrollingPanel(List<String> asList) {
-		JFrame display = init();
+		JFrame display = init("tickers");
 		display.add(makeScrollingTickerButtonList(asList));
 	}
 
@@ -43,8 +45,7 @@ public class TickerButtonsScrollingPanel {
 		for (String ticker : asList) {
 			if(TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA.containsKey(ticker.toUpperCase().replaceAll(".*\\W+.*", "")))
 			scrollForButtons.addComp(makeTickerButton(ticker));
-		}
-
+		} 
 		return scrollForButtons;
 	}
 

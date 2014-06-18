@@ -584,7 +584,7 @@ public class TickerTechView extends JPanel {
 		menu.getAccessibleContext().setAccessibleDescription(
 				"The only menu in this program that has menu items");
 		menuBar.add(menu);
-		JMenuItem menuItem = new JMenuItem("A text-only menu item",
+		JMenuItem menuItem = new JMenuItem(profile,
 				KeyEvent.VK_T);
 		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
 				ActionEvent.ALT_MASK));

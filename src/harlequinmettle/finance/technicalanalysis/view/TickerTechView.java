@@ -4,7 +4,6 @@ import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsDat
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
-import harlequinmettle.utils.finance.TickerSetWithETFs;
 import harlequinmettle.utils.guitools.CommonColors;
 import harlequinmettle.utils.guitools.JScrollPanelledPane;
 import harlequinmettle.utils.guitools.PreferredJScrollPane;
@@ -17,9 +16,11 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -39,9 +40,14 @@ import java.util.Date;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JViewport;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 public class TickerTechView extends JPanel {
@@ -90,7 +96,7 @@ public class TickerTechView extends JPanel {
 
 	private JViewport viewport;
 
-	public   String pathToObj = "technical_database_settings";
+	public String pathToObj = "technical_database_settings";
 	String profilePathKey = "path to profiles text file";
 	private String ticker;
 
@@ -185,27 +191,27 @@ public class TickerTechView extends JPanel {
 	}
 
 	private void setFundamentalData(String ticker) {
-	
-			 TreeMap<String, Float>tickersFundamentals = CurrentFundamentalsDatabase.data
-					.get(ticker);
-			for (int i = 0; i < CurrentFundamentalsDatabase.forDisplaying.length; i++) {
-				String  readabledata = "NAN";
-				try {
-				
-				 float data = tickersFundamentals.get(CurrentFundamentalsDatabase.forDisplaying[i]);
-				if (data != data
-						|| Float.isInfinite(data))
+
+		TreeMap<String, Float> tickersFundamentals = CurrentFundamentalsDatabase.data
+				.get(ticker);
+		for (int i = 0; i < CurrentFundamentalsDatabase.forDisplaying.length; i++) {
+			String readabledata = "NAN";
+			try {
+
+				float data = tickersFundamentals
+						.get(CurrentFundamentalsDatabase.forDisplaying[i]);
+				if (data != data || Float.isInfinite(data))
 					continue;
-				BigDecimal readableNumber = new BigDecimal(
-						data).round(new MathContext(2));
-				readabledata =  readableNumber.toPlainString();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				currentFundamentals.put(CurrentFundamentalsDatabase.forDisplaying[i],
-						readabledata);
+				BigDecimal readableNumber = new BigDecimal(data)
+						.round(new MathContext(2));
+				readabledata = readableNumber.toPlainString();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-	
+			currentFundamentals.put(
+					CurrentFundamentalsDatabase.forDisplaying[i], readabledata);
+		}
+
 	}
 
 	private ArrayList<java.awt.geom.Line2D.Float> generateDisplayableLines(
@@ -564,6 +570,34 @@ public class TickerTechView extends JPanel {
 				container.removeComponentListener(refForRemoval);
 			}
 		});
+
+		container.setJMenuBar(makeGraphOptionsJMenu());
+	}
+
+	private JMenuBar makeGraphOptionsJMenu() {
+
+		JMenuBar menuBar = new JMenuBar();
+
+		JMenu menu = new JMenu("options");
+
+		menu.setMnemonic(KeyEvent.VK_A);
+		menu.getAccessibleContext().setAccessibleDescription(
+				"The only menu in this program that has menu items");
+		menuBar.add(menu);
+		JMenuItem menuItem = new JMenuItem("A text-only menu item",
+				KeyEvent.VK_T);
+		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
+				ActionEvent.ALT_MASK));
+		menuItem.getAccessibleContext().setAccessibleDescription(
+				"This doesn't really do anything");
+		menu.add(menuItem);
+
+		//a group of check box menu items
+		menu.addSeparator();
+		JCheckBoxMenuItem	cbMenuItem = new JCheckBoxMenuItem("A check box menu item");
+		cbMenuItem.setMnemonic(KeyEvent.VK_C);
+		menu.add(cbMenuItem);
+		return menuBar;
 	}
 
 	private ComponentListener doWindowRescaleListener(final TickerTechView tv) {

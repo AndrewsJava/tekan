@@ -69,6 +69,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 
 		JSearchPanel searchPanel = new JSearchPanel();
 		searchPanel.addSearchAction(doSearchActionListener(searchPanel));
+		
 		controls.addComp(searchPanel);
 
 		controls.addComp(makeUpcomingDividendsPanel());

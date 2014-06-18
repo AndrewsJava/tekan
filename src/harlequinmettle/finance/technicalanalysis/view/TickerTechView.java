@@ -5,10 +5,13 @@ import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.guitools.CommonColors;
+import harlequinmettle.utils.guitools.JLabelFactory;
 import harlequinmettle.utils.guitools.JScrollPanelledPane;
+import harlequinmettle.utils.guitools.MenuScroller;
 import harlequinmettle.utils.guitools.PreferredJScrollPane;
 import harlequinmettle.utils.guitools.SmoothStroke;
 import harlequinmettle.utils.guitools.SquareStroke;
+import harlequinmettle.utils.guitools.VerticalJPanel;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -16,7 +19,6 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -40,14 +42,12 @@ import java.util.Date;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JViewport;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 public class TickerTechView extends JPanel {
@@ -57,6 +57,7 @@ public class TickerTechView extends JPanel {
 	public static final int margins = 20;
 	public static int eW = TechnicalDatabase.TOTAL_NUM_DAYS
 			* (BAR_W + INTERBARMARGINS);
+	public static float frameW = 500;
 	public static float W = 2 * margins + eW;
 	public static int eH = 1000;
 	public static int H = 1000;
@@ -112,12 +113,16 @@ public class TickerTechView extends JPanel {
 
 	public void updateSizePreferrence() {
 		setPreferredSize(new Dimension((int) (scalex * W),
-				(int) (scaley * H + 40)));
+				(int) (scaley * H - 40)));
 	}
 
 	private void init() {
+	//	H = getHeight() - 40;
+		frameW = getWidth();
+		eH = H - 2 * margins;
 		String profilePath = establishPathToProfilesText();
 		profile = getProfile(profilePath, ticker);
+		profile = profile.replaceAll("\\.", "\\.\n\n");
 		updateSizePreferrence();
 		setFundamentalData(ticker);
 		this.addMouseListener(dateDisplayer);
@@ -366,12 +371,12 @@ public class TickerTechView extends JPanel {
 
 		drawVolumeLines(g);
 		drawDividendOvals(g);
-		drawProfileDescription(g);
+		// drawProfileDescription(g);
 		drawHighLowLines(g);
 		drawOpenCloseLines(g);
 		drawDatesData(g);
-		if (toggleVisible)
-			drawFundamentalsData(g);
+		// if (toggleVisible)
+		// drawFundamentalsData(g);
 	}
 
 	private void drawDividendOvals(Graphics2D g) {
@@ -577,27 +582,79 @@ public class TickerTechView extends JPanel {
 	private JMenuBar makeGraphOptionsJMenu() {
 
 		JMenuBar menuBar = new JMenuBar();
+		menuBar.add(makeProfileMenuItem());
+		menuBar.add(makeFundamentalsGridMenuItem());
+		menuBar.add(makeOptionsMenuItem());
 
-		JMenu menu = new JMenu("options");
+		// a group of check box menu items
+		// menu.addSeparator();
+		// JCheckBoxMenuItem cbMenuItem = new
+		// JCheckBoxMenuItem("A check box menu item");
+		// cbMenuItem.setMnemonic(KeyEvent.VK_C);
+		// menu.add(cbMenuItem);
+		return menuBar;
+	}
+
+	private JMenu makeOptionsMenuItem() {
+		JMenu menu = new JMenu("[options]");
+
+		return menu;
+	}
+
+	private JMenu makeFundamentalsGridMenuItem() {
+ 
+		JMenu menu = new JMenu("[company statistics]");
+		VerticalJPanel twoColumn = new VerticalJPanel(2);
+		PreferredJScrollPane scrollable = new PreferredJScrollPane(twoColumn);
+		boolean alternate = true;
+		for (String key : CurrentFundamentalsDatabase.forDisplaying) {
+			String value = "";
+			if (currentFundamentals.containsKey(key))
+				value = currentFundamentals.get(key).toString();
+			if (alternate = !alternate) {
+				twoColumn.add(JLabelFactory.doBluishJLabel(key,BIG_FONT));
+				twoColumn.add(JLabelFactory.doLightBluishJLabel(value,BIG_FONT));
+			} else {
+				twoColumn.add(JLabelFactory.doLightBluishJLabel(key,BIG_FONT));
+				twoColumn.add(JLabelFactory.doBluishJLabel(value,BIG_FONT));
+			}
+		} 
+		menu.setAutoscrolls(true);
+		//menu.scrollRectToVisible(aRect);
+		menu.add(scrollable);
+		return menu;
+	}
+
+	private JMenu makeProfileMenuItem() {
+
+		JMenu menu = new JMenu("[company description]");
 
 		menu.setMnemonic(KeyEvent.VK_A);
 		menu.getAccessibleContext().setAccessibleDescription(
 				"The only menu in this program that has menu items");
-		menuBar.add(menu);
-		JMenuItem menuItem = new JMenuItem(profile,
-				KeyEvent.VK_T);
-		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
-				ActionEvent.ALT_MASK));
-		menuItem.getAccessibleContext().setAccessibleDescription(
-				"This doesn't really do anything");
-		menu.add(menuItem);
 
-		//a group of check box menu items
-		menu.addSeparator();
-		JCheckBoxMenuItem	cbMenuItem = new JCheckBoxMenuItem("A check box menu item");
-		cbMenuItem.setMnemonic(KeyEvent.VK_C);
-		menu.add(cbMenuItem);
-		return menuBar;
+		// ///
+		JTextArea myText = new JTextArea();
+		myText.setText(profile);
+		myText.setLineWrap(true);
+		myText.setFont(BIG_FONT);
+		myText.setWrapStyleWord(true);
+		myText.setPreferredSize(new Dimension(900, eH / 2));
+		PreferredJScrollPane scrollable = new PreferredJScrollPane(myText);
+		scrollable.setPreferredSize(new Dimension(900, eH / 2));
+		// ///
+
+		// JMenuItem menuItem = new JMenuItem(profile,
+		// KeyEvent.VK_T);
+		// menuItem.setPreferredSize(new Dimension(eW,eH));
+		// menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
+		// ActionEvent.ALT_MASK));
+		// menuItem.getAccessibleContext().setAccessibleDescription(
+		// "This doesn't really do anything");
+		// menu.add(menuItem);
+		menu.add(scrollable);
+		//menu.add(myText);
+		return menu;
 	}
 
 	private ComponentListener doWindowRescaleListener(final TickerTechView tv) {

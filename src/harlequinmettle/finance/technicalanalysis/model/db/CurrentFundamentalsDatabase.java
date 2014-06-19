@@ -175,7 +175,7 @@ public class CurrentFundamentalsDatabase {
 
 	}
 
-	private static String[] labels = { "CNN analysts",// cnn - 0
+	public static String[] labels = { "CNN analysts",// cnn - 0
 			"1-yr forcast",// cnn - 1
 			// /////////////////////////////
 			"Avg. Estimate Current Qt",// these 5 use

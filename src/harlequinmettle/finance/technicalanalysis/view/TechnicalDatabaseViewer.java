@@ -59,7 +59,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 				"apply filters for results");
 
 		submit.addActionListener(doFilterListener(fdb, filters));
-		JFrame container = new JFrame();
+		JFrame container = new JFrame("Control Panel - Technical Analysis");
 		container.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		container.setSize(800, 500);
 		container.add(this);
@@ -128,7 +128,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				new TickerButtonsScrollingPanel(
-						new DividendForecaster().scannForUpcommingDividends());
+						new DividendForecaster().scannForUpcommingDividends(),"ex div date soon");
 
 			}
 
@@ -151,7 +151,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				new TickerButtonsScrollingPanel(
-						Arrays.asList(ETFs.fidelityFreeTradeETFS));
+						Arrays.asList(ETFs.fidelityFreeTradeETFS), "fidelity etfs");
 
 			}
 
@@ -185,10 +185,15 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 			public void actionPerformed(ActionEvent arg0) {
 				TreeMap<String, String> filterResults = fdb
 						.getFilterResults(filters);
-				for (Entry<String, String> ent : filterResults.entrySet()) {
-					System.out.println(ent);
+				String title ="";
+				for(FilterPanel fp : filters){
+					if(fp.shouldFilterBeApplied())
+					title+=" "+fp.getFilterName();
 				}
-				new TickerButtonsScrollingPanel(filterResults);
+//				for (Entry<String, String> ent : filterResults.entrySet()) { 
+//					System.out.println(ent);
+//				}
+				new TickerButtonsScrollingPanel(filterResults,"Filter(s): "+title);
 			}
 
 		};

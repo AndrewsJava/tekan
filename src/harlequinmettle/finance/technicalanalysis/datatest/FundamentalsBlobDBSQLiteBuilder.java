@@ -1,7 +1,7 @@
-package harlequinmettle.finance.technicalanalysis.model.db;
+package harlequinmettle.finance.technicalanalysis.datatest;
 
 import harlequinmettle.finance.database.DataUtil;
-import harlequinmettle.finance.technicalanalysis.datatest.FundamentalsDBSQLiteBuilder;
+import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsDatabase;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.filetools.sqlite.SQLiteTools;
 

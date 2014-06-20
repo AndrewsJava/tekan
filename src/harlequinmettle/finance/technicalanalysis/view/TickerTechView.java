@@ -12,6 +12,7 @@ import harlequinmettle.utils.guitools.PreferredJScrollPane;
 import harlequinmettle.utils.guitools.SmoothStroke;
 import harlequinmettle.utils.guitools.SquareStroke;
 import harlequinmettle.utils.guitools.VerticalJPanel;
+import harlequinmettle.utils.numbertools.format.NumberFormater;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -207,9 +208,8 @@ public class TickerTechView extends JPanel {
 						.get(CurrentFundamentalsDatabase.forDisplaying[i]);
 				if (data != data || Float.isInfinite(data))
 					continue;
-				BigDecimal readableNumber = new BigDecimal(data)
-						.round(new MathContext(2));
-				readabledata = readableNumber.toPlainString();
+				readabledata = NumberFormater.floatToBMKTrunkated(data);
+ 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -606,11 +606,12 @@ public class TickerTechView extends JPanel {
 		JMenu menu = new JMenu("[company statistics]");
 		VerticalJPanel twoColumn = new VerticalJPanel(2);
 		PreferredJScrollPane scrollable = new PreferredJScrollPane(twoColumn);
+		scrollable.setPreferredSize(new Dimension(400,900));
 		boolean alternate = true;
 		for (String key : CurrentFundamentalsDatabase.forDisplaying) {
 			String value = "";
 			if (currentFundamentals.containsKey(key))
-				value = currentFundamentals.get(key).toString();
+				value = currentFundamentals.get(key) ;
 			if (alternate = !alternate) {
 				twoColumn.add(JLabelFactory.doBluishJLabel(key, BIG_FONT));
 				twoColumn.add(JLabelFactory
@@ -636,6 +637,7 @@ public class TickerTechView extends JPanel {
 
 		// ///
 		JTextArea myText = new JTextArea();
+		myText.setBackground(new Color(200,225,255));
 		myText.setText(profile);
 		myText.setLineWrap(true);
 		myText.setFont(BIG_FONT);

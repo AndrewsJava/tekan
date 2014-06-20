@@ -21,8 +21,8 @@ public class TickerButtonsScrollingPanel {
 
 	public TickerButtonsScrollingPanel( ) { 
 	}
-	public TickerButtonsScrollingPanel(TreeMap<String, String> results) {
-		JFrame display = init("tickers");
+	public TickerButtonsScrollingPanel(TreeMap<String, String> results,String title) {
+		JFrame display = init(title);
 		display.add(makeScrollingTickerButtonList(results));
 	}
 
@@ -34,8 +34,8 @@ public class TickerButtonsScrollingPanel {
 		return display;
 	}
 
-	public TickerButtonsScrollingPanel(List<String> asList) {
-		JFrame display = init("tickers");
+	public TickerButtonsScrollingPanel(List<String> asList, String title) {
+		JFrame display = init(title);
 		display.add(makeScrollingTickerButtonList(asList));
 	}
 

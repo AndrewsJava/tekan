@@ -68,7 +68,7 @@ public class FilePathButtonsScrollingPanel extends TickerButtonsScrollingPanel {
 					}
 					
 
-					new TickerButtonsScrollingPanel(  results);
+					new TickerButtonsScrollingPanel(  results, f.getName());
 				 
 
 			}

@@ -1,13 +1,13 @@
 package harlequinmettle.finance.technicalanalysis.view;
 
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsDatabase;
+import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.guitools.CommonColors;
 import harlequinmettle.utils.guitools.JLabelFactory;
 import harlequinmettle.utils.guitools.JScrollPanelledPane;
-import harlequinmettle.utils.guitools.MenuScroller;
 import harlequinmettle.utils.guitools.PreferredJScrollPane;
 import harlequinmettle.utils.guitools.SmoothStroke;
 import harlequinmettle.utils.guitools.SquareStroke;
@@ -117,7 +117,7 @@ public class TickerTechView extends JPanel {
 	}
 
 	private void init() {
-	//	H = getHeight() - 40;
+		// H = getHeight() - 40;
 		frameW = getWidth();
 		eH = H - 2 * margins;
 		String profilePath = establishPathToProfilesText();
@@ -197,7 +197,7 @@ public class TickerTechView extends JPanel {
 
 	private void setFundamentalData(String ticker) {
 
-		TreeMap<String, Float> tickersFundamentals = CurrentFundamentalsDatabase.data
+		TreeMap<String, Float> tickersFundamentals = CurrentFundamentalsSQLiteDatabase.CURRENT_TICKER_TO_LABEL_DATA_MAPING
 				.get(ticker);
 		for (int i = 0; i < CurrentFundamentalsDatabase.forDisplaying.length; i++) {
 			String readabledata = "NAN";
@@ -602,7 +602,7 @@ public class TickerTechView extends JPanel {
 	}
 
 	private JMenu makeFundamentalsGridMenuItem() {
- 
+
 		JMenu menu = new JMenu("[company statistics]");
 		VerticalJPanel twoColumn = new VerticalJPanel(2);
 		PreferredJScrollPane scrollable = new PreferredJScrollPane(twoColumn);
@@ -612,15 +612,16 @@ public class TickerTechView extends JPanel {
 			if (currentFundamentals.containsKey(key))
 				value = currentFundamentals.get(key).toString();
 			if (alternate = !alternate) {
-				twoColumn.add(JLabelFactory.doBluishJLabel(key,BIG_FONT));
-				twoColumn.add(JLabelFactory.doLightBluishJLabel(value,BIG_FONT));
+				twoColumn.add(JLabelFactory.doBluishJLabel(key, BIG_FONT));
+				twoColumn.add(JLabelFactory
+						.doLightBluishJLabel(value, BIG_FONT));
 			} else {
-				twoColumn.add(JLabelFactory.doLightBluishJLabel(key,BIG_FONT));
-				twoColumn.add(JLabelFactory.doBluishJLabel(value,BIG_FONT));
+				twoColumn.add(JLabelFactory.doLightBluishJLabel(key, BIG_FONT));
+				twoColumn.add(JLabelFactory.doBluishJLabel(value, BIG_FONT));
 			}
-		} 
+		}
 		menu.setAutoscrolls(true);
-		//menu.scrollRectToVisible(aRect);
+		// menu.scrollRectToVisible(aRect);
 		menu.add(scrollable);
 		return menu;
 	}
@@ -653,7 +654,7 @@ public class TickerTechView extends JPanel {
 		// "This doesn't really do anything");
 		// menu.add(menuItem);
 		menu.add(scrollable);
-		//menu.add(myText);
+		// menu.add(myText);
 		return menu;
 	}
 

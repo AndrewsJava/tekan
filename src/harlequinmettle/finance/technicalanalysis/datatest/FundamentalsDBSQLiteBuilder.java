@@ -33,7 +33,16 @@ public class FundamentalsDBSQLiteBuilder {
 			String[] columnEntries = doColumnentries();
 			String[] types = new String[columnEntries.length];
 			Arrays.fill(types, "real");
-			// Statement used for query
+			ArrayList<Integer> sqlStorageTypes = new ArrayList<Integer>();
+			//day number
+			sqlStorageTypes.add(SQLiteTools.SQL_FLOAT_ADD);
+			//ticker
+			sqlStorageTypes.add(SQLiteTools.SQL_STRING_ADD);
+			//ALL THE REST FLOAT
+			for(int i = 0; i<200; i++){ 
+				sqlStorageTypes.add(SQLiteTools.SQL_FLOAT_ADD);
+				
+			}
 			Statement stat = SQLiteTools.reinitializeTable(cn, tableName,
 					columnEntries, types);
 
@@ -53,18 +62,10 @@ public class FundamentalsDBSQLiteBuilder {
 				PreparedStatement prep = SQLiteTools.initPreparedStatement(cn,
 						NUMBER_ENTRIES, tableName);
 				for (ArrayList<String> values : allValues)
-					SQLiteTools.buildSQLStatement(prep, values);
+					SQLiteTools.buildSQLStatement(prep, values,sqlStorageTypes);
 				SQLiteTools.executeStatement(cn, prep);
 			}
-			// TODO:FIXME: SEE SQLiteTester for SQLite statement exectution
-			//
-			// PreparedStatement prep = cn
-			// .prepareStatement("insert into "+tableName+" values (?, ?);");
-			// //for float[] s of data
-			// SQLiteTools.enterRecord(stat, String[]);
-			//
-			// SQLiteTools.executeSQLiteStatement(cn, );
-			//
+ 
 
 		}
 	}
@@ -106,10 +107,9 @@ public class FundamentalsDBSQLiteBuilder {
 		for (String s : CurrentFundamentalsDatabase.forDisplaying) {
 			int index = labels.indexOf(s);
 			if (index < rawData.length){
-				if(rawData[index] == rawData[index])
+				//if(rawData[index] == rawData[index])
 					data.add(""+rawData[index]);
-				else
-				data.add("NULL");
+		 
 		
 			}
 			}

@@ -2,6 +2,7 @@ package harlequinmettle.finance.technicalanalysis.view;
 
 import harlequinmettle.finance.technicalanalysis.datatest.DividendForecaster;
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsDatabase;
+import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
@@ -44,15 +45,15 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 
 		SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
 		TechnicalDatabase db = new TechnicalDatabase(2, 0);
-		CurrentFundamentalsDatabase fdb = new CurrentFundamentalsDatabase();
+		CurrentFundamentalsSQLiteDatabase fdb = new CurrentFundamentalsSQLiteDatabase();
 
 		// new ArrayList<String>(
 		// TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA
 		// .keySet())
 
-		final FilterPanel filter_one = new FilterPanel(fdb.forDisplaying);
-		final FilterPanel filter_two = new FilterPanel(fdb.forDisplaying);
-		final FilterPanel filter_three = new FilterPanel(fdb.forDisplaying);
+		final FilterPanel filter_one = new FilterPanel(fdb.subsetLabels);
+		final FilterPanel filter_two = new FilterPanel(fdb.subsetLabels);
+		final FilterPanel filter_three = new FilterPanel(fdb.subsetLabels);
 		final FilterPanel[] filters = { filter_one, filter_two, filter_three };
 		JButtonWithEnterKeyAction submit = new JButtonWithEnterKeyAction(
 				"apply filters for results");
@@ -157,8 +158,26 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		};
 	}
 
+//	private ActionListener doFilterListener(
+//			final CurrentFundamentalsDatabase fdb, final FilterPanel[] filters) {
+//		// public TreeMap<String, String> getFilterResults(FilterPanel[]
+//		// searchFilters) {
+//		return new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				TreeMap<String, String> filterResults = fdb
+//						.getFilterResults(filters);
+//				for (Entry<String, String> ent : filterResults.entrySet()) {
+//					System.out.println(ent);
+//				}
+//				new TickerButtonsScrollingPanel(filterResults);
+//			}
+//
+//		};
+//	}
+
 	private ActionListener doFilterListener(
-			final CurrentFundamentalsDatabase fdb, final FilterPanel[] filters) {
+			final CurrentFundamentalsSQLiteDatabase fdb, final FilterPanel[] filters) {
 		// public TreeMap<String, String> getFilterResults(FilterPanel[]
 		// searchFilters) {
 		return new ActionListener() {

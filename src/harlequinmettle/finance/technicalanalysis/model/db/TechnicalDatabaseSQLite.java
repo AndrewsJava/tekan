@@ -12,7 +12,6 @@ import java.util.TreeMap;
 
 public class TechnicalDatabaseSQLite implements TechnicalDatabaseInterface {
 
-
 	static String pathToDatabase = "";
 	public static boolean loadingDatabase = true;
 
@@ -23,10 +22,6 @@ public class TechnicalDatabaseSQLite implements TechnicalDatabaseInterface {
 	public static void main(String[] args) {
 		TechnicalDatabaseSQLite db = new TechnicalDatabaseSQLite();
 
-		System.out.println("time taken: " + (System.currentTimeMillis() - time)
-				/ 1000 + " sec");
-		System.out.println("memory used : "
-				+ (Runtime.getRuntime().totalMemory() / 1000000) + "   MB");
 	}
 
 	public TechnicalDatabaseSQLite() {
@@ -42,6 +37,7 @@ public class TechnicalDatabaseSQLite implements TechnicalDatabaseInterface {
 		pathToDatabase = new ChooseFilePrompterPathSaved("databasesettings")
 				.getSetting("path to sqlite technical database");
 
+		new DBLoadThread().start();
 	}
 
 	private class DBLoadThread extends Thread {
@@ -50,11 +46,18 @@ public class TechnicalDatabaseSQLite implements TechnicalDatabaseInterface {
 		public void run() {
 			loadAllDataFromSQLiteDB();
 			loadingDatabase = false;
+			System.out.println("technical database loading time taken: "
+					+ (System.currentTimeMillis() - time) / 1000 + " sec");
+			System.out.println("memory used : "
+					+ (Runtime.getRuntime().totalMemory() / 1000000) + "   MB");
 		}
 
 	}
 
 	private void loadAllDataFromSQLiteDB() {
+
+		System.out
+				.println("Technical Database Loading Thread Started ..........");
 		pathToDatabase = new ChooseFilePrompterPathSaved("databasesettings")
 				.getSetting("path to sqlite technical database");
 		Connection cnxn = SQLiteTools.establishSQLiteConnection(new File(
@@ -76,8 +79,8 @@ public class TechnicalDatabaseSQLite implements TechnicalDatabaseInterface {
 			while (rs.next()) {
 
 				String t = rs.getString("db_ticker");
-				// System.out.println(counter++ + "   getting blob for:  	" +
-				// t);
+				if (counter++ % 1000 == 0)
+					System.out.println(counter + "   getting blob for:  	" + t);
 				float[][] data = (float[][]) SQLiteTools.deserialize(rs
 						.getBytes("db_data"));
 
@@ -109,6 +112,8 @@ public class TechnicalDatabaseSQLite implements TechnicalDatabaseInterface {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		System.out
+				.println(".........   done loading technical database from sqlite");
 	}
 
 	public float[][] queryTechnicalDatabase(String ticker) {

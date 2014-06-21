@@ -6,6 +6,7 @@ import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseInterface;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseSQLite;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
+import harlequinmettle.utils.filetools.SerializationTool;
 import harlequinmettle.utils.guitools.CommonColors;
 import harlequinmettle.utils.guitools.JLabelFactory;
 import harlequinmettle.utils.guitools.JScrollPanelledPane;
@@ -24,6 +25,8 @@ import java.awt.Graphics2D;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -43,6 +46,7 @@ import java.util.Date;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -56,8 +60,7 @@ public class TickerTechView extends JPanel {
 	public static final int DIVIDEND_100_PERCENT_CLOSE_WIDTH = 5000;
 	public static final int BAR_W = 10;
 	public static final int margins = 20;
-	
-	
+
 	public static float eW = 1111;
 	public static float frameW = 500;
 	public static float W = 2 * margins + eW;
@@ -102,6 +105,19 @@ public class TickerTechView extends JPanel {
 	public String pathToObj = "technical_database_settings";
 	String profilePathKey = "path to profiles text file";
 	private String ticker;
+	private TreeMap<String, Boolean> myPreferences = new TreeMap<String, Boolean>();;
+	private static final String VOL_BARS = "show volume bars";
+	private static final String CANDLESTICKS = "show candlesticks";
+	private static final String GRID_LINES = "show grid";
+	private static final String DIV_BALLS = "show dividends";
+	// private static final String VOL_BAR ="show open line"
+	// private static final String VOL_BAR = "show close line"
+	// private static final String VOL_BAR = "show high line"
+	// private static final String VOL_BAR ="show low line"
+	// private static final String VOL_BAR = "show volume line"
+	private static final String[] preferenceOptions = { //
+	VOL_BARS, CANDLESTICKS, GRID_LINES, DIV_BALLS };
+	String preferencesSerializedName = "preferences_serialized_name";
 
 	public TickerTechView() {
 		this.ticker = "BME";
@@ -119,6 +135,7 @@ public class TickerTechView extends JPanel {
 	}
 
 	private void init() {
+		restorePreferences();
 		// H = getHeight() - 40;
 		frameW = getWidth();
 		eH = H - 2 * margins;
@@ -135,14 +152,27 @@ public class TickerTechView extends JPanel {
 		showChartInNewWindow(ticker);
 	}
 
+	private void restorePreferences() {
+
+		myPreferences = SerializationTool.deserialize(myPreferences.getClass(),
+				preferencesSerializedName);
+		if (myPreferences == null) {
+			myPreferences = new TreeMap<String, Boolean>();
+			for (String pref : preferenceOptions) {
+				myPreferences.put(pref, true);
+			}
+		}
+	}
+
 	private void doSetUpWithTechnicalDatabaseSQLite(String ticker2) {
-		technicalData = TechnicalDatabaseViewer.TDB.queryTechnicalDatabase(ticker2);
-		eW = technicalData.length*(7f/5f)
-				* (BAR_W + INTERBARMARGINS);
+		technicalData = TechnicalDatabaseViewer.TDB.SQLITE_PER_TICKER_PER_DAY_TECHNICAL_DATA
+				.get(ticker2);
+		// queryTechnicalDatabase(ticker2);
+		eW = technicalData.length * (7f / 5f) * (BAR_W + INTERBARMARGINS);
 		W = 2 * margins + eW;
 
 		updateSizePreferrence();
-		
+
 		TreeMap<Float, Float> high = genMap(technicalData,
 				TechnicalDatabaseSQLite.HIGH);
 		TreeMap<Float, Float> low = genMap(technicalData,
@@ -174,33 +204,33 @@ public class TickerTechView extends JPanel {
 		return mapping;
 	}
 
-//	private void doSetUpWithTechnicalDatabase() {
-//
-//		TreeMap<Float, Float> high = TechnicalDatabase.makeGetDataToDateMap(
-//				ticker, TechnicalDatabase.HIGH);
-//		TreeMap<Float, Float> low = TechnicalDatabase.makeGetDataToDateMap(
-//				ticker, TechnicalDatabase.LOW);
-//
-//		minMaxPrice = calcMinMax(low, high);
-//		highLow = generateDisplayableLines(low, high, minMaxPrice);
-//
-//		TreeMap<Float, Float> open = TechnicalDatabase.makeGetDataToDateMap(
-//				ticker, TechnicalDatabase.OPEN);
-//		TreeMap<Float, Float> close = TechnicalDatabase.makeGetDataToDateMap(
-//				ticker, TechnicalDatabase.CLOSE);
-//		openClose = generateDisplayableLines(open, close, minMaxPrice);
-//
-//		TreeMap<Float, Float> volume = TechnicalDatabase.makeGetDataToDateMap(
-//				ticker, TechnicalDatabase.VOLUME);
-//		minMaxVolume = calcMinMax(volume);
-//		days = calculateDaysFromMap(volume);
-//		volumeBars = generateDisplayableLines(volume, minMaxVolume);
-//		technicalData = TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA
-//				.get(ticker);
-//
-//		if (DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.containsKey(ticker))
-//			dividendEllipses = generateDivDisplay(close);
-//	}
+	// private void doSetUpWithTechnicalDatabase() {
+	//
+	// TreeMap<Float, Float> high = TechnicalDatabase.makeGetDataToDateMap(
+	// ticker, TechnicalDatabase.HIGH);
+	// TreeMap<Float, Float> low = TechnicalDatabase.makeGetDataToDateMap(
+	// ticker, TechnicalDatabase.LOW);
+	//
+	// minMaxPrice = calcMinMax(low, high);
+	// highLow = generateDisplayableLines(low, high, minMaxPrice);
+	//
+	// TreeMap<Float, Float> open = TechnicalDatabase.makeGetDataToDateMap(
+	// ticker, TechnicalDatabase.OPEN);
+	// TreeMap<Float, Float> close = TechnicalDatabase.makeGetDataToDateMap(
+	// ticker, TechnicalDatabase.CLOSE);
+	// openClose = generateDisplayableLines(open, close, minMaxPrice);
+	//
+	// TreeMap<Float, Float> volume = TechnicalDatabase.makeGetDataToDateMap(
+	// ticker, TechnicalDatabase.VOLUME);
+	// minMaxVolume = calcMinMax(volume);
+	// days = calculateDaysFromMap(volume);
+	// volumeBars = generateDisplayableLines(volume, minMaxVolume);
+	// technicalData = TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA
+	// .get(ticker);
+	//
+	// if (DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.containsKey(ticker))
+	// dividendEllipses = generateDivDisplay(close);
+	// }
 
 	private String establishPathToProfilesText() {
 		ChooseFilePrompterPathSaved profileDatabasePathSaver = new ChooseFilePrompterPathSaved(
@@ -415,13 +445,16 @@ public class TickerTechView extends JPanel {
 
 		g.scale(scalex, scaley);
 		drawBackground(g);
-
-		drawVolumeLines(g);
-		drawDividendOvals(g);
+		if (myPreferences.get(VOL_BARS))
+			drawVolumeLines(g);
+		if (myPreferences.get(DIV_BALLS))
+			drawDividendOvals(g);
 		// drawProfileDescription(g);
-		drawHighLowLines(g);
-		drawOpenCloseLines(g);
-		drawDatesData(g);
+		if (myPreferences.get(CANDLESTICKS)) {
+			drawHighLowLines(g);
+			drawOpenCloseLines(g);
+		}
+		drawDaysData(g);
 		// if (toggleVisible)
 		// drawFundamentalsData(g);
 	}
@@ -481,7 +514,8 @@ public class TickerTechView extends JPanel {
 		}
 	}
 
-	private void drawDatesData(Graphics2D g) {
+	private void drawDaysData(Graphics2D g) {
+
 		g.setColor(Color.black);
 		g.setFont(BIG_FONT);
 		String date = DATE_FORMAT
@@ -531,12 +565,14 @@ public class TickerTechView extends JPanel {
 		g.fillRect(0, 0, (int) W, H + 100);
 		// g.setColor(Color.DARK_GRAY);
 		// g.drawRect(margins,margins,eW,eH);
-		g.setColor(Color.LIGHT_GRAY);
-		for (int i = margins; i < W - margins; i += 25) {
-			g.drawLine(i, margins, i, margins + H);
-		}
-		for (int i = margins; i < H - margins; i += 25) {
-			g.drawLine(margins, i, margins + (int) W, i);
+		if (myPreferences.get(GRID_LINES)) {
+			g.setColor(Color.LIGHT_GRAY);
+			for (int i = margins; i < W - margins; i += 25) {
+				g.drawLine(i, margins, i, margins + H);
+			}
+			for (int i = margins; i < H - margins; i += 25) {
+				g.drawLine(margins, i, margins + (int) W, i);
+			}
 		}
 	}
 
@@ -597,8 +633,8 @@ public class TickerTechView extends JPanel {
 
 	private void showChartInNewWindow(String ticker) {
 		final JFrame container = new JFrame(ticker + "   "
-//				+ TechnicalDatabase.NUM_DAYS_START + "  days ago, to "
-//				+ TechnicalDatabase.NUM_DAYS_END
+		// + TechnicalDatabase.NUM_DAYS_START + "  days ago, to "
+		// + TechnicalDatabase.NUM_DAYS_END
 				+ "  days ago  ");
 
 		container.setSize(900, 550);
@@ -636,8 +672,7 @@ public class TickerTechView extends JPanel {
 
 		// a group of check box menu items
 		// menu.addSeparator();
-		// JCheckBoxMenuItem cbMenuItem = new
-		// JCheckBoxMenuItem("A check box menu item");
+
 		// cbMenuItem.setMnemonic(KeyEvent.VK_C);
 		// menu.add(cbMenuItem);
 		return menuBar;
@@ -645,13 +680,39 @@ public class TickerTechView extends JPanel {
 
 	private JMenu makeOptionsMenuItem() {
 		JMenu menu = new JMenu("[options]");
-
+		for (String s : preferenceOptions) {
+			JCheckBoxMenuItem cbMenuItem = new JCheckBoxMenuItem(s);
+			cbMenuItem.addItemListener(makePreferencesItemListener());
+			if (myPreferences.get(s))
+				cbMenuItem.setSelected(true);
+			menu.add(cbMenuItem);
+		}
 		return menu;
+	}
+
+	private ItemListener makePreferencesItemListener() {
+		return new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+
+				JCheckBoxMenuItem source = ((JCheckBoxMenuItem) arg0
+						.getSource());
+				String sourceText = source.getText();
+				myPreferences.put(sourceText, source.isSelected());
+				System.out.println(myPreferences);
+				repaint();
+				SerializationTool.serialize(myPreferences,
+						preferencesSerializedName);
+			}
+
+		};
 	}
 
 	private JMenu makeFundamentalsGridMenuItem() {
 
 		JMenu menu = new JMenu("[company statistics]");
+		menu.setMnemonic(KeyEvent.VK_S);
 		VerticalJPanel twoColumn = new VerticalJPanel(2);
 		PreferredJScrollPane scrollable = new PreferredJScrollPane(twoColumn);
 		scrollable.setPreferredSize(new Dimension(400, 900));
@@ -679,7 +740,7 @@ public class TickerTechView extends JPanel {
 
 		JMenu menu = new JMenu("[company description]");
 
-		menu.setMnemonic(KeyEvent.VK_A);
+		menu.setMnemonic(KeyEvent.VK_D);
 		menu.getAccessibleContext().setAccessibleDescription(
 				"The only menu in this program that has menu items");
 

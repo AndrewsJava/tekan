@@ -1,6 +1,5 @@
-package harlequinmettle.finance.technicalanalysis.datatest;
+package harlequinmettle.finance.technicalanalysis.legacy;
 
-import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
 import harlequinmettle.utils.debugtools.InstanceCounter;
 import harlequinmettle.utils.finance.TickerSetWithETFs;
 
@@ -68,7 +67,7 @@ public class FindSparseDataTickers {
 		File writeTo = new File(datalocation.getAbsolutePath()
 				+ File.separatorChar
 				+ "tickerhistorysize/tickerhistorysize.txt");
-	 
+
 		try {
 			FileUtils.writeStringToFile(writeTo, history);
 		} catch (IOException e) {
@@ -90,11 +89,10 @@ public class FindSparseDataTickers {
 	}
 
 	private static TreeMap<Double, String> finsSparseTickers(
-			TechnicalDatabase techDatabase) {
+			TreeMap<String, float[][]> DB) {
 		// <actualinvalidcount+ smalluniqeamount, ticker>
 		TreeMap<Double, String> lowPriorityTickers = new TreeMap<Double, String>();
 		// <ticker, [day][technical data]>
-		TreeMap<String, float[][]> DB = techDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA;
 
 		int uc = 100;
 		for (Entry<String, float[][]> ent : DB.entrySet()) {

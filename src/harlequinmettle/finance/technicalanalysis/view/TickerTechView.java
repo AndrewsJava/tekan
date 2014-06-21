@@ -3,7 +3,8 @@ package harlequinmettle.finance.technicalanalysis.view;
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
-import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
+import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseInterface;
+import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseSQLite;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.guitools.CommonColors;
 import harlequinmettle.utils.guitools.JLabelFactory;
@@ -36,7 +37,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,8 +56,9 @@ public class TickerTechView extends JPanel {
 	public static final int DIVIDEND_100_PERCENT_CLOSE_WIDTH = 5000;
 	public static final int BAR_W = 10;
 	public static final int margins = 20;
-	public static int eW = TechnicalDatabase.TOTAL_NUM_DAYS
-			* (BAR_W + INTERBARMARGINS);
+	
+	
+	public static float eW = 1111;
 	public static float frameW = 500;
 	public static float W = 2 * margins + eW;
 	public static int eH = 1000;
@@ -127,33 +128,79 @@ public class TickerTechView extends JPanel {
 		updateSizePreferrence();
 		setFundamentalData(ticker);
 		this.addMouseListener(dateDisplayer);
-		TreeMap<Float, Float> high = TechnicalDatabase.makeGetDataToDateMap(
-				ticker, TechnicalDatabase.HIGH);
-		TreeMap<Float, Float> low = TechnicalDatabase.makeGetDataToDateMap(
-				ticker, TechnicalDatabase.LOW);
+
+		// doSetUpWithTechnicalDatabase();
+		doSetUpWithTechnicalDatabaseSQLite(ticker);
+
+		showChartInNewWindow(ticker);
+	}
+
+	private void doSetUpWithTechnicalDatabaseSQLite(String ticker2) {
+		technicalData = TechnicalDatabaseViewer.TDB.queryTechnicalDatabase(ticker2);
+		eW = technicalData.length*(7f/5f)
+				* (BAR_W + INTERBARMARGINS);
+		W = 2 * margins + eW;
+
+		updateSizePreferrence();
+		
+		TreeMap<Float, Float> high = genMap(technicalData,
+				TechnicalDatabaseSQLite.HIGH);
+		TreeMap<Float, Float> low = genMap(technicalData,
+				TechnicalDatabaseSQLite.LOW);
+		TreeMap<Float, Float> open = genMap(technicalData,
+				TechnicalDatabaseSQLite.OPEN);
+		TreeMap<Float, Float> close = genMap(technicalData,
+				TechnicalDatabaseSQLite.CLOSE);
+		TreeMap<Float, Float> volume = genMap(technicalData,
+				TechnicalDatabaseSQLite.VOLUME);
 
 		minMaxPrice = calcMinMax(low, high);
 		highLow = generateDisplayableLines(low, high, minMaxPrice);
 
-		TreeMap<Float, Float> open = TechnicalDatabase.makeGetDataToDateMap(
-				ticker, TechnicalDatabase.OPEN);
-		TreeMap<Float, Float> close = TechnicalDatabase.makeGetDataToDateMap(
-				ticker, TechnicalDatabase.CLOSE);
 		openClose = generateDisplayableLines(open, close, minMaxPrice);
-
-		TreeMap<Float, Float> volume = TechnicalDatabase.makeGetDataToDateMap(
-				ticker, TechnicalDatabase.VOLUME);
 		minMaxVolume = calcMinMax(volume);
 		days = calculateDaysFromMap(volume);
 		volumeBars = generateDisplayableLines(volume, minMaxVolume);
-		technicalData = TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA
-				.get(ticker);
 
 		if (DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.containsKey(ticker))
 			dividendEllipses = generateDivDisplay(close);
-
-		showChartInNewWindow(ticker);
 	}
+
+	private TreeMap<Float, Float> genMap(float[][] techData, int id) {
+		TreeMap<Float, Float> mapping = new TreeMap<Float, Float>();
+		for (float[] daydata : techData)
+			mapping.put(daydata[0], daydata[id]);
+
+		return mapping;
+	}
+
+//	private void doSetUpWithTechnicalDatabase() {
+//
+//		TreeMap<Float, Float> high = TechnicalDatabase.makeGetDataToDateMap(
+//				ticker, TechnicalDatabase.HIGH);
+//		TreeMap<Float, Float> low = TechnicalDatabase.makeGetDataToDateMap(
+//				ticker, TechnicalDatabase.LOW);
+//
+//		minMaxPrice = calcMinMax(low, high);
+//		highLow = generateDisplayableLines(low, high, minMaxPrice);
+//
+//		TreeMap<Float, Float> open = TechnicalDatabase.makeGetDataToDateMap(
+//				ticker, TechnicalDatabase.OPEN);
+//		TreeMap<Float, Float> close = TechnicalDatabase.makeGetDataToDateMap(
+//				ticker, TechnicalDatabase.CLOSE);
+//		openClose = generateDisplayableLines(open, close, minMaxPrice);
+//
+//		TreeMap<Float, Float> volume = TechnicalDatabase.makeGetDataToDateMap(
+//				ticker, TechnicalDatabase.VOLUME);
+//		minMaxVolume = calcMinMax(volume);
+//		days = calculateDaysFromMap(volume);
+//		volumeBars = generateDisplayableLines(volume, minMaxVolume);
+//		technicalData = TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA
+//				.get(ticker);
+//
+//		if (DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.containsKey(ticker))
+//			dividendEllipses = generateDivDisplay(close);
+//	}
 
 	private String establishPathToProfilesText() {
 		ChooseFilePrompterPathSaved profileDatabasePathSaver = new ChooseFilePrompterPathSaved(
@@ -209,7 +256,7 @@ public class TickerTechView extends JPanel {
 				if (data != data || Float.isInfinite(data))
 					continue;
 				readabledata = NumberFormater.floatToBMKTrunkated(data);
- 
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -463,7 +510,7 @@ public class TickerTechView extends JPanel {
 		g.drawString(date, left + 5, top + FONT_SIZE + 5);
 		for (int i = 1; i < dailyRecord.size(); i++) {
 
-			g.drawString(TechnicalDatabase.elements[i], left + 5, top
+			g.drawString(TechnicalDatabaseInterface.elements[i], left + 5, top
 					+ FONT_SIZE + 5 + FONT_SIZE * (1 + i));
 			g.drawString(dailyRecord.get(i), 80 + left + 5, top + FONT_SIZE + 5
 					+ FONT_SIZE * (1 + i));
@@ -550,8 +597,9 @@ public class TickerTechView extends JPanel {
 
 	private void showChartInNewWindow(String ticker) {
 		final JFrame container = new JFrame(ticker + "   "
-				+ TechnicalDatabase.NUM_DAYS_START + "  days ago, to "
-				+ TechnicalDatabase.NUM_DAYS_END + "  days ago  ");
+//				+ TechnicalDatabase.NUM_DAYS_START + "  days ago, to "
+//				+ TechnicalDatabase.NUM_DAYS_END
+				+ "  days ago  ");
 
 		container.setSize(900, 550);
 		container.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -606,12 +654,12 @@ public class TickerTechView extends JPanel {
 		JMenu menu = new JMenu("[company statistics]");
 		VerticalJPanel twoColumn = new VerticalJPanel(2);
 		PreferredJScrollPane scrollable = new PreferredJScrollPane(twoColumn);
-		scrollable.setPreferredSize(new Dimension(400,900));
+		scrollable.setPreferredSize(new Dimension(400, 900));
 		boolean alternate = true;
 		for (String key : CurrentFundamentalsDatabase.forDisplaying) {
 			String value = "";
 			if (currentFundamentals.containsKey(key))
-				value = currentFundamentals.get(key) ;
+				value = currentFundamentals.get(key);
 			if (alternate = !alternate) {
 				twoColumn.add(JLabelFactory.doBluishJLabel(key, BIG_FONT));
 				twoColumn.add(JLabelFactory
@@ -637,7 +685,7 @@ public class TickerTechView extends JPanel {
 
 		// ///
 		JTextArea myText = new JTextArea();
-		myText.setBackground(new Color(200,225,255));
+		myText.setBackground(new Color(200, 225, 255));
 		myText.setText(profile);
 		myText.setLineWrap(true);
 		myText.setFont(BIG_FONT);

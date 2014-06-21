@@ -3,7 +3,6 @@ package harlequinmettle.finance.technicalanalysis.datatest;
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
-import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
 import harlequinmettle.utils.TimeRecord;
 
 import java.util.Map.Entry;
@@ -45,14 +44,16 @@ public class DividendForecaster {
 						continue;
 					TreeMap<String, Float> tickerData = CurrentFundamentalsSQLiteDatabase.CURRENT_TICKER_TO_LABEL_DATA_MAPING
 							.get(ticker);
-					float fiftyDayAvg = 1000;
-					if (tickerData.containsKey("50-Day Moving Average"))
-						fiftyDayAvg = tickerData.get("50-Day Moving Average");
-					else
-						fiftyDayAvg = getPriceFromTechnicalDatabase(ticker,
-								currentDate);
-					String divoverview = (((int) (1000 * dividend / fiftyDayAvg) / 10f)
-							+ "%" + ticker + "     " + lastDiv + "     " + dividend);
+		 	
+					String divoverview = "unknown";
+					if (tickerData.containsKey("50-Day Moving Average")){
+						float	fiftyDayAvg = tickerData.get("50-Day Moving Average");
+						  divoverview = (((int) (1000 * dividend / fiftyDayAvg) / 10f)
+									+ "%" + ticker + "     " + lastDiv + "     " + dividend);
+					}else{
+						divoverview +=  "%" + ticker + "     " + lastDiv + "     " + dividend;
+						
+					}
 					results.put(divoverview, ticker);
 					System.out.println(ticker);
 					System.out.println(divoverview);
@@ -77,10 +78,10 @@ public class DividendForecaster {
 
 	private float getPriceFromTechnicalDatabase(String ticker, float currentDate) {
 		float approxPrice = 5;
-		float[][] techData = TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA
-				.get(ticker);
-		int date = (int) (currentDate - TechnicalDatabase.NUM_DAYS_START);
-		approxPrice = techData[techData.length-1][6];
+//		float[][] techData = TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA
+//				.get(ticker);
+//		int date = (int) (currentDate - TechnicalDatabase.NUM_DAYS_START);
+//		approxPrice = techData[techData.length-1][6];
 		return approxPrice;
 	}
 

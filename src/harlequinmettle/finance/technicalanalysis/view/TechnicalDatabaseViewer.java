@@ -1,10 +1,9 @@
 package harlequinmettle.finance.technicalanalysis.view;
 
 import harlequinmettle.finance.technicalanalysis.datatest.DividendForecaster;
-import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
-import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
+import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseSQLite;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.finance.ETFs;
 import harlequinmettle.utils.guitools.FilterPanel;
@@ -16,10 +15,7 @@ import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import javax.swing.JButton;
@@ -27,11 +23,11 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 
-import org.apache.commons.io.FileUtils;
-
 public class TechnicalDatabaseViewer extends JTabbedPane {
 
-	public static final DividendDatabase ddb = new DividendDatabase();
+	public static final DividendDatabase DDB = new DividendDatabase();
+	public static final TechnicalDatabaseSQLite TDB = new TechnicalDatabaseSQLite();
+	//public static final TechnicalDatabaseSQLite TDB = new TechnicalDatabaseSQLite(2000);
 
 	public static void main(String[] arg) {
 		TechnicalDatabaseViewer tdbviewer = new TechnicalDatabaseViewer();
@@ -44,7 +40,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 	private void init() {
 
 		SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
-		TechnicalDatabase db = new TechnicalDatabase(2, 0);
+		// TechnicalDatabase db = new TechnicalDatabase(2, 0); 
 		CurrentFundamentalsSQLiteDatabase fdb = new CurrentFundamentalsSQLiteDatabase();
 
 		// new ArrayList<String>(

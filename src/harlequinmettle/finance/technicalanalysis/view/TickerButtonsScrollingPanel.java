@@ -1,6 +1,5 @@
 package harlequinmettle.finance.technicalanalysis.view;
 
-import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabase;
 import harlequinmettle.utils.guitools.HorizontalJPanel;
 import harlequinmettle.utils.guitools.JScrollPanelledPane;
 
@@ -43,7 +42,7 @@ public class TickerButtonsScrollingPanel {
 
 		JScrollPanelledPane scrollForButtons = new JScrollPanelledPane();
 		for (String ticker : asList) {
-			if(TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA.containsKey(ticker.toUpperCase().replaceAll(".*\\W+.*", "")))
+	//		if(TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA.containsKey(ticker.toUpperCase().replaceAll(".*\\W+.*", "")))
 			scrollForButtons.addComp(makeTickerButton(ticker));
 		} 
 		return scrollForButtons;

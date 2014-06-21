@@ -1,4 +1,4 @@
-package harlequinmettle.finance.technicalanalysis.model.db;
+package harlequinmettle.finance.technicalanalysis.legacy;
 
 import harlequinmettle.utils.TimeRecord;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
@@ -17,7 +17,7 @@ import javax.swing.JFrame;
 
 import org.apache.commons.io.FileUtils;
 
-public class TechnicalDatabase {
+    class TechnicalDatabaseLegacy {
 	public static final SimpleDateFormat REPORT_DATE_FORMAT = new SimpleDateFormat(
 			"yyyy-MM-dd");
 
@@ -38,15 +38,15 @@ public class TechnicalDatabase {
 	public static final String a = "adjcls";
 	public static final String[] elements = { d, o, h, l, c, v, a };
 	// defaults
-	public static  int NUM_YRS_START = 5;
-	public static  int NUM_DAYS_START = 365 * NUM_YRS_START;
-	public static  int NUM_YRS_END = 0;
-	public static  int NUM_DAYS_END = 365 * NUM_YRS_END;
-	public static  int TOTAL_NUM_DAYS = (NUM_DAYS_START - NUM_DAYS_END);
-	public static   int COLLECTION_DAY_NUMBER = (int) TimeRecord.dayNumber(1402664533867l);
+	public static int NUM_YRS_START = 5;
+	public static int NUM_DAYS_START = 365 * NUM_YRS_START;
+	public static int NUM_YRS_END = 0;
+	public static int NUM_DAYS_END = 365 * NUM_YRS_END;
+	public static int TOTAL_NUM_DAYS = (NUM_DAYS_START - NUM_DAYS_END);
+	public static int COLLECTION_DAY_NUMBER = (int) TimeRecord
+			.dayNumber(1402664533867l);
 
- 
-	public   float PERCENT_TO_DISCARD = 0.01f;
+	public float PERCENT_TO_DISCARD = 0.01f;
 	// String ticker maps to time series map daynumber->value
 	// public static final TreeMap<String, TreeMap<Float, float[]>>
 	// PER_TICKER_PER_DAY_TECHNICAL_DATA = new TreeMap<String, TreeMap<Float,
@@ -55,10 +55,11 @@ public class TechnicalDatabase {
 	public static TreeMap<String, float[][]> PER_TICKER_PER_DAY_TECHNICAL_DATA = new TreeMap<String, float[][]>();
 
 	long time = System.currentTimeMillis();
-	public   String pathToObj = "technical_database_settings";
+	public String pathToObj = "technical_database_settings";
 	String pathtodata = "path to technicals price data csv";
 	String rootPathToTechnicals = "path not set";
-	public TechnicalDatabase(int oldestYearsAgo, int newestYearsAgo) {
+
+	public TechnicalDatabaseLegacy(int oldestYearsAgo, int newestYearsAgo) {
 
 		NUM_YRS_START = oldestYearsAgo;
 		NUM_DAYS_START = 365 * NUM_YRS_START;
@@ -68,8 +69,7 @@ public class TechnicalDatabase {
 		allocateMemory();
 		int count = 0;
 		restoreSettings();
- 
-		
+
 		if (new File("TECHNICAL_DATA/OBJECTS/TECHDATAOBJ_" + NUM_DAYS_START
 				+ "_" + NUM_DAYS_END).exists()) {
 			PER_TICKER_PER_DAY_TECHNICAL_DATA = SerializationTool.deserialize(
@@ -81,7 +81,7 @@ public class TechnicalDatabase {
 			for (File file : files) {
 				// / if(count>110)break;
 				System.out.println(count++ + "     " + file.getName());
-			  if (file.isFile() && file.getName().endsWith(".csv")) {
+				if (file.isFile() && file.getName().endsWith(".csv")) {
 					loadTechnicalData(file);
 				}
 			}
@@ -90,10 +90,32 @@ public class TechnicalDatabase {
 							+ "_" + NUM_DAYS_END);
 
 		}
+		// 20yrs - 10yrs
+		// initial
+		// technical database successfully created with up to: 3650 days of data
+		// time taken: 398 sec
+		// memory used : 614 MB
+		// vs from deserialize
+		// technical database successfully created with up to: 3650 days of data
+		// time taken: 35 sec
+		// memory used : 576 MB
+		// *//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
+		// 10yrs - 0yrs
+		// initial
+		// technical database successfully created with up to: 3650 days of data
+		// time taken: 433 sec
+		// memory used : 871 MB
+		// vs from deserialize
+		// time taken: 53 sec
+		// memory used : 734 MB
+		//vs sqlite 
+		// time taken: 83 sec
+		// memory used : 785 MB
 		System.out
 				.println("technical database successfully created with up to: "
 						+ TOTAL_NUM_DAYS + "  days of data");
-		System.out.println("in : " + (System.currentTimeMillis() - time));
+		System.out.println("time taken: " + (System.currentTimeMillis() - time)
+				/ 1000 + " sec");
 		System.out.println("memory used : "
 				+ (Runtime.getRuntime().totalMemory() / 1000000) + "   MB");
 
@@ -122,13 +144,13 @@ public class TechnicalDatabase {
 			PER_TICKER_PER_DAY_TECHNICAL_DATA.put(ticker,
 					new float[TOTAL_NUM_DAYS][]);
 
-		} 
+		}
 		System.out.println("time: " + (System.currentTimeMillis() - time));
 	}
 
 	private TreeMap<String, Float> readNumbersFromFile() {
 		TreeMap<String, Float> maxDays = new TreeMap<String, Float>();
-		File sizes = new File(rootPathToTechnicals+ File.separatorChar
+		File sizes = new File(rootPathToTechnicals + File.separatorChar
 				+ "tickerhistorysize/tickerhistorysize.txt");
 
 		try {
@@ -165,7 +187,7 @@ public class TechnicalDatabase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-//OPTION CHECK PROFILE FOR RECNET YEAR MAYBE KEEP IN DATA
+		// OPTION CHECK PROFILE FOR RECNET YEAR MAYBE KEEP IN DATA
 		if (daysOfValidData < (PERCENT_TO_DISCARD * TOTAL_NUM_DAYS)) {
 			PER_TICKER_PER_DAY_TECHNICAL_DATA.remove(ticker);
 		}
@@ -195,7 +217,7 @@ public class TechnicalDatabase {
 			float[] dataForDay = { date, open, high, low, close, volume,
 					adjclose };
 			int dayNumberIndexedToArray = (int) date
-					- (COLLECTION_DAY_NUMBER - NUM_DAYS_START) ;
+					- (COLLECTION_DAY_NUMBER - NUM_DAYS_START);
 			PER_TICKER_PER_DAY_TECHNICAL_DATA.get(ticker)[dayNumberIndexedToArray] = dataForDay;
 			return 1;
 		}
@@ -238,7 +260,7 @@ public class TechnicalDatabase {
 	public static void main(String[] arg) {
 		SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
 		smu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		TechnicalDatabase quotes = new TechnicalDatabase(20, 10);
+		TechnicalDatabaseLegacy quotes = new TechnicalDatabaseLegacy(10, 0);
 
 		System.out.println("time: "
 				+ (System.currentTimeMillis() - quotes.time));

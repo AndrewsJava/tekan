@@ -1,4 +1,4 @@
-package harlequinmettle.finance.technicalanalysis.datatest;
+package harlequinmettle.finance.technicalanalysis.sqlitedatabasebuilders;
 
 import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;
 

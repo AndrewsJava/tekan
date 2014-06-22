@@ -1,11 +1,10 @@
-package harlequinmettle.finance.technicalanalysis.util;
+package harlequinmettle.finance.technicalanalysis.tickertech;
 
-import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsDatabase;
+import harlequinmettle.finance.technicalanalysis.applications.TechnicalDatabaseViewer;
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseInterface;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseSQLite;
-import harlequinmettle.finance.technicalanalysis.view.TechnicalDatabaseViewer;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.filetools.SerializationTool;
 import harlequinmettle.utils.guitools.CommonColors;
@@ -15,7 +14,6 @@ import harlequinmettle.utils.numbertools.format.NumberFormater;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -28,82 +26,80 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.swing.JViewport;
 
 public class TickerTechModel {
 
-	public static final int INTERBARMARGINS = 2;
-	public static final int DIVIDEND_100_PERCENT_CLOSE_WIDTH = 5000;
-	public static final int BAR_W = 10;
-	public static final int margins = 20;
+	private static final int INTERBARMARGINS = 2;
+	private static final int DIVIDEND_100_PERCENT_CLOSE_WIDTH = 5000;
+	private static final int BAR_W = 10;
+	static final int margins = 20;
 
-	public static float eW = 1111;
-	public static float frameW = 500;
-	public static float W = 2 * margins + eW;
-	public static int eH = 1000;
-	public static int H = 1000;
-	public static final int FONT_SIZE = 18;
-	public static final int REAL_BIG_FONT_SIZE = 24;
-	public static final Font BIG_FONT = new Font("Bitstream", Font.PLAIN,
-			FONT_SIZE);
-	public static final Font REAL_BIG_FONT = new Font("Bitstream", Font.PLAIN,
+	static float eW = 1111;
+	static float frameW = 500;
+	static float W = 2 * margins + eW;
+	static int eH = 1000;
+	static int H = 1000;
+	private static final int FONT_SIZE = 18;
+	private static final int REAL_BIG_FONT_SIZE = 24;
+	static final Font BIG_FONT = new Font("Bitstream", Font.PLAIN, FONT_SIZE);
+	private static final Font REAL_BIG_FONT = new Font("Bitstream", Font.PLAIN,
 			REAL_BIG_FONT_SIZE);
-	public static final SmoothStroke SMOOTH_STROKE = new SmoothStroke(3);
-	public static final SquareStroke SQUARE_STROKE = new SquareStroke(8);
-	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
+	private static final SmoothStroke SMOOTH_STROKE = new SmoothStroke(3);
+	private static final SquareStroke SQUARE_STROKE = new SquareStroke(8);
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
 			"EEE YYYY-MMM-dd");
 
-	public TreeMap<Float, Ellipse2D.Float> dividendEllipses = new TreeMap<Float, Ellipse2D.Float>();
-	public ArrayList<Line2D.Float> volumeBars;
-	public ArrayList<Line2D.Float> openClose;
-	public ArrayList<Line2D.Float> highLow;
-	public Point2D.Float minMaxPrice;
-	public Point2D.Float minMaxVolume;
-	public float x, y, xf, yf, day;
-	public float[] days;
-	public float[][] technicalData;
-	public float scalex = 1, scaley = 1;
-	public String profile = "no profile on record";
+	private TreeMap<Float, Ellipse2D.Float> dividendEllipses = new TreeMap<Float, Ellipse2D.Float>();
+	private ArrayList<Line2D.Float> volumeBars;
+	private ArrayList<Line2D.Float> openClose;
+	private ArrayList<Line2D.Float> highLow;
+	private Point2D.Float minMaxPrice;
+	private Point2D.Float minMaxVolume;
+	float x, y;
+	float xf;
+	float yf;
+	private float day;
+	private float[] days;
+	private float[][] technicalData;
+	private float scalex = 1, scaley = 1;
+	String profile = "no profile on record";
 	// TODO: VOLUME AVG LINE(S)
 	// TODO: AVERAGE LINES
 	// TODO: PERCENT
 	// TODO: R-VALUE
 	// TODO: LEAST SQUARES FIT
-	// TODO: SEARCH RESULTS LIST
-	// TODO: DIVIDENDS
-	public ArrayList<String> dailyRecord = new ArrayList<String>();
+	private ArrayList<String> dailyRecord = new ArrayList<String>();
 
-	public TreeMap<String, String> currentFundamentals = new TreeMap<String, String>();
+	TreeMap<String, String> currentFundamentals = new TreeMap<String, String>();
 
-	public JViewport viewport;
+	private JViewport viewport;
 
-	public String pathToObj = "technical_database_settings";
-	public String profilePathKey = "path to profiles text file";
-	public String ticker;
-	public TreeMap<String, Boolean> myPreferences = new TreeMap<String, Boolean>();
-	public static final String VOL_BARS = "show volume bars";
-	public static final String CANDLESTICKS = "show candlesticks";
-	public static final String GRID_LINES = "show grid";
-	public static final String DIV_BALLS = "show dividends";
-	// public static final String VOL_BAR ="show open line"
-	// public static final String VOL_BAR = "show close line"
-	// public static final String VOL_BAR = "show high line"
-	// public static final String VOL_BAR ="show low line"
-	// public static final String VOL_BAR = "show volume line"
-	public static final String[] preferenceOptions = { //
+	String ticker;
+	TreeMap<String, Boolean> myPreferences = new TreeMap<String, Boolean>();
+	static final String VOL_BARS = "show volume bars";
+	static final String CANDLESTICKS = "show candlesticks";
+	static final String GRID_LINES = "show grid";
+	static final String DIV_BALLS = "show dividends";
+	// private static final String VOL_BAR ="show open line"
+	// private static final String VOL_BAR = "show close line"
+	// private static final String VOL_BAR = "show high line"
+	// private static final String VOL_BAR ="show low line"
+	// private static final String VOL_BAR = "show volume line"
+	static final String[] preferenceOptions = { //
 	VOL_BARS, CANDLESTICKS, GRID_LINES, DIV_BALLS };
-	public String preferencesSerializedName = "preferences_serialized_name";
+	String preferencesSerializedName = "application_settings"+File.separator+"preferences_serialized_name";
 
 	public TickerTechModel(String ticker) {
 		this.ticker = ticker;
 		init();
 	}
 
-	public void init() {
-restorePreferences();
+	private void init() {
+		restorePreferences();
 		String profilePath = establishPathToProfilesText();
 		profile = getProfile(profilePath, ticker);
 		profile = profile.replaceAll("\\.", "\\.\n\n");
@@ -111,13 +107,12 @@ restorePreferences();
 		doSetUpWithTechnicalDatabaseSQLite(ticker);
 	}
 
-	public void doSetUpWithTechnicalDatabaseSQLite(String ticker2) {
+	private void doSetUpWithTechnicalDatabaseSQLite(String ticker2) {
 		technicalData = TechnicalDatabaseViewer.TDB.SQLITE_PER_TICKER_PER_DAY_TECHNICAL_DATA
 				.get(ticker2);
 		// queryTechnicalDatabase(ticker2);
 		eW = technicalData.length * (7f / 5f) * (BAR_W + INTERBARMARGINS);
 		W = 2 * margins + eW;
-
 
 		TreeMap<Float, Float> high = genMap(technicalData,
 				TechnicalDatabaseSQLite.HIGH);
@@ -141,7 +136,6 @@ restorePreferences();
 		if (DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.containsKey(ticker))
 			dividendEllipses = generateDivDisplay(close);
 	}
-
 
 	private float[] calculateDaysFromMap(TreeMap<Float, Float> volume) {
 
@@ -184,7 +178,8 @@ restorePreferences();
 
 		return mapping;
 	}
-	public void restorePreferences() {
+
+	private void restorePreferences() {
 
 		myPreferences = SerializationTool.deserialize(myPreferences.getClass(),
 				preferencesSerializedName);
@@ -195,7 +190,8 @@ restorePreferences();
 			}
 		}
 	}
-	public void setDailyTradeData(float xpt, float ypt) {
+
+	void setDailyTradeData(float xpt, float ypt) {
 		x = xpt;
 		y = ypt;
 		dailyRecord.clear();
@@ -220,25 +216,25 @@ restorePreferences();
 						if (f > 10000000) {
 							f /= 1000000;
 							dailyRecord.add(""
-									+ new BigDecimal((long) f)
-											.toPlainString() + " M");
+									+ new BigDecimal((long) f).toPlainString()
+									+ " M");
 						} else if (f > 10000) {
 							f /= 1000;
 							dailyRecord.add(""
-									+ new BigDecimal((long) f)
-											.toPlainString() + " K");
+									+ new BigDecimal((long) f).toPlainString()
+									+ " K");
 						} else {
 
 							dailyRecord.add(""
-									+ new BigDecimal((long) f)
-											.toPlainString());
+									+ new BigDecimal((long) f).toPlainString());
 
 						}
 					}
 				}
 		}
 	}
-	public String getProfile(String profilePath, String ticker) {
+
+	private String getProfile(String profilePath, String ticker) {
 		try {
 			String[] files = { "NASDAQ_PROFILES_I.txt", "NYSE_PROFILES_I.txt" };
 			// look for NASDAQ_PROFILES_I.txt and NYSE_PROFILES_I.txt
@@ -271,16 +267,16 @@ restorePreferences();
 		return "no profile found";
 	}
 
-	public void setFundamentalData(String ticker) {
+	private void setFundamentalData(String ticker) {
 
 		TreeMap<String, Float> tickersFundamentals = CurrentFundamentalsSQLiteDatabase.CURRENT_TICKER_TO_LABEL_DATA_MAPING
 				.get(ticker);
-		for (int i = 0; i < CurrentFundamentalsDatabase.forDisplaying.length; i++) {
+		for (int i = 0; i < CurrentFundamentalsSQLiteDatabase.forDisplaying.length; i++) {
 			String readabledata = "NAN";
 			try {
 
 				float data = tickersFundamentals
-						.get(CurrentFundamentalsDatabase.forDisplaying[i]);
+						.get(CurrentFundamentalsSQLiteDatabase.forDisplaying[i]);
 				if (data != data || Float.isInfinite(data))
 					continue;
 				readabledata = NumberFormater.floatToBMKTrunkated(data);
@@ -289,20 +285,21 @@ restorePreferences();
 				e.printStackTrace();
 			}
 			currentFundamentals.put(
-					CurrentFundamentalsDatabase.forDisplaying[i], readabledata);
+					CurrentFundamentalsSQLiteDatabase.forDisplaying[i],
+					readabledata);
 		}
 
 	}
 
-	public String establishPathToProfilesText() {
+	private String establishPathToProfilesText() {
 		ChooseFilePrompterPathSaved profileDatabasePathSaver = new ChooseFilePrompterPathSaved(
-				pathToObj);
+				"application_settings", "technical_database_settings");
 		String profilePath = profileDatabasePathSaver
-				.getSetting(profilePathKey);
+				.getSetting("path to profiles text file");
 		return profilePath;
 	}
 
-	public TreeMap<Float, Ellipse2D.Float> generateDivDisplay(
+	private TreeMap<Float, Ellipse2D.Float> generateDivDisplay(
 			TreeMap<Float, Float> close) {
 		TreeMap<Float, Ellipse2D.Float> divs = new TreeMap<Float, Ellipse2D.Float>();
 
@@ -328,7 +325,7 @@ restorePreferences();
 		return divs;
 	}
 
-	public Ellipse2D.Float calculateEllipseDisplay(int i, float exDivDate,
+	private Ellipse2D.Float calculateEllipseDisplay(int i, float exDivDate,
 			float dayClose) {
 
 		float divAmt = DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.get(ticker)
@@ -345,7 +342,7 @@ restorePreferences();
 		return new Ellipse2D.Float(left, top, ellipseWidth, ellipseWidth);
 	}
 
-	public Line2D.Float calculateLineDisplay(int i, float thislow,
+	private Line2D.Float calculateLineDisplay(int i, float thislow,
 			float thishigh, Point2D.Float minmax) {
 		float xLow = margins + BAR_W / 2 + i * (BAR_W + INTERBARMARGINS);
 		float xHigh = xLow;
@@ -356,7 +353,7 @@ restorePreferences();
 		return new Line2D.Float(xLow, yLow, xHigh, yHigh);
 	}
 
-	public float calculateVerticalScreenPoint(float value, Point2D.Float minmax) {
+	private float calculateVerticalScreenPoint(float value, Point2D.Float minmax) {
 		float numerator = eH - margins;
 		float denominator = minmax.y - minmax.x;
 		// denominator should not be zero
@@ -386,7 +383,7 @@ restorePreferences();
 		return hl;
 	}
 
-	public ArrayList<Line2D.Float> generateDisplayableLines(
+	private ArrayList<Line2D.Float> generateDisplayableLines(
 			TreeMap<Float, Float> start, TreeMap<Float, Float> end,
 			Point2D.Float minmax) {
 		ArrayList<Line2D.Float> hl = new ArrayList<Line2D.Float>();
@@ -406,7 +403,7 @@ restorePreferences();
 		return hl;
 	}
 
-	public void drawDividendOvals(Graphics2D g) {
+	void drawDividendOvals(Graphics2D g) {
 
 		for (Entry<Float, Ellipse2D.Float> div : dividendEllipses.entrySet()) {
 			g.setColor(Color.magenta);
@@ -421,47 +418,7 @@ restorePreferences();
 		}
 	}
 
-	public void drawProfileDescription(Graphics2D g) {
-		g.setFont(REAL_BIG_FONT);
-		g.setColor(CommonColors.FAINT_RED);
-		FontMetrics fontMetrics = g.getFontMetrics();
-		int width = fontMetrics.stringWidth(profile);
-		float lineCount = width / (W / 2);
-		int substringSize = (int) (profile.length() / lineCount);
-		for (int i = 0; i < lineCount; i++) {
-			int substringStart = i * substringSize;
-			int substringEnd = (i + 1) * substringSize > profile.length() ? profile
-					.length() : (i + 1) * substringSize;
-			int x = 50;
-			int y = 20 + (i + 2) * REAL_BIG_FONT_SIZE;
-			g.drawString(profile.substring(substringStart, substringEnd), x, y);
-		}
-	}
-
-	public void drawFundamentalsData(Graphics2D g) {
-
-		g.setFont(BIG_FONT);
-		g.setColor(CommonColors.REGION_HIGHLIGHT);
-
-		float totalHeight = (margins + FONT_SIZE)
-				* (4 + CurrentFundamentalsDatabase.forDisplaying.length);
-		g.fill(new Rectangle2D.Float(xf, margins, 500, totalHeight));
-		g.setColor(Color.black);
-
-		int i = 0;
-
-		for (String key : CurrentFundamentalsDatabase.forDisplaying) {
-
-			g.drawString(key, xf + 5, margins + FONT_SIZE * (2 + i));
-			if (currentFundamentals.containsKey(key))
-				g.drawString(currentFundamentals.get(key).toString(), xf + 355,
-						margins + FONT_SIZE * (2 + i));
-			i++;
-
-		}
-	}
-
-	public void drawDaysData(Graphics2D g) {
+	void drawDaysData(Graphics2D g) {
 
 		g.setColor(Color.black);
 		g.setFont(BIG_FONT);
@@ -506,7 +463,7 @@ restorePreferences();
 		// }
 	}
 
-	public void drawBackground(Graphics2D g) {
+	void drawBackground(Graphics2D g) {
 		Color bg = new Color(100, 120, 170);
 		g.setColor(bg);
 		g.fillRect(0, 0, (int) W, H + 100);
@@ -523,7 +480,7 @@ restorePreferences();
 		}
 	}
 
-	public void drawVolumeLines(Graphics2D g) {
+	void drawVolumeLines(Graphics2D g) {
 		g.setStroke(SQUARE_STROKE);
 		g.setColor(CommonColors.COLOR_HISTOGRAM_BAR_VOL);
 
@@ -534,7 +491,7 @@ restorePreferences();
 		}
 	}
 
-	public void drawOpenCloseLines(Graphics2D g) {
+	void drawOpenCloseLines(Graphics2D g) {
 		g.setStroke(SQUARE_STROKE);
 
 		for (Line2D.Float openclose : openClose) {
@@ -549,7 +506,7 @@ restorePreferences();
 		}
 	}
 
-	public void drawHighLowLines(Graphics2D g) {
+	void drawHighLowLines(Graphics2D g) {
 		g.setStroke(SMOOTH_STROKE);
 		g.setColor(Color.black);
 
@@ -569,7 +526,7 @@ restorePreferences();
 		}
 	}
 
-	public void setScrollBar(JViewport jViewport) {
+	void setScrollBar(JViewport jViewport) {
 		viewport = jViewport;
 	}
 }

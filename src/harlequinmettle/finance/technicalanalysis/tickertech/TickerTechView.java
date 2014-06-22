@@ -1,7 +1,7 @@
-package harlequinmettle.finance.technicalanalysis.view;
+package harlequinmettle.finance.technicalanalysis.tickertech;
 
-import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsDatabase;
-import harlequinmettle.finance.technicalanalysis.util.TickerTechModel;
+import harlequinmettle.finance.technicalanalysis.legacy.CurrentFundamentalsDatabase;
+import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.utils.filetools.SerializationTool;
 import harlequinmettle.utils.guitools.JLabelFactory;
 import harlequinmettle.utils.guitools.JScrollPanelledPane;
@@ -22,7 +22,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.TreeMap;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -33,39 +32,33 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 public class TickerTechView extends JPanel {
-	TickerTechModel model ; 
+	TickerTechModel model;
+
 	public TickerTechView() {
-	 
+
 		model = new TickerTechModel("BME");
 		init();
 	}
 
 	public TickerTechView(String ticker) {
-		model = new TickerTechModel(ticker); 
+		model = new TickerTechModel(ticker);
 		init();
 	}
 
 	public void updateSizePreferrence() {
-		setPreferredSize(new Dimension((int) (model.scalex *model. W),
-				(int) (model.scaley * model.H - 40)));
+		setPreferredSize(new Dimension((int) (model.W), (int) (model.H - 40)));
 	}
 
-	private void init() { 
+	private void init() {
 		// H = getHeight() - 40;
 		model.frameW = getWidth();
-		model.eH = model.H - 2 * model.margins; 
+		model.eH = model.H - 2 * model.margins;
 		updateSizePreferrence();
 		this.addMouseListener(dateDisplayer);
- 
 
 		updateSizePreferrence();
 		showChartInNewWindow(model.ticker);
 	}
-
-
-
-
-
 
 	// private void doSetUpWithTechnicalDatabase() {
 	//
@@ -104,7 +97,7 @@ public class TickerTechView extends JPanel {
 		updateSizePreferrence();
 		Graphics2D g = (Graphics2D) g1;
 
-		//g.scale(scalex, scaley);
+		// g.scale(scalex, scaley);
 		model.drawBackground(g);
 		if (model.myPreferences.get(model.VOL_BARS))
 			model.drawVolumeLines(g);
@@ -124,7 +117,6 @@ public class TickerTechView extends JPanel {
 		// TODO Auto-generated method stub
 
 	}
-
 
 	private void showChartInNewWindow(String ticker) {
 		final JFrame container = new JFrame(ticker + "   "
@@ -212,17 +204,20 @@ public class TickerTechView extends JPanel {
 		PreferredJScrollPane scrollable = new PreferredJScrollPane(twoColumn);
 		scrollable.setPreferredSize(new Dimension(400, 900));
 		boolean alternate = true;
-		for (String key : CurrentFundamentalsDatabase.forDisplaying) {
+		for (String key : CurrentFundamentalsSQLiteDatabase.forDisplaying) {
 			String value = "";
 			if (model.currentFundamentals.containsKey(key))
 				value = model.currentFundamentals.get(key);
 			if (alternate = !alternate) {
-				twoColumn.add(JLabelFactory.doBluishJLabel(key, model.BIG_FONT));
-				twoColumn.add(JLabelFactory
-						.doLightBluishJLabel(value, model.BIG_FONT));
+				twoColumn
+						.add(JLabelFactory.doBluishJLabel(key, model.BIG_FONT));
+				twoColumn.add(JLabelFactory.doLightBluishJLabel(value,
+						model.BIG_FONT));
 			} else {
-				twoColumn.add(JLabelFactory.doLightBluishJLabel(key, model.BIG_FONT));
-				twoColumn.add(JLabelFactory.doBluishJLabel(value, model.BIG_FONT));
+				twoColumn.add(JLabelFactory.doLightBluishJLabel(key,
+						model.BIG_FONT));
+				twoColumn.add(JLabelFactory.doBluishJLabel(value,
+						model.BIG_FONT));
 			}
 		}
 		menu.setAutoscrolls(true);
@@ -279,6 +274,7 @@ public class TickerTechView extends JPanel {
 	final MouseAdapter dateDisplayer = new MouseAdapter() {
 
 		public boolean toggleVisible = false;
+
 		public void mouseClicked(MouseEvent e) {
 			float newx = e.getX();
 			float newy = e.getY();
@@ -293,7 +289,6 @@ public class TickerTechView extends JPanel {
 			}
 			repaint();
 		}
-
 
 	};
 }

@@ -1,4 +1,4 @@
-package harlequinmettle.finance.technicalanalysis.datatest;
+package harlequinmettle.finance.technicalanalysis.sqlitedatabasebuilders;
 
 import harlequinmettle.utils.TimeRecord;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
@@ -35,7 +35,7 @@ public class TechnicalDBSQLiteBlobsBuilder {
 			Statement stat = SQLiteTools.reinitializeTable(cn, tableName,
 					columnEntries, types);
 
-			String rootq = new ChooseFilePrompterPathSaved("databasebuilter")
+			String rootq = new ChooseFilePrompterPathSaved("application_settings","databasebuilter")
 					.getSetting("path to technicals csv files");
 			ArrayList<File> allCSVDataFiles = new ArrayList<File>();
 			allCSVDataFiles.addAll(Arrays.asList(new File(rootq).listFiles()));

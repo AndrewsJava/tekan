@@ -34,7 +34,7 @@ public class TechnicalDatabaseSQLite implements TechnicalDatabaseInterface {
 	}
 
 	private void init() {
-		pathToDatabase = new ChooseFilePrompterPathSaved("databasesettings")
+		pathToDatabase = new ChooseFilePrompterPathSaved("application_settings","databasesettings")
 				.getSetting("path to sqlite technical database");
 
 		new DBLoadThread().start();
@@ -58,7 +58,7 @@ public class TechnicalDatabaseSQLite implements TechnicalDatabaseInterface {
 
 		System.out
 				.println("Technical Database Loading Thread Started ..........");
-		pathToDatabase = new ChooseFilePrompterPathSaved("databasesettings")
+		pathToDatabase = new ChooseFilePrompterPathSaved("application_settings","databasesettings")
 				.getSetting("path to sqlite technical database");
 		Connection cnxn = SQLiteTools.establishSQLiteConnection(new File(
 				pathToDatabase));
@@ -117,7 +117,7 @@ public class TechnicalDatabaseSQLite implements TechnicalDatabaseInterface {
 	}
 
 	public float[][] queryTechnicalDatabase(String ticker) {
-		pathToDatabase = new ChooseFilePrompterPathSaved("databasesettings")
+		pathToDatabase = new ChooseFilePrompterPathSaved("application_settings","databasesettings")
 				.getSetting("path to sqlite technical database");
 		Connection cnxn = SQLiteTools.establishSQLiteConnection(new File(
 				pathToDatabase));

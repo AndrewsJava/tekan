@@ -1,4 +1,4 @@
-package harlequinmettle.finance.technicalanalysis.datatest;
+package harlequinmettle.finance.technicalanalysis.sqlitedatabasebuilders;
 
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseSQLite;
 import harlequinmettle.utils.numbertools.math.statistics.StatInfo;

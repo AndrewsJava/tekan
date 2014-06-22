@@ -27,7 +27,7 @@ public class DividendDatabase {
 	}
 
 	private void init() {
-		ChooseFilePrompterPathSaved settingssaver = new ChooseFilePrompterPathSaved(
+		ChooseFilePrompterPathSaved settingssaver = new ChooseFilePrompterPathSaved("application_settings",
 				pathToObj);
 		divRoot = settingssaver.getSetting(pathtodata);
 		loadDividendData();		

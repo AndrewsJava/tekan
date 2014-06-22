@@ -1,5 +1,6 @@
 package harlequinmettle.finance.technicalanalysis.view;
 
+import harlequinmettle.finance.technicalanalysis.tickertech.TickerTechView;
 import harlequinmettle.utils.guitools.HorizontalJPanel;
 import harlequinmettle.utils.guitools.JScrollPanelledPane;
 

@@ -1,9 +1,12 @@
-package harlequinmettle.finance.technicalanalysis.view;
+package harlequinmettle.finance.technicalanalysis.applications;
 
-import harlequinmettle.finance.technicalanalysis.datatest.DividendForecaster;
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseSQLite;
+import harlequinmettle.finance.technicalanalysis.sqlitedatabasebuilders.DividendForecaster;
+import harlequinmettle.finance.technicalanalysis.tickertech.TickerTechView;
+import harlequinmettle.finance.technicalanalysis.view.FilePathButtonsScrollingPanel;
+import harlequinmettle.finance.technicalanalysis.view.TickerButtonsScrollingPanel;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.finance.ETFs;
 import harlequinmettle.utils.guitools.FilterPanel;
@@ -62,7 +65,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		submit.addActionListener(doFilterListener(fdb, filters));
 		JFrame container = new JFrame("Control Panel - Technical Analysis");
 		container.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		container.setSize(800, 500);
+		container.setSize(900, 500);
 		container.add(this);
 		container.setVisible(true);
 
@@ -102,7 +105,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 			public void actionPerformed(ActionEvent arg0) {
 				String pathToObj = "technical_database_settings";
 				String key = "path to downloads folder";
-				ChooseFilePrompterPathSaved downloads = new ChooseFilePrompterPathSaved(
+				ChooseFilePrompterPathSaved downloads = new ChooseFilePrompterPathSaved("application_settings",
 						pathToObj);
 				String root = downloads.getSetting(key);
 

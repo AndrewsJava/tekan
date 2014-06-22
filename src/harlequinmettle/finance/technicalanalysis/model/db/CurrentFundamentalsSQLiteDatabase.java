@@ -15,11 +15,12 @@ import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-public class CurrentFundamentalsSQLiteDatabase {
+public class CurrentFundamentalsSQLiteDatabase implements
+		FundamentalsDatabaseInterface {
 	public static ArrayList<String> allLabels = new ArrayList<String>(
-			Arrays.asList(CurrentFundamentalsDatabase.labels));
+			Arrays.asList(labels));
 	public static ArrayList<String> subsetLabels = new ArrayList<String>(
-			Arrays.asList(CurrentFundamentalsDatabase.forDisplaying));
+			Arrays.asList(forDisplaying));
 	public static TreeMap<String, TreeMap<String, Float>> CURRENT_TICKER_TO_LABEL_DATA_MAPING = new TreeMap<String, TreeMap<String, Float>>();
 	public String pathToObj = "sqlite_blob_based_technical_database_settings";
 	String pathtodata = "path to small sqlite database";
@@ -27,24 +28,24 @@ public class CurrentFundamentalsSQLiteDatabase {
 	public static void main(String[] args) {
 
 		CurrentFundamentalsSQLiteDatabase sqlitedb = new CurrentFundamentalsSQLiteDatabase();
-//		for (Entry<String, TreeMap<String, Float>> ent : CURRENT_TICKER_TO_LABEL_DATA_MAPING
-//				.entrySet()) {
-//			System.out.println(ent.getKey() + "    " + ent.getValue());
-//		}
-
+		// for (Entry<String, TreeMap<String, Float>> ent :
+		// CURRENT_TICKER_TO_LABEL_DATA_MAPING
+		// .entrySet()) {
+		// System.out.println(ent.getKey() + "    " + ent.getValue());
+		// }
 
 	}
 
 	public CurrentFundamentalsSQLiteDatabase() {
 		long time = System.currentTimeMillis();
 		init();
-		System.out.println("current fundamentals sql load -time: " + (System.currentTimeMillis() - time)
-				/ 1000+ "  sec");
+		System.out.println("current fundamentals sql load -time: "
+				+ (System.currentTimeMillis() - time) / 1000 + "  sec");
 	}
 
 	private void init() {
 		ChooseFilePrompterPathSaved settingssaver = new ChooseFilePrompterPathSaved(
-				pathToObj);
+				"application_settings", pathToObj);
 		String root = settingssaver.getSetting(pathtodata);
 
 		Connection cn = SQLiteTools.establishSQLiteConnection(new File(root));
@@ -57,7 +58,7 @@ public class CurrentFundamentalsSQLiteDatabase {
 
 	void loadDatabase(Connection conn, String tableName) {
 		recentDataExceptCnnForecast(conn, tableName);
-		load1YrAgoCnn(conn, tableName); 
+		load1YrAgoCnn(conn, tableName);
 	}
 
 	private void recentDataExceptCnnForecast(Connection conn, String tableName) {
@@ -86,10 +87,10 @@ public class CurrentFundamentalsSQLiteDatabase {
 						continue;
 					addToDatabase(ticker, i, data[i]);
 				}
-//				 System.out.println("\n\n"  );
-//				 System.out.println("name = " + ticker);
-//				 System.out.println("date  = " + datenumber);
-//				 System.out.println("data  = " + Arrays.toString(data));
+				// System.out.println("\n\n" );
+				// System.out.println("name = " + ticker);
+				// System.out.println("date  = " + datenumber);
+				// System.out.println("data  = " + Arrays.toString(data));
 			}
 			rs.close();
 		} catch (SQLException e) {
@@ -147,11 +148,12 @@ public class CurrentFundamentalsSQLiteDatabase {
 
 	private void addToDatabase(String ticker, int labelIndex, float value) {
 		String originalLable = allLabels.get(labelIndex);
-//		if(labelIndex!=1){
-//			 System.out.println("label  = " + originalLable);
-//			 System.out.println("value  = " + value);
-//		}
-	 if(!subsetLabels.contains(originalLable))return;
+		// if(labelIndex!=1){
+		// System.out.println("label  = " + originalLable);
+		// System.out.println("value  = " + value);
+		// }
+		if (!subsetLabels.contains(originalLable))
+			return;
 		if (CURRENT_TICKER_TO_LABEL_DATA_MAPING.containsKey(ticker)) {
 			TreeMap<String, Float> tickersData = CURRENT_TICKER_TO_LABEL_DATA_MAPING
 					.get(ticker);
@@ -159,7 +161,7 @@ public class CurrentFundamentalsSQLiteDatabase {
 				float currentData = tickersData.get(originalLable);
 				if (currentData != currentData)
 					tickersData.put(originalLable, value);
-			}else{ 
+			} else {
 				tickersData.put(originalLable, value);
 			}
 		} else {
@@ -168,7 +170,6 @@ public class CurrentFundamentalsSQLiteDatabase {
 			CURRENT_TICKER_TO_LABEL_DATA_MAPING.put(ticker, tickerData);
 		}
 	}
-	
 
 	public TreeMap<String, String> getFilterResults(FilterPanel[] searchFilters) {
 		TreeMap<String, String> results = new TreeMap<String, String>();
@@ -182,13 +183,14 @@ public class CurrentFundamentalsSQLiteDatabase {
 				int id = filter.getId();
 				float low = filter.getLow();
 				float high = filter.getHigh();
-				float dataPoint = CURRENT_TICKER_TO_LABEL_DATA_MAPING.get(ticker).get(subsetLabels.get(id));
+				float dataPoint = CURRENT_TICKER_TO_LABEL_DATA_MAPING.get(
+						ticker).get(subsetLabels.get(id));
 				if (dataPoint != dataPoint || dataPoint > high
 						|| dataPoint < low)
 					qualifies = false;
 				else
-					reasonForQualification += "  " + subsetLabels.get(id)+ "  :  ["
-							+ dataPoint + "] ";
+					reasonForQualification += "  " + subsetLabels.get(id)
+							+ "  :  [" + dataPoint + "] ";
 			}
 
 			if (qualifies)

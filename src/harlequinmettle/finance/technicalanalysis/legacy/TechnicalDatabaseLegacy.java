@@ -167,7 +167,7 @@ import org.apache.commons.io.FileUtils;
 	}
 
 	private void restoreSettings() {
-		ChooseFilePrompterPathSaved settingssaver = new ChooseFilePrompterPathSaved(
+		ChooseFilePrompterPathSaved settingssaver = new ChooseFilePrompterPathSaved("application_settings",
 				pathToObj);
 		rootPathToTechnicals = settingssaver.getSetting(pathtodata);
 	}

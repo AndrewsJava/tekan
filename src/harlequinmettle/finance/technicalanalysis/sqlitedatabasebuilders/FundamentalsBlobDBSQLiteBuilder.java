@@ -1,22 +1,17 @@
-package harlequinmettle.finance.technicalanalysis.datatest;
+package harlequinmettle.finance.technicalanalysis.sqlitedatabasebuilders;
 
 import harlequinmettle.finance.database.DataUtil;
-import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsDatabase;
+import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.filetools.sqlite.SQLiteTools;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
@@ -42,9 +37,11 @@ public class FundamentalsBlobDBSQLiteBuilder {
 			Statement stat = SQLiteTools.reinitializeTable(cn, tableName,
 					columnEntries, types);
 
-			String rootq = new ChooseFilePrompterPathSaved("databasebuilter")
+			String rootq = new ChooseFilePrompterPathSaved(
+					"application_settings", "databasebuilter")
 					.getSetting("path to q");
-			String rooty = new ChooseFilePrompterPathSaved("databasebuilter")
+			String rooty = new ChooseFilePrompterPathSaved(
+					"application_settings", "databasebuilter")
 					.getSetting("path to y");
 			ArrayList<File> allSmallDBFiles = new ArrayList<File>();
 			allSmallDBFiles.addAll(Arrays.asList(new File(rootq).listFiles()));
@@ -52,20 +49,21 @@ public class FundamentalsBlobDBSQLiteBuilder {
 			int NUMBER_ENTRIES = columnEntries.length;
 
 			ArrayList<Integer> sqlStorageTypes = new ArrayList<Integer>();
-			//day number
+			// day number
 			sqlStorageTypes.add(SQLiteTools.SQL_FLOAT_ADD);
-			//ticker
+			// ticker
 			sqlStorageTypes.add(SQLiteTools.SQL_STRING_ADD);
-			//float[] as byte[]
+			// float[] as byte[]
 			sqlStorageTypes.add(SQLiteTools.SQL_BYTES_ADD);
-	 	for (int i = 0; i < allSmallDBFiles.size(); i++) {
-			//	  for (int i = 0; i <5; i++) {
+			for (int i = 0; i < allSmallDBFiles.size(); i++) {
+				// for (int i = 0; i <5; i++) {
 				ArrayList<ArrayList<Object>> allValues = buildDataForDatabaseTable(allSmallDBFiles
 						.get(i));
 				PreparedStatement prep = SQLiteTools.initPreparedStatement(cn,
 						NUMBER_ENTRIES, tableName);
 				for (ArrayList<Object> values : allValues)
-					SQLiteTools.buildSQLStatement(prep, values,sqlStorageTypes);
+					SQLiteTools
+							.buildSQLStatement(prep, values, sqlStorageTypes);
 				SQLiteTools.executeStatement(cn, prep);
 			}
 
@@ -86,9 +84,9 @@ public class FundamentalsBlobDBSQLiteBuilder {
 				String ticker = tickerDataPair[0];
 				data.add(ticker);
 				float[] rawData = extractFundamentalData(tickerDataPair[1]);
-				 
-				 data.add( (rawData));
-			 
+
+				data.add((rawData));
+
 				fileResults.add(data);
 			}
 		} catch (IOException e) {
@@ -97,21 +95,19 @@ public class FundamentalsBlobDBSQLiteBuilder {
 		return fileResults;
 	}
 
-	private float[] extractFundamentalData(String data) { 
+	private float[] extractFundamentalData(String data) {
 
-		final float[] values = new float[CurrentFundamentalsDatabase.labels.length];
-		float[] rawData = 		DataUtil.validSmallDataSet(data,
-				null);
-		
-			for (int k = 0; k < 82; k++) {
-				values[k] = rawData[k];
-			}
-			values[82] = rawData[172];
-			values[83] = rawData[173];
-			values[84] = rawData[174];
- 
- 
-return values;
+		final float[] values = new float[CurrentFundamentalsSQLiteDatabase.labels.length];
+		float[] rawData = DataUtil.validSmallDataSet(data, null);
+
+		for (int k = 0; k < 82; k++) {
+			values[k] = rawData[k];
+		}
+		values[82] = rawData[172];
+		values[83] = rawData[173];
+		values[84] = rawData[174];
+
+		return values;
 	}
 
 }

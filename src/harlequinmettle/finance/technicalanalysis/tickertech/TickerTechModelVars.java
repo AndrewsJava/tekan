@@ -5,6 +5,7 @@ import harlequinmettle.utils.guitools.SquareStroke;
 
 import java.awt.Font;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -15,7 +16,10 @@ import java.util.TreeMap;
 import javax.swing.JViewport;
 
 public class TickerTechModelVars {
-
+	
+	GeneralPath avgVolPath = new GeneralPath();
+	int avgLineNumber = 4;
+//////////////////////////////////////////////
 	protected final int INTERBARMARGINS = 2;
 	protected final int DIVIDEND_100_PERCENT_CLOSE_WIDTH = 5000;
 	protected final int BAR_W = 10;

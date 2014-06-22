@@ -1,6 +1,5 @@
 package harlequinmettle.finance.technicalanalysis.tickertech;
 
-import harlequinmettle.finance.technicalanalysis.legacy.CurrentFundamentalsDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.utils.filetools.SerializationTool;
 import harlequinmettle.utils.guitools.JLabelFactory;
@@ -35,7 +34,6 @@ public class TickerTechView extends JPanel {
 	TickerTechModel model;
 
 	public TickerTechView() {
-
 		model = new TickerTechModel("BME");
 		init();
 	}
@@ -60,38 +58,6 @@ public class TickerTechView extends JPanel {
 		showChartInNewWindow(model.ticker);
 	}
 
-	// private void doSetUpWithTechnicalDatabase() {
-	//
-	// TreeMap<Float, Float> high = TechnicalDatabase.makeGetDataToDateMap(
-	// ticker, TechnicalDatabase.HIGH);
-	// TreeMap<Float, Float> low = TechnicalDatabase.makeGetDataToDateMap(
-	// ticker, TechnicalDatabase.LOW);
-	//
-	// minMaxPrice = calcMinMax(low, high);
-	// highLow = generateDisplayableLines(low, high, minMaxPrice);
-	//
-	// TreeMap<Float, Float> open = TechnicalDatabase.makeGetDataToDateMap(
-	// ticker, TechnicalDatabase.OPEN);
-	// TreeMap<Float, Float> close = TechnicalDatabase.makeGetDataToDateMap(
-	// ticker, TechnicalDatabase.CLOSE);
-	// openClose = generateDisplayableLines(open, close, minMaxPrice);
-	//
-	// TreeMap<Float, Float> volume = TechnicalDatabase.makeGetDataToDateMap(
-	// ticker, TechnicalDatabase.VOLUME);
-	// minMaxVolume = calcMinMax(volume);
-	// days = calculateDaysFromMap(volume);
-	// volumeBars = generateDisplayableLines(volume, minMaxVolume);
-	// technicalData = TechnicalDatabase.PER_TICKER_PER_DAY_TECHNICAL_DATA
-	// .get(ticker);
-	//
-	// if (DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.containsKey(ticker))
-	// dividendEllipses = generateDivDisplay(close);
-	// }
-
-	// @Override
-	// public void update(Graphics g) {
-	// super.update(g);
-	// }
 	@Override
 	public void paintComponent(Graphics g1) {
 		updateSizePreferrence();
@@ -103,14 +69,13 @@ public class TickerTechView extends JPanel {
 			model.drawVolumeLines(g);
 		if (model.myPreferences.get(model.DIV_BALLS))
 			model.drawDividendOvals(g);
-		// drawProfileDescription(g);
 		if (model.myPreferences.get(model.CANDLESTICKS)) {
 			model.drawHighLowLines(g);
 			model.drawOpenCloseLines(g);
 		}
+		if(true)
+			model.drawAvgVolLine(g);
 		model.drawDaysData(g);
-		// if (toggleVisible)
-		// drawFundamentalsData(g);
 	}
 
 	public void rescaleCanvas(Dimension size) {
@@ -119,17 +84,13 @@ public class TickerTechView extends JPanel {
 	}
 
 	private void showChartInNewWindow(String ticker) {
-		final JFrame container = new JFrame(ticker + "   "
-		// + TechnicalDatabase.NUM_DAYS_START + "  days ago, to "
-		// + TechnicalDatabase.NUM_DAYS_END
-				+ "  days ago  ");
+		final JFrame container = new JFrame(ticker + "   " + "  days ago  ");
 
 		container.setSize(900, 550);
 		container.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		container.setVisible(true);
 		JScrollPanelledPane chart = new JScrollPanelledPane();
-		// TickerTechView tv = new TickerTechView(ticker);
 		PreferredJScrollPane tickerTechScroll = new PreferredJScrollPane(this);
 		model.setScrollBar(tickerTechScroll.getViewport());
 
@@ -156,12 +117,6 @@ public class TickerTechView extends JPanel {
 		menuBar.add(makeProfileMenuItem());
 		menuBar.add(makeFundamentalsGridMenuItem());
 		menuBar.add(makeOptionsMenuItem());
-
-		// a group of check box menu items
-		// menu.addSeparator();
-
-		// cbMenuItem.setMnemonic(KeyEvent.VK_C);
-		// menu.add(cbMenuItem);
 		return menuBar;
 	}
 
@@ -246,16 +201,7 @@ public class TickerTechView extends JPanel {
 		scrollable.setPreferredSize(new Dimension(900, model.eH / 2));
 		// ///
 
-		// JMenuItem menuItem = new JMenuItem(profile,
-		// KeyEvent.VK_T);
-		// menuItem.setPreferredSize(new Dimension(eW,eH));
-		// menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
-		// ActionEvent.ALT_MASK));
-		// menuItem.getAccessibleContext().setAccessibleDescription(
-		// "This doesn't really do anything");
-		// menu.add(menuItem);
 		menu.add(scrollable);
-		// menu.add(myText);
 		return menu;
 	}
 

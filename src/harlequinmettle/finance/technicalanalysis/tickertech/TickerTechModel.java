@@ -16,6 +16,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -30,8 +31,8 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import javax.swing.JViewport;
-
-public class TickerTechModel extends TickerTechModelUtil {
+//extension chain: TickerTechModelVars -> TickerTechModelUtil -> TickerTechModelRenderUtil -> TickerTechModelSetupUtil
+public class TickerTechModel extends TickerTechModelSetupUtil {
 
 	public TickerTechModel(String ticker) {
 		this.ticker = ticker;
@@ -39,75 +40,13 @@ public class TickerTechModel extends TickerTechModelUtil {
 	}
 
 	private void init() {
+		//inherited  TickerTechModelSetupUtil
 		restorePreferences();
-		String profilePath = establishPathToProfilesText();
-		profile = getProfile(profilePath, ticker);
+		profile = getProfile( ticker);
 		profile = profile.replaceAll("\\.", "\\.\n\n");
 		setFundamentalData(ticker);
+		//local with calls to TickerTechModelUtil
 		doSetUpWithTechnicalDatabaseSQLite(ticker);
-	}
-	private void setFundamentalData(String ticker) {
-
-		TreeMap<String, Float> tickersFundamentals = CurrentFundamentalsSQLiteDatabase.CURRENT_TICKER_TO_LABEL_DATA_MAPING
-				.get(ticker);
-		for (int i = 0; i < CurrentFundamentalsSQLiteDatabase.forDisplaying.length; i++) {
-			String readabledata = "NAN";
-			try {
-
-				float data = tickersFundamentals
-						.get(CurrentFundamentalsSQLiteDatabase.forDisplaying[i]);
-				if (data != data || Float.isInfinite(data))
-					continue;
-				readabledata = NumberFormater.floatToBMKTrunkated(data);
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			currentFundamentals.put(
-					CurrentFundamentalsSQLiteDatabase.forDisplaying[i],
-					readabledata);
-		}
-
-	}
-	private String getProfile(String profilePath, String ticker) {
-		try {
-			String[] files = { "NASDAQ_PROFILES_I.txt", "NYSE_PROFILES_I.txt" };
-			// look for NASDAQ_PROFILES_I.txt and NYSE_PROFILES_I.txt
-			// read each line by line to until starts with ticker^ return line
-			for (String fileName : files) {
-				File indexFile = new File(profilePath + File.separator
-						+ fileName);
-				System.out.println("file: " + indexFile.getAbsolutePath()
-						+ "    exists:  " + indexFile.exists());
-				int tries = 0;
-				while (!indexFile.exists()) {
-					profilePath = establishPathToProfilesText();
-					indexFile = new File(profilePath + File.separator
-							+ fileName);
-					if (tries++ > 4)
-						break;
-				}
-				try (BufferedReader br = new BufferedReader(new FileReader(
-						indexFile))) {
-					for (String line; (line = br.readLine()) != null;) {
-						if (line.startsWith(ticker + "^"))
-							return line.replaceAll("_", " ");
-					}
-					// line is not visible here.
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return "no profile found";
-	}
-
-	private String establishPathToProfilesText() {
-		ChooseFilePrompterPathSaved profileDatabasePathSaver = new ChooseFilePrompterPathSaved(
-				"application_settings", "technical_database_settings");
-		String profilePath = profileDatabasePathSaver
-				.getSetting("path to profiles text file");
-		return profilePath;
 	}
 
 	private void doSetUpWithTechnicalDatabaseSQLite(String ticker2) {
@@ -127,23 +66,98 @@ public class TickerTechModel extends TickerTechModelUtil {
 				TechnicalDatabaseSQLite.CLOSE);
 		TreeMap<Float, Float> volume = genMap(technicalData,
 				TechnicalDatabaseSQLite.VOLUME);
-//		TreeMap<Float, Float> allHighLow = new TreeMap<Float, Float> ();
-//		allHighLow.putAll(high);
-//		allHighLow.putAll(low);
+ 
 		minMaxPrice = calcMinMax(low);
 		highLow = generateDisplayableLines(low, high, minMaxPrice);
 
 		openClose = generateDisplayableLines(open, close, minMaxPrice);
+		
 		minMaxVolume = calcMinMax(volume);
 		days = calculateDaysFromMap(volume);
 		volumeBars = generateDisplayableLines(volume, minMaxVolume);
+		
+		
+		avgVolPath = generateAvgPath(volume, minMaxVolume);
 
 		if (DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.containsKey(ticker))
 			dividendEllipses = generateDivDisplay(close);
 	}
 
 
+
+	private TreeMap<Float, Ellipse2D.Float> generateDivDisplay(
+			TreeMap<Float, Float> close) {
+		TreeMap<Float, Ellipse2D.Float> divs = new TreeMap<Float, Ellipse2D.Float>();
+
+		float firstDay = close.firstKey();
+		float f = firstDay;
+		for (Entry<Float, Float> ent : close.entrySet()) {
+			float day = ent.getKey();
+
+			if (!DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.get(ticker)
+					.containsKey(day))
+				continue;
+
+			float dayClose = ent.getValue();
+			f = day - firstDay;
+			if (!DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.get(ticker)
+					.containsKey(day))
+				continue;
+			Ellipse2D.Float dividendEllipse = calculateEllipseDisplay((int) f,
+					day, dayClose);
+			divs.put(day, dividendEllipse);
+
+		}
+		return divs;
+	}
+
+	private float[] calculateDaysFromMap(TreeMap<Float, Float> volume) {
+
+		float dayone = volume.firstKey();
+		float lastday = volume.lastKey();
+		int numberdays = (int) (lastday - dayone);
+		float[] daystobe = new float[numberdays];
+		for (int i = 0; i < numberdays; i++) {
+			daystobe[i] = dayone + i;
+		}
+		return daystobe;
+	}
+
+	private TreeMap<Float, float[]> mapTechnicalDataToDay(float[][] techData) {
+		TreeMap<Float, float[]> mapping = new TreeMap<Float, float[]>();
+		for (float[] daydata : techData)
+			mapping.put(daydata[0], daydata);
+
+		return mapping;
+	}	private Point2D.Float calcMinMax(
+			TreeMap<Float, Float> individual) {
+		float lastmax = 0;
+		float min = Float.MAX_VALUE;
+		float max = Float.MIN_VALUE;
+ 
+			for (float f : individual.values()) {
+				if (f == f && !Float.isInfinite(f)) {
+					if (f > max) {
+						lastmax = max;
+						max = f;
+					}
+					if (f < min)
+						min = f;
+				}
+			}
+		 
+		return new Point2D.Float(min, lastmax);
+
+	}
+	private TreeMap<Float, Float> genMap(TreeMap<Float, float[]> techData, int id) {
+		TreeMap<Float, Float> mapping = new TreeMap<Float, Float>();
+		for (float[] daydata : techData.values())
+			mapping.put(daydata[0], daydata[id]);
+
+		return mapping;
+	}
 	void setScrollBar(JViewport jViewport) {
 		viewport = jViewport;
 	}
+
 }

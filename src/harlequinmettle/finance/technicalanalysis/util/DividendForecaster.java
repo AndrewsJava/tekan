@@ -1,4 +1,4 @@
-package harlequinmettle.finance.technicalanalysis.sqlitedatabasebuilders;
+package harlequinmettle.finance.technicalanalysis.util;
 
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;

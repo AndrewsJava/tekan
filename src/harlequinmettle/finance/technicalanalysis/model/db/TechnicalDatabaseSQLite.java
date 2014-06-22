@@ -16,7 +16,7 @@ public class TechnicalDatabaseSQLite implements TechnicalDatabaseInterface {
 	public static boolean loadingDatabase = true;
 
 	public static TreeMap<String, float[][]> SQLITE_PER_TICKER_PER_DAY_TECHNICAL_DATA = new TreeMap<String, float[][]>();
-	public static int MAX_ARRAY_SIZE = 1000;
+	public static int tradingDaysLimit = 1000;
 	static long time = System.currentTimeMillis();
 
 	public static void main(String[] args) {
@@ -29,7 +29,7 @@ public class TechnicalDatabaseSQLite implements TechnicalDatabaseInterface {
 	}
 
 	public TechnicalDatabaseSQLite(int alternateSize) {
-		MAX_ARRAY_SIZE = alternateSize;
+		tradingDaysLimit = alternateSize;
 		init();
 	}
 
@@ -84,11 +84,13 @@ public class TechnicalDatabaseSQLite implements TechnicalDatabaseInterface {
 				float[][] data = (float[][]) SQLiteTools.deserialize(rs
 						.getBytes("db_data"));
 
-				if (data.length > MAX_ARRAY_SIZE) {
+				if (data.length > tradingDaysLimit) {
 
-					float[][] part2 = new float[MAX_ARRAY_SIZE][];
+					float[][] part2 = new float[tradingDaysLimit][];
 
-					System.arraycopy(data, data.length - MAX_ARRAY_SIZE, part2,
+//					System.arraycopy(data, data.length - tradingDaysLimit, part2,
+//							0, part2.length);
+					System.arraycopy(data, 0, part2,
 							0, part2.length);
 
 					data = part2;

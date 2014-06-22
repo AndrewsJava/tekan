@@ -30,7 +30,12 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 	//public static final TechnicalDatabaseSQLite TDB = new TechnicalDatabaseSQLite(2000);
 
 	public static void main(String[] arg) {
+		long time = System.currentTimeMillis();
 		TechnicalDatabaseViewer tdbviewer = new TechnicalDatabaseViewer();
+		System.out.println("TOTAL TIME TO LOAD ALL: "
+				+ (System.currentTimeMillis() - time) / 1000 + " sec");
+		System.out.println("MEMORY USED : "
+				+ (Runtime.getRuntime().totalMemory() / 1000000) + "   MB");
 	}
 
 	public TechnicalDatabaseViewer() {

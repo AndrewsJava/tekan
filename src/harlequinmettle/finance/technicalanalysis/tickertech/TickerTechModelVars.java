@@ -1,5 +1,6 @@
 package harlequinmettle.finance.technicalanalysis.tickertech;
 
+import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseSQLite;
 import harlequinmettle.utils.guitools.SmoothStroke;
 import harlequinmettle.utils.guitools.SquareStroke;
 
@@ -16,10 +17,9 @@ import java.util.TreeMap;
 import javax.swing.JViewport;
 
 public class TickerTechModelVars {
-	
-	GeneralPath avgVolPath = new GeneralPath();
-	int avgLineNumber = 4;
-//////////////////////////////////////////////
+
+	ArrayList<OptionsMenuChoicePanel> lineAverageChoices = new ArrayList<OptionsMenuChoicePanel>(); 
+	// ////////////////////////////////////////////
 	protected final int INTERBARMARGINS = 2;
 	protected final int DIVIDEND_100_PERCENT_CLOSE_WIDTH = 5000;
 	protected final int BAR_W = 10;
@@ -43,6 +43,10 @@ public class TickerTechModelVars {
 	final String DIV_BALLS = "show dividends";
 	final String[] preferenceOptions = { //
 	VOL_BARS, CANDLESTICKS, GRID_LINES, DIV_BALLS };
+//	final String VOL_AVG = "show volume avg";
+//	final String CLOSE_AVG = "show close avg";
+	final String[] preferenceOptionsWithOptions = TechnicalDatabaseSQLite.elements;//{ //
+//	VOL_AVG, CLOSE_AVG };
 	final int margins = 20;
 	final Font BIG_FONT = new Font("Bitstream", Font.PLAIN, FONT_SIZE);
 
@@ -56,7 +60,7 @@ public class TickerTechModelVars {
 	protected Point2D.Float minMaxVolume;
 	protected float day;
 	protected float[] days;
-	//protected float[][] technicalData;
+	// protected float[][] technicalData;
 	TreeMap<Float, float[]> technicalData = new TreeMap<Float, float[]>();
 	protected float scalex = 1, scaley = 1;
 

@@ -22,7 +22,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -32,6 +32,7 @@ import javax.swing.SwingUtilities;
 
 public class TickerTechView extends JPanel {
 	TickerTechModel model;
+	public static TickerTechView tickertechviewaccess;
 
 	public TickerTechView() {
 		model = new TickerTechModel("BME");
@@ -48,6 +49,8 @@ public class TickerTechView extends JPanel {
 	}
 
 	private void init() {
+		tickertechviewaccess = this;
+
 		// H = getHeight() - 40;
 		model.frameW = getWidth();
 		model.eH = model.H - 2 * model.margins;
@@ -73,8 +76,8 @@ public class TickerTechView extends JPanel {
 			model.drawHighLowLines(g);
 			model.drawOpenCloseLines(g);
 		}
-		if(true)
-			model.drawAvgVolLine(g);
+
+		model.drawAvgLines(g);
 		model.drawDaysData(g);
 	}
 
@@ -122,23 +125,61 @@ public class TickerTechView extends JPanel {
 
 	private JMenu makeOptionsMenuItem() {
 		JMenu menu = new JMenu("[options]");
-		for (String s : model.preferenceOptions) {
-			JCheckBoxMenuItem cbMenuItem = new JCheckBoxMenuItem(s);
-			cbMenuItem.addItemListener(makePreferencesItemListener());
-			if (model.myPreferences.get(s))
-				cbMenuItem.setSelected(true);
-			menu.add(cbMenuItem);
-		}
+		menu.addItemListener(makeOptionsWindowOpenItemListener());
 		return menu;
 	}
 
-	private ItemListener makePreferencesItemListener() {
+	private ItemListener makeOptionsWindowOpenItemListener() {
+		return new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				//if (true) {
+				 if (event.getStateChange() == ItemEvent.SELECTED) {
+					JFrame optionsWindow = new JFrame( "select graph options");
+					optionsWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+					JScrollPanelledPane options = new JScrollPanelledPane();
+					optionsWindow.setVisible(true);
+					optionsWindow.setSize(500,700);
+					optionsWindow.add(options);
+					optionsWindow.setAlwaysOnTop(true);
+					
+					for (String s : model.preferenceOptions) {
+						JCheckBox cbMenuItem = new JCheckBox(s);
+						cbMenuItem
+								.addItemListener(makePreferencesItemListener());
+						if (model.myPreferences.get(s))
+							cbMenuItem.setSelected(true);
+						options.addComp(cbMenuItem);
+					} 
+					options.addComp(JLabelFactory
+							.doBluishJLabel("averages - (days*2),measure,option"));
+					for (OptionsMenuChoicePanel avgLine : model.lineAverageChoices)
+						options.addComp(avgLine);
+				}
+			}
+
+		};
+	}
+
+	// private JMenu makeOptionsMenuItem() {
+	// JMenu menu = new JMenu("[options]");
+	// for (String s : model.preferenceOptions) {
+	// JCheckBoxMenuItem cbMenuItem = new JCheckBoxMenuItem(s);
+	// cbMenuItem.addItemListener(makePreferencesItemListener());
+	// if (model.myPreferences.get(s))
+	// cbMenuItem.setSelected(true);
+	// menu.add(cbMenuItem);
+	// }
+	// return menu;
+	// }
+	public ItemListener makePreferencesItemListener() {
 		return new ItemListener() {
 
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
 
-				JCheckBoxMenuItem source = ((JCheckBoxMenuItem) arg0
+				JCheckBox  source = ((JCheckBox ) arg0
 						.getSource());
 				String sourceText = source.getText();
 				model.myPreferences.put(sourceText, source.isSelected());

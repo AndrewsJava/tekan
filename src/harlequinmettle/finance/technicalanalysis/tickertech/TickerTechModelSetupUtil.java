@@ -13,7 +13,7 @@ import java.util.TreeMap;
 public class TickerTechModelSetupUtil extends TickerTechModelRenderUtil{
 
 	protected void restorePreferences() {
-
+ 
 		myPreferences = SerializationTool.deserialize(myPreferences.getClass(),
 				preferencesSerializedName);
 		if (myPreferences == null) {

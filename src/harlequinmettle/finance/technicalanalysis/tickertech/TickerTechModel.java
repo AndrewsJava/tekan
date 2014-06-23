@@ -40,6 +40,10 @@ public class TickerTechModel extends TickerTechModelSetupUtil {
 	}
 
 	private void init() {
+
+		for(int i = 0;i<8; i++){
+			 lineAverageChoices.add(new OptionsMenuChoicePanel(this));
+		}
 		//inherited  TickerTechModelSetupUtil
 		restorePreferences();
 		profile = getProfile( ticker);
@@ -77,7 +81,6 @@ public class TickerTechModel extends TickerTechModelSetupUtil {
 		volumeBars = generateDisplayableLines(volume, minMaxVolume);
 		
 		
-		avgVolPath = generateAvgPath(volume, minMaxVolume);
 
 		if (DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.containsKey(ticker))
 			dividendEllipses = generateDivDisplay(close);
@@ -149,15 +152,11 @@ public class TickerTechModel extends TickerTechModelSetupUtil {
 		return new Point2D.Float(min, lastmax);
 
 	}
-	private TreeMap<Float, Float> genMap(TreeMap<Float, float[]> techData, int id) {
-		TreeMap<Float, Float> mapping = new TreeMap<Float, Float>();
-		for (float[] daydata : techData.values())
-			mapping.put(daydata[0], daydata[id]);
 
-		return mapping;
-	}
 	void setScrollBar(JViewport jViewport) {
 		viewport = jViewport;
 	}
+
+ 
 
 }

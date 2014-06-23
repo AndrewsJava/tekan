@@ -76,10 +76,14 @@ public class TickerTechModelRenderUtil extends TickerTechModelUtil {
 		}
 	}
 
-	protected void drawAvgVolLine(Graphics2D g) {
-		g.setStroke(SMOOTH_STROKE);
-		g.setColor(CommonColors.COLOR_HISTOGRAM_BAR_VOL);
-		g.draw(avgVolPath);
+	protected void drawAvgLines(Graphics2D g) {
+		for (OptionsMenuChoicePanel avgLine : lineAverageChoices) {
+			if (!avgLine.isDisplayPreferred())
+				return;
+			g.setStroke(SMOOTH_STROKE);
+			g.setColor(avgLine.color);
+			g.draw(avgLine.path);
+		}
 	}
 
 	protected void drawVolumeLines(Graphics2D g) {

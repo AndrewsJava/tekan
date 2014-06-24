@@ -1,6 +1,7 @@
 package harlequinmettle.finance.technicalanalysis.tickertech;
 
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
+import harlequinmettle.utils.numbertools.format.NumberFormater;
 
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
@@ -15,45 +16,32 @@ import java.util.TreeMap;
 public class TickerTechModelUtil extends TickerTechModelVars {
 
 	void setDailyTradeData(float xpt, float ypt) {
+
 		x = xpt;
 		y = ypt;
 		dailyRecord.clear();
-		int scrollValue = 0;
-		// if (viewport != null)
+		int scrollValue = 0; 
 		scrollValue = viewport.getX();
 		int index = 1 + (int) ((x - margins - scrollValue) / (BAR_W + INTERBARMARGINS));
-		if (index < days.length)
+		if (index < days.length && index > 0) {
 			day = days[index];
-		if (index > 0) {
 			boolean first = true;
 			float[] dayData = technicalData.get(day - 1);
-			if (dayData != null)
-				for (float f : dayData) {
-					if (first) {
-						first = false;
-						dailyRecord.add(DATE_FORMAT.format(new Date(
-								(long) f * 24 * 3600 * 1000)));
-					} else if (f < 1e5) {
-						dailyRecord.add("" + f);
-					} else {
-						if (f > 10000000) {
-							f /= 1000000;
-							dailyRecord.add(""
-									+ new BigDecimal((long) f).toPlainString()
-									+ " M");
-						} else if (f > 10000) {
-							f /= 1000;
-							dailyRecord.add(""
-									+ new BigDecimal((long) f).toPlainString()
-									+ " K");
-						} else {
-
-							dailyRecord.add(""
-									+ new BigDecimal((long) f).toPlainString());
-
-						}
-					}
+			if (dayData == null)
+				return;
+			for (float f : dayData) {
+				if (first) {
+					first = false;
+					dailyRecord.add(DATE_FORMAT.format(new Date(
+							(long) f * 24 * 3600 * 1000)));
+				}  else {
+					dailyRecord.add(NumberFormater.floatToBMKTrunkated(f,2));
 				}
+			}
+			String percentChange = NumberFormater.formatCalculatePercentChange(dayData[1],dayData[4]);
+			dailyRecord.add(percentChange);
+			String percentRange = NumberFormater.formatCalculatePercentChange(dayData[3],dayData[2]);
+			dailyRecord.add(percentRange);
 		}
 	}
 
@@ -143,67 +131,34 @@ public class TickerTechModelUtil extends TickerTechModelVars {
 
 		return mapping;
 	}
-	
-	
-//	protected GeneralPath generateAvgPath(TreeMap<Float, Float> points,
-//			Point2D.Float minMax) {
-//		GeneralPath hl = new GeneralPath();
-//		boolean first = true;
-//		float firstDay = points.firstKey();
-//
-//		ArrayList<Float> keys = new ArrayList<Float>(points.keySet());
-//
-//		for (int J = avgLineNumber; J < (keys.size() - avgLineNumber); J++) {
-//			float sum = 0;
-//			float n = 0.01f;
-//			for (int L = J - avgLineNumber; L <= J + 1 + 2 * avgLineNumber
-//					&& L < keys.size(); L++) {
-//				float day = keys.get(L);
-//				float value = points.get(day);
-//				sum += value;
-//				n++;
-//
-//			}
-//			float dayOfAvg = keys.get(J);
-//			float f = dayOfAvg - firstDay;
-//			float xMove = margins + BAR_W / 2 + f * (BAR_W + INTERBARMARGINS);
-//			float average = sum / n;
-//			float yMove = calculateVerticalScreenPoint(average, minMax);
-//			if (first) {
-//				first = false; 
-//				hl.moveTo(xMove, yMove);
-//			} else {
-//				hl.lineTo(xMove, yMove);
-//			}
-//		}
-//		return hl;
-//	}
-//	
-	
+
+	// TODO: possibly wrong logic display point, minmax or leading/trailing
 	protected GeneralPath generateAvgPath(int type, Point2D.Float minMax,
-			int avgLineNumber,boolean useSqrt,boolean useTrailingValuesOnly) {
-		 
+			int avgLineNumber, boolean useSqrt, boolean useTrailingValuesOnly) {
+
 		TreeMap<Float, Float> points = genMap(technicalData, type);
-		
+
 		GeneralPath hl = new GeneralPath();
 		boolean first = true;
 		float firstDay = points.firstKey();
-int trailingValues = avgLineNumber;
-int leadingValues = avgLineNumber;
-if(useTrailingValuesOnly)leadingValues = 0;
+		int trailingValues = avgLineNumber;
+		int leadingValues = avgLineNumber;
+		if (useTrailingValuesOnly)
+			leadingValues = 0;
 		ArrayList<Float> keys = new ArrayList<Float>(points.keySet());
 
 		for (int J = trailingValues; J < (keys.size() - leadingValues); J++) {
 			float sum = 0;
 			float n = 0.01f;
-			for (int L = J - trailingValues; L <= J + 1 + leadingValues+trailingValues
+			for (int L = J - trailingValues; L <= J + 1 + leadingValues
+					+ trailingValues
 					&& L < keys.size(); L++) {
 				float day = keys.get(L);
 				float value = points.get(day);
 				if (useSqrt)
 					sum += Math.sqrt(value);
 				else
-				sum+=value;
+					sum += value;
 				n++;
 
 			}
@@ -215,7 +170,7 @@ if(useTrailingValuesOnly)leadingValues = 0;
 			if (useSqrt)
 				newMinMax = new Point2D.Float((float) Math.sqrt(minMax.x),
 						(float) Math.sqrt(minMax.y));
-			float yMove = calculateVerticalScreenPoint(average,  newMinMax);
+			float yMove = calculateVerticalScreenPoint(average, newMinMax);
 			if (first) {
 				first = false;
 				hl.moveTo(xMove, yMove);
@@ -226,4 +181,3 @@ if(useTrailingValuesOnly)leadingValues = 0;
 		return hl;
 	}
 }
- 

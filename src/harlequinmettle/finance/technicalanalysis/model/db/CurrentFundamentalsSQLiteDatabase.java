@@ -5,6 +5,7 @@ import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.filetools.sqlite.SQLiteTools;
 import harlequinmettle.utils.guitools.FilterPanel;
 
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 public class CurrentFundamentalsSQLiteDatabase implements
@@ -57,15 +57,15 @@ public class CurrentFundamentalsSQLiteDatabase implements
 	}
 
 	void loadDatabase(Connection conn, String tableName) {
-		recentDataExceptCnnForecast(conn, tableName);
 		load1YrAgoCnn(conn, tableName);
+		recentDataExceptCnnForecast(conn, tableName);
 	}
 
 	private void recentDataExceptCnnForecast(Connection conn, String tableName) {
 		PreparedStatement stmt = null;
 		try {
 			// last month
-			float recent = TimeRecord.dayNumber(System.currentTimeMillis()) - 33;
+			float recent = TimeRecord.dayNumber(System.currentTimeMillis()) - 53;
 			// String sqlstatement = "SELECT * FROM " + tableName
 			// + " WHERE db_datenumber > " + recentDateNumber;
 			String sqlstatement = "SELECT * FROM " + tableName
@@ -82,6 +82,9 @@ public class CurrentFundamentalsSQLiteDatabase implements
 				float datenumber = rs.getFloat("db_datenumber");
 				float[] data = (float[]) SQLiteTools.deserialize(rs
 						.getBytes("db_data"));
+		//		System.out.println("\n\n"+ticker);
+			//	System.out.println(datenumber);
+			//	System.out.println(Arrays.toString(data));
 				for (int i = 0; i < data.length; i++) {
 					if (i == 1)
 						continue;
@@ -180,9 +183,16 @@ public class CurrentFundamentalsSQLiteDatabase implements
 			for (FilterPanel filter : searchFilters) {
 				if (!filter.shouldFilterBeApplied())
 					continue;
+
 				int id = filter.getId();
 				float low = filter.getLow();
 				float high = filter.getHigh();
+				if (!CURRENT_TICKER_TO_LABEL_DATA_MAPING.get(ticker)
+						.containsKey(subsetLabels.get(id))) {
+
+					qualifies = false;
+					continue;
+				}
 				float dataPoint = CURRENT_TICKER_TO_LABEL_DATA_MAPING.get(
 						ticker).get(subsetLabels.get(id));
 				if (dataPoint != dataPoint || dataPoint > high
@@ -200,4 +210,31 @@ public class CurrentFundamentalsSQLiteDatabase implements
 		return results;
 	}
 
+	public static Point2D.Float getMinMaxForIndicator(String indicator) {
+		float min = Float.MAX_VALUE;
+		float max = Float.MIN_VALUE;
+		ArrayList<Float> values = new ArrayList<Float>();
+		// ////////////////////////////////
+		for (String ticker : CURRENT_TICKER_TO_LABEL_DATA_MAPING.keySet()) {
+
+			if (!CURRENT_TICKER_TO_LABEL_DATA_MAPING.get(ticker).containsKey(
+					indicator)) {
+				continue;
+			}
+			float dataPoint = CURRENT_TICKER_TO_LABEL_DATA_MAPING.get(ticker)
+					.get(indicator);
+			if (dataPoint != dataPoint || Float.isInfinite(dataPoint))
+				continue;
+
+			values.add(dataPoint);
+			if (dataPoint > max)
+				max = dataPoint;
+			if (dataPoint < min)
+				min = dataPoint;
+		}
+		// //////////////////////////////
+		
+		System.out.println(values.size()+"      -"+values);
+		return new Point2D.Float(min, max);
+	}
 }

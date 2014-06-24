@@ -2,11 +2,13 @@ package harlequinmettle.finance.technicalanalysis.tickertech;
 
 import harlequinmettle.finance.technicalanalysis.applications.TechnicalDatabaseViewer;
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
+import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseInterface;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseSQLite;
 
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -44,6 +46,9 @@ public class TickerTechModel extends TickerTechModelSetupUtil {
 			lineAverageChoices.add(optionMenu);
 			optionMenu.setLineStateFromInputs();
 		}
+		dailyRecordLabels.addAll(Arrays.asList(TechnicalDatabaseInterface.elements));
+		dailyRecordLabels.add("%chng");//open to close
+		dailyRecordLabels.add("%rng");//low/high
 	}
 
 	private void doSetUpWithTechnicalDatabaseSQLite(String ticker2) {

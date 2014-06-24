@@ -3,7 +3,9 @@ package harlequinmettle.finance.technicalanalysis.applications;
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseSQLite;
+import harlequinmettle.finance.technicalanalysis.tickertech.TickerTechModelVars;
 import harlequinmettle.finance.technicalanalysis.tickertech.TickerTechView;
+import harlequinmettle.finance.technicalanalysis.util.DefaultRangeSettingItemListener;
 import harlequinmettle.finance.technicalanalysis.util.DividendForecaster;
 import harlequinmettle.finance.technicalanalysis.view.FilePathButtonsScrollingPanel;
 import harlequinmettle.finance.technicalanalysis.view.TickerButtonsScrollingPanel;
@@ -14,7 +16,6 @@ import harlequinmettle.utils.guitools.HorizontalJPanel;
 import harlequinmettle.utils.guitools.JButtonWithEnterKeyAction;
 import harlequinmettle.utils.guitools.JScrollPanelledPane;
 import harlequinmettle.utils.guitools.JSearchPanel;
-import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -72,7 +73,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		JScrollPanelledPane controls = new JScrollPanelledPane();
 		this.add("controls", controls);
 
-		JSearchPanel searchPanel = new JSearchPanel();
+		JSearchPanel searchPanel = new JSearchPanel(45);
 		searchPanel.addSearchAction(doSearchActionListener(searchPanel));
 		
 		controls.addComp(searchPanel);
@@ -84,6 +85,8 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		controls.addComp(makeRecentReportsPanel());
 
 		for (FilterPanel fp : filters) {
+			fp.setFontSize(40);
+			fp.choices.addItemListener(new DefaultRangeSettingItemListener(fp));
 			controls.addComp(fp);
 		}
 		controls.addComp(submit);

@@ -41,14 +41,14 @@ public class TickerTechModelRenderUtil extends TickerTechModelUtil {
 		float left = x;
 		float top = y;
 		g.setColor(CommonColors.REGION_HIGHLIGHT);
-		g.fill(new Rectangle2D.Float(left, margins, 200, totalHeight));
+		g.fill(new Rectangle2D.Float(left, margins, 220, totalHeight));
 		g.setColor(Color.black);
 		g.drawString(date, left + 5, top + FONT_SIZE + 5);
 		for (int i = 1; i < dailyRecord.size(); i++) {
 
-			g.drawString(TechnicalDatabaseInterface.elements[i], left + 5, top
+			g.drawString(dailyRecordLabels.get(i), left + 5, top
 					+ FONT_SIZE + 5 + FONT_SIZE * (1 + i));
-			g.drawString(dailyRecord.get(i), 80 + left + 5, top + FONT_SIZE + 5
+			g.drawString(dailyRecord.get(i), 110 + left + 5, top + FONT_SIZE + 5
 					+ FONT_SIZE * (1 + i));
 		}
 

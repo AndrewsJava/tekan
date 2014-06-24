@@ -127,91 +127,12 @@ public class TickerTechView extends JPanel {
 	}
 
 	private JMenu makeOptionsMenuItem() {
-		JMenu menu = new JMenu("[options]");
-		menu.addItemListener(makeOptionsWindowOpenItemListener());
+		JMenu menu = new JMenu("[display options]");
+		menu.addItemListener( new OptionsWindowOpenItemListener(model));
 		return menu;
 	}
 
-	private ItemListener makeOptionsWindowOpenItemListener() {
-		return new ItemListener() {
-
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				// if (true) {
-				if (event.getStateChange() == ItemEvent.SELECTED) {
-					JFrame optionsWindow = new JFrame("select graph options");
-					optionsWindow
-							.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-					JScrollPanelledPane options = new JScrollPanelledPane();
-					optionsWindow.setVisible(true);
-					optionsWindow.setSize(650, 200);
-					optionsWindow.add(options);
-					optionsWindow.setAlwaysOnTop(true);
-
-					for (String s : model.preferenceOptions) {
-						JCheckBox cbMenuItem = new JCheckBox(s);
-						cbMenuItem
-								.addItemListener(makePreferencesItemListener());
-						if (model.myPreferences.get(s))
-							cbMenuItem.setSelected(true);
-						options.addComp(cbMenuItem);
-					}
-					options.addComp(JLabelFactory
-							.doBluishJLabel("averages - (days*2),measure,option"));
-					for (OptionsMenuChoicePanel avgLine : model.lineAverageChoices)
-						options.addComp(avgLine);
-					JButton resetColors = new JButton("reset colors");
-					options.addComp(resetColors);
-					resetColors.addActionListener(new ActionListener() {
-
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							for (OptionsMenuChoicePanel lineOp : model.lineAverageChoices) {
-								if (!lineOp.showHide.isSelected()) {
-									lineOp.resetColors();
-								}
-							}
-						}
-
-					});
-				}
-			}
-
-		};
-	}
-
-	// private JMenu makeOptionsMenuItem() {
-	// JMenu menu = new JMenu("[options]");
-	// for (String s : model.preferenceOptions) {
-	// JCheckBoxMenuItem cbMenuItem = new JCheckBoxMenuItem(s);
-	// cbMenuItem.addItemListener(makePreferencesItemListener());
-	// if (model.myPreferences.get(s))
-	// cbMenuItem.setSelected(true);
-	// menu.add(cbMenuItem);
-	// }
-	// return menu;
-	// }
-	public ItemListener makePreferencesItemListener() {
-		return new ItemListener() {
-
-			@Override
-			public void itemStateChanged(ItemEvent arg0) {
-
-				if (arg0.getStateChange() == ItemEvent.SELECTED
-						|| arg0.getStateChange() == ItemEvent.DESELECTED) {
-					JCheckBox source = ((JCheckBox) arg0.getSource());
-					String sourceText = source.getText();
-					model.myPreferences.put(sourceText, source.isSelected());
-					System.out.println(model.myPreferences);
-					repaint();
-					SerializationTool.serialize(model.myPreferences,
-							model.preferencesSerializedName);
-				}
-			}
-
-		};
-	}
-
+ 
 	private JMenu makeFundamentalsGridMenuItem() {
 
 		JMenu menu = new JMenu("[company statistics]");
@@ -279,18 +200,14 @@ public class TickerTechView extends JPanel {
 	}
 
 	final MouseAdapter dateDisplayer = new MouseAdapter() {
-
-		public boolean toggleVisible = false;
-
+ 
 		public void mouseClicked(MouseEvent e) {
 			float newx = e.getX();
 			float newy = e.getY();
 			if (SwingUtilities.isLeftMouseButton(e)) {
 				model.setDailyTradeData(newx, newy);
 			} else if (SwingUtilities.isRightMouseButton(e)) {
-				toggleVisible = !toggleVisible;
-				model.xf = newx;
-				model.yf = newy;
+			 //TODO: somthing with right mouse click
 			} else if (SwingUtilities.isMiddleMouseButton(e)) {
 
 			}

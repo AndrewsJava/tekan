@@ -51,6 +51,7 @@ public class TickerTechModelVars {
 	final Font BIG_FONT = new Font("Bitstream", Font.PLAIN, FONT_SIZE);
 
 	protected ArrayList<String> dailyRecord = new ArrayList<String>();
+	protected ArrayList<String> dailyRecordLabels = new ArrayList<String>();
 	protected JViewport viewport;
 	protected TreeMap<Float, Ellipse2D.Float> dividendEllipses = new TreeMap<Float, Ellipse2D.Float>();
 	protected ArrayList<Line2D.Float> volumeBars;
@@ -69,9 +70,7 @@ public class TickerTechModelVars {
 	float W = 2 * margins + eW;
 	int eH = 1000;
 	int H = 1000;
-	float x, y;
-	float xf;
-	float yf;
+	float x, y; 
 	TreeMap<String, String> currentFundamentals = new TreeMap<String, String>();
 	TreeMap<String, Boolean> myPreferences = new TreeMap<String, Boolean>();
 	String profile = "no profile on record";

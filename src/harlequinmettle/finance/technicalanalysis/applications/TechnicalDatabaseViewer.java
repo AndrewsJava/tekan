@@ -47,7 +47,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 
 	private void init() {
 
-		SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
+		//SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
 		// TechnicalDatabase db = new TechnicalDatabase(2, 0); 
 		CurrentFundamentalsSQLiteDatabase fdb = new CurrentFundamentalsSQLiteDatabase();
 

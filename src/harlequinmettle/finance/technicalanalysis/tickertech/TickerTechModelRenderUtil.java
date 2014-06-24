@@ -31,6 +31,8 @@ public class TickerTechModelRenderUtil extends TickerTechModelUtil {
 
 	protected void drawDaysData(Graphics2D g) {
 
+		if (day == 0 && x == 0)
+			return;
 		g.setColor(Color.black);
 		g.setFont(BIG_FONT);
 		String date = DATE_FORMAT
@@ -78,10 +80,10 @@ public class TickerTechModelRenderUtil extends TickerTechModelUtil {
 
 	protected void drawAvgLines(Graphics2D g) {
 		for (OptionsMenuChoicePanel avgLine : lineAverageChoices) {
-			if (!avgLine.isDisplayPreferred())
-				return;
+			if (!avgLine.isDisplayPreferred() || avgLine.path ==null)
+				continue;
 			g.setStroke(SMOOTH_STROKE);
-			g.setColor(avgLine.color);
+			g.setColor(avgLine.getColor());
 			g.draw(avgLine.path);
 		}
 	}

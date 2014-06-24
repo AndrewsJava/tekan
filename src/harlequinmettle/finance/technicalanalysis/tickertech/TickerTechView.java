@@ -11,6 +11,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -22,6 +24,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -134,16 +137,17 @@ public class TickerTechView extends JPanel {
 
 			@Override
 			public void itemStateChanged(ItemEvent event) {
-				//if (true) {
-				 if (event.getStateChange() == ItemEvent.SELECTED) {
-					JFrame optionsWindow = new JFrame( "select graph options");
-					optionsWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				// if (true) {
+				if (event.getStateChange() == ItemEvent.SELECTED) {
+					JFrame optionsWindow = new JFrame("select graph options");
+					optionsWindow
+							.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 					JScrollPanelledPane options = new JScrollPanelledPane();
 					optionsWindow.setVisible(true);
-					optionsWindow.setSize(500,700);
+					optionsWindow.setSize(650, 200);
 					optionsWindow.add(options);
 					optionsWindow.setAlwaysOnTop(true);
-					
+
 					for (String s : model.preferenceOptions) {
 						JCheckBox cbMenuItem = new JCheckBox(s);
 						cbMenuItem
@@ -151,11 +155,25 @@ public class TickerTechView extends JPanel {
 						if (model.myPreferences.get(s))
 							cbMenuItem.setSelected(true);
 						options.addComp(cbMenuItem);
-					} 
+					}
 					options.addComp(JLabelFactory
 							.doBluishJLabel("averages - (days*2),measure,option"));
 					for (OptionsMenuChoicePanel avgLine : model.lineAverageChoices)
 						options.addComp(avgLine);
+					JButton resetColors = new JButton("reset colors");
+					options.addComp(resetColors);
+					resetColors.addActionListener(new ActionListener() {
+
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							for (OptionsMenuChoicePanel lineOp : model.lineAverageChoices) {
+								if (!lineOp.showHide.isSelected()) {
+									lineOp.resetColors();
+								}
+							}
+						}
+
+					});
 				}
 			}
 
@@ -179,14 +197,16 @@ public class TickerTechView extends JPanel {
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
 
-				JCheckBox  source = ((JCheckBox ) arg0
-						.getSource());
-				String sourceText = source.getText();
-				model.myPreferences.put(sourceText, source.isSelected());
-				System.out.println(model.myPreferences);
-				repaint();
-				SerializationTool.serialize(model.myPreferences,
-						model.preferencesSerializedName);
+				if (arg0.getStateChange() == ItemEvent.SELECTED
+						|| arg0.getStateChange() == ItemEvent.DESELECTED) {
+					JCheckBox source = ((JCheckBox) arg0.getSource());
+					String sourceText = source.getText();
+					model.myPreferences.put(sourceText, source.isSelected());
+					System.out.println(model.myPreferences);
+					repaint();
+					SerializationTool.serialize(model.myPreferences,
+							model.preferencesSerializedName);
+				}
 			}
 
 		};
@@ -237,9 +257,9 @@ public class TickerTechView extends JPanel {
 		myText.setLineWrap(true);
 		myText.setFont(model.BIG_FONT);
 		myText.setWrapStyleWord(true);
-		myText.setPreferredSize(new Dimension(900, model.eH / 2));
+		// myText.setPreferredSize(new Dimension(900, model.eH / 2));
 		PreferredJScrollPane scrollable = new PreferredJScrollPane(myText);
-		scrollable.setPreferredSize(new Dimension(900, model.eH / 2));
+		scrollable.setPreferredSize(new Dimension(900, 9 * model.eH / 10));
 		// ///
 
 		menu.add(scrollable);

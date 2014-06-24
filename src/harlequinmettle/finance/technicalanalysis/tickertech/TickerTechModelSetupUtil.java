@@ -8,6 +8,7 @@ import harlequinmettle.utils.numbertools.format.NumberFormater;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 public class TickerTechModelSetupUtil extends TickerTechModelRenderUtil{
@@ -21,6 +22,14 @@ public class TickerTechModelSetupUtil extends TickerTechModelRenderUtil{
 			for (String pref : preferenceOptions) {
 				myPreferences.put(pref, true);
 			}
+		}
+		//////////////////
+
+		optionStates = SerializationTool.deserialize(optionStates.getClass(),
+				morePreferencesSerializedName);
+		if (optionStates == null) {
+			optionStates = new ArrayList<OptionsMenuModel> ();
+		
 		}
 	}
 

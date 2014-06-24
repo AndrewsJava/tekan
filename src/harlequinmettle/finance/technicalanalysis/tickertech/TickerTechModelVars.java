@@ -6,7 +6,6 @@ import harlequinmettle.utils.guitools.SquareStroke;
 
 import java.awt.Font;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -17,7 +16,8 @@ import java.util.TreeMap;
 import javax.swing.JViewport;
 
 public class TickerTechModelVars {
-
+	 
+	ArrayList<OptionsMenuModel> optionStates = new ArrayList<OptionsMenuModel>(); 
 	ArrayList<OptionsMenuChoicePanel> lineAverageChoices = new ArrayList<OptionsMenuChoicePanel>(); 
 	// ////////////////////////////////////////////
 	protected final int INTERBARMARGINS = 2;
@@ -25,7 +25,7 @@ public class TickerTechModelVars {
 	protected final int BAR_W = 10;
 	protected final int FONT_SIZE = 18;
 	protected final int REAL_BIG_FONT_SIZE = 24;
-	protected final SmoothStroke SMOOTH_STROKE = new SmoothStroke(3);
+	protected final SmoothStroke SMOOTH_STROKE = new SmoothStroke(6);
 	protected final SquareStroke SQUARE_STROKE = new SquareStroke(8);
 	protected final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
 			"EEE YYYY-MMM-dd");
@@ -77,6 +77,8 @@ public class TickerTechModelVars {
 	String profile = "no profile on record";
 	String preferencesSerializedName = "application_settings" + File.separator
 			+ "preferences_serialized_name";
+	String morePreferencesSerializedName = "application_settings" + File.separator
+			+ "specific_preferences_serialized_name";
 	String ticker;
 	// TODO: VOLUME AVG LINE(S)
 	// TODO: AVERAGE LINES

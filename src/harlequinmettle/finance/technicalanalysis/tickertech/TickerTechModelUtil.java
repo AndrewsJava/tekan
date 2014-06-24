@@ -181,25 +181,28 @@ public class TickerTechModelUtil extends TickerTechModelVars {
 //	
 	
 	protected GeneralPath generateAvgPath(int type, Point2D.Float minMax,
-			int avgLineNumber) {
-		boolean useSqrt = false;
+			int avgLineNumber,boolean useSqrt,boolean useTrailingValuesOnly) {
+		 
 		TreeMap<Float, Float> points = genMap(technicalData, type);
 		
 		GeneralPath hl = new GeneralPath();
 		boolean first = true;
 		float firstDay = points.firstKey();
-
+int trailingValues = avgLineNumber;
+int leadingValues = avgLineNumber;
+if(useTrailingValuesOnly)leadingValues = 0;
 		ArrayList<Float> keys = new ArrayList<Float>(points.keySet());
 
-		for (int J = avgLineNumber; J < (keys.size() - avgLineNumber); J++) {
+		for (int J = trailingValues; J < (keys.size() - leadingValues); J++) {
 			float sum = 0;
 			float n = 0.01f;
-			for (int L = J - avgLineNumber; L <= J + 1 + 2 * avgLineNumber
+			for (int L = J - trailingValues; L <= J + 1 + leadingValues+trailingValues
 					&& L < keys.size(); L++) {
 				float day = keys.get(L);
 				float value = points.get(day);
 				if (useSqrt)
 					sum += Math.sqrt(value);
+				else
 				sum+=value;
 				n++;
 
@@ -208,11 +211,11 @@ public class TickerTechModelUtil extends TickerTechModelVars {
 			float f = dayOfAvg - firstDay;
 			float xMove = margins + BAR_W / 2 + f * (BAR_W + INTERBARMARGINS);
 			float average = sum / n;
-//			Point2D.Float newMinMax = new Point2D.Float(minMax.x, minMax.y);
-//			if (useSqrt)
-//				newMinMax = new Point2D.Float((float) Math.sqrt(minMax.x),
-//						(float) Math.sqrt(minMax.y));
-			float yMove = calculateVerticalScreenPoint(average,  minMax);
+			Point2D.Float newMinMax = new Point2D.Float(minMax.x, minMax.y);
+			if (useSqrt)
+				newMinMax = new Point2D.Float((float) Math.sqrt(minMax.x),
+						(float) Math.sqrt(minMax.y));
+			float yMove = calculateVerticalScreenPoint(average,  newMinMax);
 			if (first) {
 				first = false;
 				hl.moveTo(xMove, yMove);

@@ -31,7 +31,9 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 
 	public static final DividendDatabase DDB = new DividendDatabase();
 	public static final TechnicalDatabaseSQLite TDB = new TechnicalDatabaseSQLite();
-	//public static final TechnicalDatabaseSQLite TDB = new TechnicalDatabaseSQLite(2000);
+
+	// public static final TechnicalDatabaseSQLite TDB = new
+	// TechnicalDatabaseSQLite(2000);
 
 	public static void main(String[] arg) {
 		long time = System.currentTimeMillis();
@@ -48,8 +50,8 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 
 	private void init() {
 
-		//SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
-		// TechnicalDatabase db = new TechnicalDatabase(2, 0); 
+		// SystemMemoryUseDisplay smu = new SystemMemoryUseDisplay();
+		// TechnicalDatabase db = new TechnicalDatabase(2, 0);
 		CurrentFundamentalsSQLiteDatabase fdb = new CurrentFundamentalsSQLiteDatabase();
 
 		// new ArrayList<String>(
@@ -75,7 +77,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 
 		JSearchPanel searchPanel = new JSearchPanel(45);
 		searchPanel.addSearchAction(doSearchActionListener(searchPanel));
-		
+
 		controls.addComp(searchPanel);
 
 		controls.addComp(makeUpcomingDividendsPanel());
@@ -83,9 +85,10 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		controls.addComp(makeFreeTradeETFPanel());
 
 		controls.addComp(makeRecentReportsPanel());
-
+		// TODO: exec chromium htttp ticker
 		for (FilterPanel fp : filters) {
 			fp.setFontSize(40);
+			// TODO: add separte info on choice with statinfo generator
 			fp.choices.addItemListener(new DefaultRangeSettingItemListener(fp));
 			controls.addComp(fp);
 		}
@@ -108,8 +111,8 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 			public void actionPerformed(ActionEvent arg0) {
 				String pathToObj = "technical_database_settings";
 				String key = "path to downloads folder";
-				ChooseFilePrompterPathSaved downloads = new ChooseFilePrompterPathSaved("application_settings",
-						pathToObj);
+				ChooseFilePrompterPathSaved downloads = new ChooseFilePrompterPathSaved(
+						"application_settings", pathToObj);
 				String root = downloads.getSetting(key);
 
 				new FilePathButtonsScrollingPanel((root));
@@ -135,7 +138,8 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				new TickerButtonsScrollingPanel(
-						new DividendForecaster().scannForUpcommingDividends(),"ex div date soon");
+						new DividendForecaster().scannForUpcommingDividends(),
+						"ex div date soon");
 
 			}
 
@@ -158,49 +162,32 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				new TickerButtonsScrollingPanel(
-						Arrays.asList(ETFs.fidelityFreeTradeETFS), "fidelity etfs");
+						Arrays.asList(ETFs.fidelityFreeTradeETFS),
+						"fidelity etfs");
 
 			}
 
 		};
 	}
-
-//	private ActionListener doFilterListener(
-//			final CurrentFundamentalsDatabase fdb, final FilterPanel[] filters) {
-//		// public TreeMap<String, String> getFilterResults(FilterPanel[]
-//		// searchFilters) {
-//		return new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent arg0) {
-//				TreeMap<String, String> filterResults = fdb
-//						.getFilterResults(filters);
-//				for (Entry<String, String> ent : filterResults.entrySet()) {
-//					System.out.println(ent);
-//				}
-//				new TickerButtonsScrollingPanel(filterResults);
-//			}
-//
-//		};
-//	}
+ 
 
 	private ActionListener doFilterListener(
-			final CurrentFundamentalsSQLiteDatabase fdb, final FilterPanel[] filters) {
-		// public TreeMap<String, String> getFilterResults(FilterPanel[]
-		// searchFilters) {
+			final CurrentFundamentalsSQLiteDatabase fdb,
+			final FilterPanel[] filters) {
+	 
 		return new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				TreeMap<String, String> filterResults = fdb
 						.getFilterResults(filters);
-				String title ="";
-				for(FilterPanel fp : filters){
-					if(fp.shouldFilterBeApplied())
-					title+=" "+fp.getFilterName();
+				String title = "";
+				for (FilterPanel fp : filters) {
+					if (fp.shouldFilterBeApplied())
+						title += " " + fp.getFilterName();
 				}
-//				for (Entry<String, String> ent : filterResults.entrySet()) { 
-//					System.out.println(ent);
-//				}
-				new TickerButtonsScrollingPanel(filterResults,"Filter(s): "+title);
+ 
+				new TickerButtonsScrollingPanel(filterResults, "Filter(s): "
+						+ title);
 			}
 
 		};

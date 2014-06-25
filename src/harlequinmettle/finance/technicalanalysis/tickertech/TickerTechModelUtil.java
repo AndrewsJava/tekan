@@ -19,9 +19,8 @@ public class TickerTechModelUtil extends TickerTechModelVars {
 
 		x = xpt;
 		y = ypt;
-		dailyRecord.clear();
-		int scrollValue = 0; 
-		scrollValue = viewport.getX();
+		dailyRecord.clear(); 
+		int scrollValue = viewport.getX();
 		int index = 1 + (int) ((x - margins - scrollValue) / (BAR_W + INTERBARMARGINS));
 		if (index < days.length && index > 0) {
 			day = days[index];

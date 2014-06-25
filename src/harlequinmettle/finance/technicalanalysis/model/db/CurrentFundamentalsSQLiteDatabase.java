@@ -4,6 +4,7 @@ import harlequinmettle.utils.TimeRecord;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.filetools.sqlite.SQLiteTools;
 import harlequinmettle.utils.guitools.FilterPanel;
+import harlequinmettle.utils.numbertools.math.statistics.StatInfo;
 
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -233,8 +234,7 @@ public class CurrentFundamentalsSQLiteDatabase implements
 				min = dataPoint;
 		}
 		// //////////////////////////////
-		
-		System.out.println(values.size()+"      -"+values);
+		StatInfo stats = new StatInfo(values); 
 		return new Point2D.Float(min, max);
 	}
 }

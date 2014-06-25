@@ -41,10 +41,9 @@ public class TickerTechModelVars {
 	final String CANDLESTICKS = "show candlesticks";
 	final String GRID_LINES = "show grid";
 	final String DIV_BALLS = "show dividends";
+	final String GRAPH_WEEKS = "indicate time (weeks)";
 	final String[] preferenceOptions = { //
-	VOL_BARS, CANDLESTICKS, GRID_LINES, DIV_BALLS };
-//	final String VOL_AVG = "show volume avg";
-//	final String CLOSE_AVG = "show close avg";
+	VOL_BARS, CANDLESTICKS, GRID_LINES, DIV_BALLS,GRAPH_WEEKS }; 
 	final String[] preferenceOptionsWithOptions = TechnicalDatabaseSQLite.elements;//{ //
 //	VOL_AVG, CLOSE_AVG };
 	final int margins = 20;

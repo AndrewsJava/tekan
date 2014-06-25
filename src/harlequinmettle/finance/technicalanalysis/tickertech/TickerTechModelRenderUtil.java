@@ -20,13 +20,36 @@ public class TickerTechModelRenderUtil extends TickerTechModelUtil {
 			g.setColor(Color.magenta);
 			g.fill(div.getValue());
 			g.setColor(Color.cyan);
+			float dividend = DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.get(
+					ticker).get(div.getKey());
 
-			g.drawString(
-					""
-							+ DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.get(
-									ticker).get(div.getKey()),
-					div.getValue().x, eH / 2);
+			String exDivDate = DATE_FORMAT.format(new Date((long) (float) div
+					.getKey() * 24 * 3600 * 1000));
+			g.drawString("" + dividend, div.getValue().x, eH / 2);
+			g.drawString("" + exDivDate, div.getValue().x, eH / 2 + 25);
 		}
+	}
+
+	protected void drawDates(Graphics2D g) {
+		g.setFont(BIG_FONT);
+		g.setColor(Color.black);
+		float month = 4 * 7 * (BAR_W + INTERBARMARGINS);
+		for (int i = margins; i < W - margins; i += month) {
+
+			float dayNumber = tryToGetDateForPixel(i);
+			String date = DATE_FORMAT.format(new Date(
+					(long) dayNumber * 24 * 3600 * 1000));
+			g.drawString(date, i, margins);
+		}
+	}
+
+	private float tryToGetDateForPixel(int i) {
+
+		int index = 1 + (int) ((i - margins) / (BAR_W + INTERBARMARGINS));
+		if (index < 0 || index > days.length)
+			return 0;
+		float dayNumber = days[index];
+		return dayNumber;
 	}
 
 	protected void drawDaysData(Graphics2D g) {
@@ -46,10 +69,10 @@ public class TickerTechModelRenderUtil extends TickerTechModelUtil {
 		g.drawString(date, left + 5, top + FONT_SIZE + 5);
 		for (int i = 1; i < dailyRecord.size(); i++) {
 
-			g.drawString(dailyRecordLabels.get(i), left + 5, top
-					+ FONT_SIZE + 5 + FONT_SIZE * (1 + i));
-			g.drawString(dailyRecord.get(i), 110 + left + 5, top + FONT_SIZE + 5
-					+ FONT_SIZE * (1 + i));
+			g.drawString(dailyRecordLabels.get(i), left + 5, top + FONT_SIZE
+					+ 5 + FONT_SIZE * (1 + i));
+			g.drawString(dailyRecord.get(i), 110 + left + 5, top + FONT_SIZE
+					+ 5 + FONT_SIZE * (1 + i));
 		}
 
 		g.drawString("" + minMaxPrice.y, left + 5, 50);
@@ -67,6 +90,7 @@ public class TickerTechModelRenderUtil extends TickerTechModelUtil {
 		g.fillRect(0, 0, (int) W, H + 100);
 		// g.setColor(Color.DARK_GRAY);
 		// g.drawRect(margins,margins,eW,eH);
+
 		if (myPreferences.get(GRID_LINES)) {
 			g.setColor(Color.LIGHT_GRAY);
 			for (int i = margins; i < W - margins; i += 25) {
@@ -78,9 +102,18 @@ public class TickerTechModelRenderUtil extends TickerTechModelUtil {
 		}
 	}
 
+	public void drawWeeklyLines(Graphics2D g) {
+		g.setColor(CommonColors.REGION_HIGHLIGHT);
+		g.setStroke(SQUARE_STROKE);
+		float week = 7 * (BAR_W + INTERBARMARGINS);
+		for (int i = margins; i < W - margins; i += week) {
+			g.drawLine(i, margins, i, margins + H);
+		}
+	}
+
 	protected void drawAvgLines(Graphics2D g) {
 		for (OptionsMenuChoicePanel avgLine : lineAverageChoices) {
-			if (!avgLine.isDisplayPreferred() || avgLine.path ==null)
+			if (!avgLine.isDisplayPreferred() || avgLine.path == null)
 				continue;
 			g.setStroke(SMOOTH_STROKE);
 			g.setColor(avgLine.getColor());

@@ -71,6 +71,9 @@ public class TickerTechView extends JPanel {
 
 		// g.scale(scalex, scaley);
 		model.drawBackground(g);
+		model.drawDates(g);
+		if (model.myPreferences.get(model.GRAPH_WEEKS))
+			model.drawWeeklyLines(g);
 		if (model.myPreferences.get(model.VOL_BARS))
 			model.drawVolumeLines(g);
 		if (model.myPreferences.get(model.DIV_BALLS))
@@ -135,7 +138,7 @@ public class TickerTechView extends JPanel {
  
 	private JMenu makeFundamentalsGridMenuItem() {
 
-		JMenu menu = new JMenu("[company statistics]");
+		JMenu menu = new JMenu("[indicators]");
 		menu.setMnemonic(KeyEvent.VK_S);
 		VerticalJPanel twoColumn = new VerticalJPanel(2);
 		PreferredJScrollPane scrollable = new PreferredJScrollPane(twoColumn);

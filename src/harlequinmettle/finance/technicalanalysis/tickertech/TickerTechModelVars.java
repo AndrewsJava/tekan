@@ -5,9 +5,11 @@ import harlequinmettle.utils.guitools.SmoothStroke;
 import harlequinmettle.utils.guitools.SquareStroke;
 
 import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,21 +18,21 @@ import java.util.TreeMap;
 import javax.swing.JViewport;
 
 public class TickerTechModelVars {
-	 
-	ArrayList<OptionsMenuModel> optionStates = new ArrayList<OptionsMenuModel>(); 
-	ArrayList<OptionsMenuChoicePanel> lineAverageChoices = new ArrayList<OptionsMenuChoicePanel>(); 
+	Rectangle visible = new Rectangle();
+	long lastTranslate = 0;
+	ArrayList<OptionsMenuModel> optionStates = new ArrayList<OptionsMenuModel>();
+	ArrayList<OptionsMenuChoicePanel> lineAverageChoices = new ArrayList<OptionsMenuChoicePanel>();
 	// ////////////////////////////////////////////
 	protected final int INTERBARMARGINS = 2;
 	protected final int DIVIDEND_100_PERCENT_CLOSE_WIDTH = 5000;
 	protected final int BAR_W = 10;
 	protected final int FONT_SIZE = 18;
 	protected final int REAL_BIG_FONT_SIZE = 24;
+	protected final SmoothStroke THIN_STROKE = new SmoothStroke(2);
 	protected final SmoothStroke SMOOTH_STROKE = new SmoothStroke(6);
 	protected final SquareStroke SQUARE_STROKE = new SquareStroke(8);
-	protected final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
-			"EEE YYYY-MMM-dd");
-	protected final Font REAL_BIG_FONT = new Font("Bitstream", Font.PLAIN,
-			REAL_BIG_FONT_SIZE);
+	protected final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("EEE YYYY-MMM-dd");
+	protected final Font REAL_BIG_FONT = new Font("Bitstream", Font.PLAIN, REAL_BIG_FONT_SIZE);
 
 	// protected final String VOL_BAR ="show open line"
 	// protected final String VOL_BAR = "show close line"
@@ -41,11 +43,14 @@ public class TickerTechModelVars {
 	final String CANDLESTICKS = "show candlesticks";
 	final String GRID_LINES = "show grid";
 	final String DIV_BALLS = "show dividends";
-	final String GRAPH_WEEKS = "indicate time (weeks)";
+	final String GRAPH_WEEKS = "show weekly lines";
+	final String GRAPH_VOL_MEASURE = "indicate volume";
+	final String GRAPH_PRICE_MEASURE = "indicate price";
 	final String[] preferenceOptions = { //
-	VOL_BARS, CANDLESTICKS, GRID_LINES, DIV_BALLS,GRAPH_WEEKS }; 
-	final String[] preferenceOptionsWithOptions = TechnicalDatabaseSQLite.elements;//{ //
-//	VOL_AVG, CLOSE_AVG };
+	VOL_BARS, CANDLESTICKS, GRID_LINES, DIV_BALLS, GRAPH_WEEKS, GRAPH_VOL_MEASURE, GRAPH_PRICE_MEASURE };
+	final String[] preferenceOptionsWithOptions = TechnicalDatabaseSQLite.elements;// {
+																					// //
+	// VOL_AVG, CLOSE_AVG };
 	final int margins = 20;
 	final Font BIG_FONT = new Font("Bitstream", Font.PLAIN, FONT_SIZE);
 
@@ -69,14 +74,12 @@ public class TickerTechModelVars {
 	float W = 2 * margins + eW;
 	int eH = 1000;
 	int H = 1000;
-	float x, y; 
+	float x, y;
 	TreeMap<String, String> currentFundamentals = new TreeMap<String, String>();
 	TreeMap<String, Boolean> myPreferences = new TreeMap<String, Boolean>();
 	String profile = "no profile on record";
-	String preferencesSerializedName = "application_settings" + File.separator
-			+ "preferences_serialized_name";
-	String morePreferencesSerializedName = "application_settings" + File.separator
-			+ "specific_preferences_serialized_name";
+	String preferencesSerializedName = "application_settings" + File.separator + "preferences_serialized_name";
+	String morePreferencesSerializedName = "application_settings" + File.separator + "specific_preferences_serialized_name";
 	String ticker;
 	// TODO: VOLUME AVG LINE(S)
 	// TODO: AVERAGE LINES

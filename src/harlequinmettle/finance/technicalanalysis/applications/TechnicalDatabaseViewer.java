@@ -3,11 +3,11 @@ package harlequinmettle.finance.technicalanalysis.applications;
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseSQLite;
-import harlequinmettle.finance.technicalanalysis.tickertech.TickerTechModelVars;
 import harlequinmettle.finance.technicalanalysis.tickertech.TickerTechView;
 import harlequinmettle.finance.technicalanalysis.util.DefaultRangeSettingItemListener;
 import harlequinmettle.finance.technicalanalysis.util.DividendForecaster;
 import harlequinmettle.finance.technicalanalysis.view.FilePathButtonsScrollingPanel;
+import harlequinmettle.finance.technicalanalysis.view.InfoPanel;
 import harlequinmettle.finance.technicalanalysis.view.TickerButtonsScrollingPanel;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.finance.ETFs;
@@ -61,11 +61,15 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		final FilterPanel filter_one = new FilterPanel(fdb.subsetLabels);
 		final FilterPanel filter_two = new FilterPanel(fdb.subsetLabels);
 		final FilterPanel filter_three = new FilterPanel(fdb.subsetLabels);
-		final FilterPanel[] filters = { filter_one, filter_two, filter_three };
+		final FilterPanel filter_four = new FilterPanel(fdb.subsetLabels);
+		final FilterPanel filter_five = new FilterPanel(fdb.subsetLabels);
+		final FilterPanel[] fundamentalIndicatorfilters = { filter_one,
+				filter_two, filter_three, filter_four, filter_five };
 		JButtonWithEnterKeyAction submit = new JButtonWithEnterKeyAction(
 				"apply filters for results");
 
-		submit.addActionListener(doFilterListener(fdb, filters));
+		submit.addActionListener(doFilterListener(fdb,
+				fundamentalIndicatorfilters));
 		JFrame container = new JFrame("Control Panel - Technical Analysis");
 		container.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		container.setSize(900, 500);
@@ -85,11 +89,13 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		controls.addComp(makeFreeTradeETFPanel());
 
 		controls.addComp(makeRecentReportsPanel());
+		InfoPanel info = new InfoPanel(fdb.subsetLabels);
+		info.choices.addItemListener(new DefaultRangeSettingItemListener(info));
+		info.setFontSize(40);
+		controls.addComp(info);
 		// TODO: exec chromium htttp ticker
-		for (FilterPanel fp : filters) {
+		for (FilterPanel fp : fundamentalIndicatorfilters) {
 			fp.setFontSize(40);
-			// TODO: add separte info on choice with statinfo generator
-			fp.choices.addItemListener(new DefaultRangeSettingItemListener(fp));
 			controls.addComp(fp);
 		}
 		controls.addComp(submit);
@@ -169,12 +175,11 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 
 		};
 	}
- 
 
 	private ActionListener doFilterListener(
 			final CurrentFundamentalsSQLiteDatabase fdb,
 			final FilterPanel[] filters) {
-	 
+
 		return new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -185,7 +190,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 					if (fp.shouldFilterBeApplied())
 						title += " " + fp.getFilterName();
 				}
- 
+
 				new TickerButtonsScrollingPanel(filterResults, "Filter(s): "
 						+ title);
 			}

@@ -19,9 +19,10 @@ public class TickerTechModelUtil extends TickerTechModelVars {
 
 		x = xpt;
 		y = ypt;
-		dailyRecord.clear(); 
-		int scrollValue = viewport.getX();
-		int index = 1 + (int) ((x - margins - scrollValue) / (BAR_W + INTERBARMARGINS));
+		dailyRecord.clear();
+		// int scrollValue = 1;//viewport.getX();
+		int index = 1 + (int) ((x - margins // - scrollValue
+		) / (BAR_W + INTERBARMARGINS));
 		if (index < days.length && index > 0) {
 			day = days[index];
 			boolean first = true;
@@ -31,38 +32,32 @@ public class TickerTechModelUtil extends TickerTechModelVars {
 			for (float f : dayData) {
 				if (first) {
 					first = false;
-					dailyRecord.add(DATE_FORMAT.format(new Date(
-							(long) f * 24 * 3600 * 1000)));
-				}  else {
-					dailyRecord.add(NumberFormater.floatToBMKTrunkated(f,2));
+					dailyRecord.add(DATE_FORMAT.format(new Date((long) f * 24 * 3600 * 1000)));
+				} else {
+					dailyRecord.add(NumberFormater.floatToBMKTrunkated(f, 2));
 				}
 			}
-			String percentChange = NumberFormater.formatCalculatePercentChange(dayData[1],dayData[4]);
+			String percentChange = NumberFormater.formatCalculatePercentChange(dayData[1], dayData[4]);
 			dailyRecord.add(percentChange);
-			String percentRange = NumberFormater.formatCalculatePercentChange(dayData[3],dayData[2]);
+			String percentRange = NumberFormater.formatCalculatePercentChange(dayData[3], dayData[2]);
 			dailyRecord.add(percentRange);
 		}
 	}
 
-	protected Ellipse2D.Float calculateEllipseDisplay(int i, float exDivDate,
-			float dayClose) {
+	protected Ellipse2D.Float calculateEllipseDisplay(int i, float exDivDate, float dayClose) {
 
-		float divAmt = DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.get(ticker)
-				.get(exDivDate);
+		float divAmt = DividendDatabase.PER_TICKER_DIVIDEND_DAY_MAP.get(ticker).get(exDivDate);
 
-		float ellipseWidth = DIVIDEND_100_PERCENT_CLOSE_WIDTH
-				* (divAmt / dayClose);
+		float ellipseWidth = DIVIDEND_100_PERCENT_CLOSE_WIDTH * (divAmt / dayClose);
 
-		float left = margins + BAR_W / 2 + i * (BAR_W + INTERBARMARGINS)
-				- ellipseWidth / 2;
+		float left = margins + BAR_W / 2 + i * (BAR_W + INTERBARMARGINS) - ellipseWidth / 2;
 
 		float top = eH / 2 - ellipseWidth / 2;
 
 		return new Ellipse2D.Float(left, top, ellipseWidth, ellipseWidth);
 	}
 
-	private Line2D.Float calculateLineDisplay(int i, float thislow,
-			float thishigh, Point2D.Float minmax) {
+	private Line2D.Float calculateLineDisplay(int i, float thislow, float thishigh, Point2D.Float minmax) {
 		float xLow = margins + BAR_W / 2 + i * (BAR_W + INTERBARMARGINS);
 		float xHigh = xLow;
 
@@ -83,8 +78,7 @@ public class TickerTechModelUtil extends TickerTechModelVars {
 		return margins + eH - pixels;
 	}
 
-	protected ArrayList<Line2D.Float> generateDisplayableLines(
-			TreeMap<Float, Float> volume, Point2D.Float minmax) {
+	protected ArrayList<Line2D.Float> generateDisplayableLines(TreeMap<Float, Float> volume, Point2D.Float minmax) {
 		ArrayList<Line2D.Float> hl = new ArrayList<Line2D.Float>();
 
 		float firstDay = volume.firstKey();
@@ -94,17 +88,14 @@ public class TickerTechModelUtil extends TickerTechModelVars {
 			float thislow = 0;
 			float thishigh = ent.getValue();
 			f = day - firstDay;
-			Line2D.Float hlline = calculateLineDisplay((int) f, thislow,
-					thishigh, minmax);
+			Line2D.Float hlline = calculateLineDisplay((int) f, thislow, thishigh, minmax);
 			hl.add(hlline);
 
 		}
 		return hl;
 	}
 
-	protected ArrayList<Line2D.Float> generateDisplayableLines(
-			TreeMap<Float, Float> start, TreeMap<Float, Float> end,
-			Point2D.Float minmax) {
+	protected ArrayList<Line2D.Float> generateDisplayableLines(TreeMap<Float, Float> start, TreeMap<Float, Float> end, Point2D.Float minmax) {
 		ArrayList<Line2D.Float> hl = new ArrayList<Line2D.Float>();
 
 		float firstDay = end.firstKey();
@@ -114,16 +105,14 @@ public class TickerTechModelUtil extends TickerTechModelVars {
 			float thislow = start.get(day);
 			float thishigh = ent.getValue();
 			f = day - firstDay;
-			Line2D.Float hlline = calculateLineDisplay((int) f, thislow,
-					thishigh, minmax);
+			Line2D.Float hlline = calculateLineDisplay((int) f, thislow, thishigh, minmax);
 			hl.add(hlline);
 
 		}
 		return hl;
 	}
 
-	protected TreeMap<Float, Float> genMap(TreeMap<Float, float[]> techData,
-			int id) {
+	protected TreeMap<Float, Float> genMap(TreeMap<Float, float[]> techData, int id) {
 		TreeMap<Float, Float> mapping = new TreeMap<Float, Float>();
 		for (float[] daydata : techData.values())
 			mapping.put(daydata[0], daydata[id]);
@@ -132,8 +121,7 @@ public class TickerTechModelUtil extends TickerTechModelVars {
 	}
 
 	// TODO: possibly wrong logic display point, minmax or leading/trailing
-	protected GeneralPath generateAvgPath(int type, Point2D.Float minMax,
-			int avgLineNumber, boolean useSqrt, boolean useTrailingValuesOnly) {
+	protected GeneralPath generateAvgPath(int type, Point2D.Float minMax, int avgLineNumber, boolean useSqrt, boolean useTrailingValuesOnly) {
 
 		TreeMap<Float, Float> points = genMap(technicalData, type);
 
@@ -149,9 +137,7 @@ public class TickerTechModelUtil extends TickerTechModelVars {
 		for (int J = trailingValues; J < (keys.size() - leadingValues); J++) {
 			float sum = 0;
 			float n = 0.01f;
-			for (int L = J - trailingValues; L <= J + 1 + leadingValues
-					+ trailingValues
-					&& L < keys.size(); L++) {
+			for (int L = J - trailingValues; L <= J + 1 + leadingValues + trailingValues && L < keys.size(); L++) {
 				float day = keys.get(L);
 				float value = points.get(day);
 				if (useSqrt)
@@ -167,8 +153,7 @@ public class TickerTechModelUtil extends TickerTechModelVars {
 			float average = sum / n;
 			Point2D.Float newMinMax = new Point2D.Float(minMax.x, minMax.y);
 			if (useSqrt)
-				newMinMax = new Point2D.Float((float) Math.sqrt(minMax.x),
-						(float) Math.sqrt(minMax.y));
+				newMinMax = new Point2D.Float((float) Math.sqrt(minMax.x), (float) Math.sqrt(minMax.y));
 			float yMove = calculateVerticalScreenPoint(average, newMinMax);
 			if (first) {
 				first = false;

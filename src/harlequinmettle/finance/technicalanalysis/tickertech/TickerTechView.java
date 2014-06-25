@@ -21,6 +21,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -59,18 +60,24 @@ public class TickerTechView extends JPanel {
 		model.eH = model.H - 2 * model.margins;
 		updateSizePreferrence();
 		this.addMouseListener(dateDisplayer);
-
+		this.addMouseListener(scrollListener);
 		updateSizePreferrence();
 		showChartInNewWindow(model.ticker);
+
+		continuousRenderingGraph.start();
 	}
 
+ 
 	@Override
 	public void paintComponent(Graphics g1) {
+		// super.paintComponent(g1);
 		updateSizePreferrence();
 		Graphics2D g = (Graphics2D) g1;
+		model.visible = this.getVisibleRect();
+		g.clip(model.visible);
 
-		// g.scale(scalex, scaley);
 		model.drawBackground(g);
+		model.drawMeasurementIndicators(g);
 		model.drawDates(g);
 		if (model.myPreferences.get(model.GRAPH_WEEKS))
 			model.drawWeeklyLines(g);
@@ -85,6 +92,7 @@ public class TickerTechView extends JPanel {
 
 		model.drawAvgLines(g);
 		model.drawDaysData(g);
+ 
 	}
 
 	public void rescaleCanvas(Dimension size) {
@@ -99,15 +107,12 @@ public class TickerTechView extends JPanel {
 		container.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		container.setVisible(true);
-		JScrollPanelledPane chart = new JScrollPanelledPane();
 		PreferredJScrollPane tickerTechScroll = new PreferredJScrollPane(this);
+
 		model.setScrollBar(tickerTechScroll.getViewport());
 
-		chart.addComp(tickerTechScroll);
-
-		container.add(chart);
-		container.setExtendedState(container.getExtendedState()
-				| JFrame.MAXIMIZED_BOTH);
+		container.add(tickerTechScroll);
+		container.setExtendedState(container.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		final ComponentListener refForRemoval = doWindowRescaleListener(this);
 		container.addComponentListener(refForRemoval);
 		container.addWindowListener(new WindowAdapter() {
@@ -131,11 +136,10 @@ public class TickerTechView extends JPanel {
 
 	private JMenu makeOptionsMenuItem() {
 		JMenu menu = new JMenu("[display options]");
-		menu.addItemListener( new OptionsWindowOpenItemListener(model));
+		menu.addItemListener(new OptionsWindowOpenItemListener(model));
 		return menu;
 	}
 
- 
 	private JMenu makeFundamentalsGridMenuItem() {
 
 		JMenu menu = new JMenu("[indicators]");
@@ -149,15 +153,11 @@ public class TickerTechView extends JPanel {
 			if (model.currentFundamentals.containsKey(key))
 				value = model.currentFundamentals.get(key);
 			if (alternate = !alternate) {
-				twoColumn
-						.add(JLabelFactory.doBluishJLabel(key, model.BIG_FONT));
-				twoColumn.add(JLabelFactory.doLightBluishJLabel(value,
-						model.BIG_FONT));
+				twoColumn.add(JLabelFactory.doBluishJLabel(key, model.BIG_FONT));
+				twoColumn.add(JLabelFactory.doLightBluishJLabel(value, model.BIG_FONT));
 			} else {
-				twoColumn.add(JLabelFactory.doLightBluishJLabel(key,
-						model.BIG_FONT));
-				twoColumn.add(JLabelFactory.doBluishJLabel(value,
-						model.BIG_FONT));
+				twoColumn.add(JLabelFactory.doLightBluishJLabel(key, model.BIG_FONT));
+				twoColumn.add(JLabelFactory.doBluishJLabel(value, model.BIG_FONT));
 			}
 		}
 		menu.setAutoscrolls(true);
@@ -171,9 +171,9 @@ public class TickerTechView extends JPanel {
 		JMenu menu = new JMenu("[company description]");
 
 		menu.setMnemonic(KeyEvent.VK_D);
-		menu.getAccessibleContext().setAccessibleDescription(
-				"The only menu in this program that has menu items");
-
+		JButton openChromium = new JButton("open in chromium");
+		openChromium.addActionListener(new ChromiumOpenerActionListener(model.ticker));
+		menu.add(openChromium);
 		// ///
 		JTextArea myText = new JTextArea();
 		myText.setBackground(new Color(200, 225, 255));
@@ -203,19 +203,50 @@ public class TickerTechView extends JPanel {
 	}
 
 	final MouseAdapter dateDisplayer = new MouseAdapter() {
- 
+
 		public void mouseClicked(MouseEvent e) {
 			float newx = e.getX();
 			float newy = e.getY();
 			if (SwingUtilities.isLeftMouseButton(e)) {
 				model.setDailyTradeData(newx, newy);
 			} else if (SwingUtilities.isRightMouseButton(e)) {
-			 //TODO: somthing with right mouse click
+				// TODO: somthing with right mouse click
 			} else if (SwingUtilities.isMiddleMouseButton(e)) {
 
 			}
 			repaint();
 		}
+	};
+
+	final MouseAdapter scrollListener = new MouseAdapter() {
+
+		@Override
+		public void mouseWheelMoved(MouseWheelEvent e) {
+
+			System.out.println("repating mouseWheelMoved " + e);
+			repaint();
+		}
 
 	};
+
+	private Thread continuousRenderingGraph = new Thread(new Runnable() {
+
+		@Override
+		public void run() {
+
+			// for 10 minutes max
+			for (int i = 0; i < 50 * 60 * 10; i++) {
+				if (!getParent().isDisplayable())
+					break;
+				repaint(); 
+		 
+				try {
+					Thread.sleep(20);
+				} catch (InterruptedException e) {
+			 
+				}
+			}
+		}
+
+	});
 }

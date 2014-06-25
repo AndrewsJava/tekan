@@ -48,8 +48,8 @@ public class OptionsMenuChoicePanel extends HorizontalJPanel {
 		interval = new JComboBox<Integer>(DAYS);
 		measure = new JComboBox<String>(TechnicalDatabaseSQLite.elements);
 
-		System.out.println("\n\noptions init");
-		state.print();
+	//	System.out.println("\n\noptions init");
+	//	state.print();
 
 		showHide.setSelected(state.show);
 		interval.setSelectedItem(state.numberToUseInAvg);
@@ -108,8 +108,8 @@ public class OptionsMenuChoicePanel extends HorizontalJPanel {
 					if (showHide.isSelected()) {
 						model.optionStates.remove(state);
 						model.optionStates.add(state);
-						System.out.println("\n\nshow is selected");
-						state.print();
+						//System.out.println("\n\nshow is selected");
+						//state.print();
 						SerializationTool.serialize(model.optionStates,
 								model.morePreferencesSerializedName);
 					} else {

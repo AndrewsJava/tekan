@@ -32,6 +32,7 @@ public class TickerTechModelVars {
 	protected final SmoothStroke SMOOTH_STROKE = new SmoothStroke(6);
 	protected final SquareStroke SQUARE_STROKE = new SquareStroke(8);
 	protected final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("EEE YYYY-MMM-dd");
+	protected final SimpleDateFormat MONTH_DATE_FORMAT = new SimpleDateFormat(" YYYY MMM dd");
 	protected final Font REAL_BIG_FONT = new Font("Bitstream", Font.PLAIN, REAL_BIG_FONT_SIZE);
 
 	// protected final String VOL_BAR ="show open line"

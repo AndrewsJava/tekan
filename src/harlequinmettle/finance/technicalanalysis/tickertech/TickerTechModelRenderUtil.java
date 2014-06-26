@@ -36,7 +36,7 @@ public class TickerTechModelRenderUtil extends TickerTechModelUtil {
 		for (int i = margins; i < W - margins; i += month) {
 
 			float dayNumber = tryToGetDateForPixel(i);
-			String date = DATE_FORMAT.format(new Date((long) dayNumber * 24 * 3600 * 1000));
+			String date = MONTH_DATE_FORMAT.format(new Date((long) dayNumber * 24 * 3600 * 1000));
 			g.drawString(date, i, margins);
 		}
 	}

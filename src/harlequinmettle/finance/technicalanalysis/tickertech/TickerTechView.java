@@ -59,12 +59,11 @@ public class TickerTechView extends JPanel {
 		model.frameW = getWidth();
 		model.eH = model.H - 2 * model.margins;
 		updateSizePreferrence();
-		this.addMouseListener(dateDisplayer);
-		this.addMouseListener(scrollListener);
+		this.addMouseListener(dateDisplayer); 
 		updateSizePreferrence();
 		showChartInNewWindow(model.ticker);
 
-		continuousRenderingGraph.start();
+		continuousTickerTechRenderThread.start();
 	}
 
  
@@ -103,7 +102,7 @@ public class TickerTechView extends JPanel {
 	private void showChartInNewWindow(String ticker) {
 		final JFrame container = new JFrame(ticker + "   " + "  days ago  ");
 
-		container.setSize(900, 550);
+		//container.setSize(900, 550);
 		container.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		container.setVisible(true);
@@ -130,9 +129,11 @@ public class TickerTechView extends JPanel {
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(makeProfileMenuItem());
 		menuBar.add(makeFundamentalsGridMenuItem());
+		menuBar.add( new TechnicalIndicatorsMenuItem(model));
 		menuBar.add(makeOptionsMenuItem());
 		return menuBar;
 	}
+ 
 
 	private JMenu makeOptionsMenuItem() {
 		JMenu menu = new JMenu("[display options]");
@@ -142,7 +143,7 @@ public class TickerTechView extends JPanel {
 
 	private JMenu makeFundamentalsGridMenuItem() {
 
-		JMenu menu = new JMenu("[indicators]");
+		JMenu menu = new JMenu("[fundamental indicators]");
 		menu.setMnemonic(KeyEvent.VK_S);
 		VerticalJPanel twoColumn = new VerticalJPanel(2);
 		PreferredJScrollPane scrollable = new PreferredJScrollPane(twoColumn);
@@ -160,8 +161,7 @@ public class TickerTechView extends JPanel {
 				twoColumn.add(JLabelFactory.doBluishJLabel(value, model.BIG_FONT));
 			}
 		}
-		menu.setAutoscrolls(true);
-		// menu.scrollRectToVisible(aRect);
+		menu.setAutoscrolls(true); 
 		menu.add(scrollable);
 		return menu;
 	}
@@ -217,27 +217,18 @@ public class TickerTechView extends JPanel {
 			repaint();
 		}
 	};
-
-	final MouseAdapter scrollListener = new MouseAdapter() {
-
-		@Override
-		public void mouseWheelMoved(MouseWheelEvent e) {
-
-			System.out.println("repating mouseWheelMoved " + e);
-			repaint();
-		}
-
-	};
-
-	private Thread continuousRenderingGraph = new Thread(new Runnable() {
+ 
+	private Thread continuousTickerTechRenderThread = new Thread(new Runnable() {
 
 		@Override
 		public void run() {
 
 			// for 10 minutes max
-			for (int i = 0; i < 50 * 60 * 10; i++) {
+		//	for (int i = 0; i < 50 * 60 * 10; i++) {
+				while (true) {
 				if (!getParent().isDisplayable())
 					break;
+				if(model.myPreferences.get(model.GRAPH_PRICE_MEASURE) || model.myPreferences.get(model.GRAPH_VOL_MEASURE) )
 				repaint(); 
 		 
 				try {

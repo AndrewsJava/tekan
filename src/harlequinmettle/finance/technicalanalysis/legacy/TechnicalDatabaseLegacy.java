@@ -1,12 +1,11 @@
 package harlequinmettle.finance.technicalanalysis.legacy;
 
-import harlequinmettle.utils.TimeRecord;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.filetools.SerializationTool;
 import harlequinmettle.utils.finance.TickerSetWithETFsOptimized;
 import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;
+import harlequinmettle.utils.timetools.TimeRecord;
 
-import java.awt.Dimension;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,7 +71,7 @@ import org.apache.commons.io.FileUtils;
 
 		if (new File("TECHNICAL_DATA/OBJECTS/TECHDATAOBJ_" + NUM_DAYS_START
 				+ "_" + NUM_DAYS_END).exists()) {
-			PER_TICKER_PER_DAY_TECHNICAL_DATA = SerializationTool.deserialize(
+			PER_TICKER_PER_DAY_TECHNICAL_DATA = SerializationTool.deserializeObject(
 					PER_TICKER_PER_DAY_TECHNICAL_DATA.getClass(),
 					"TECHNICAL_DATA/OBJECTS/TECHDATAOBJ_" + NUM_DAYS_START
 							+ "_" + NUM_DAYS_END);
@@ -85,7 +84,7 @@ import org.apache.commons.io.FileUtils;
 					loadTechnicalData(file);
 				}
 			}
-			SerializationTool.serialize(PER_TICKER_PER_DAY_TECHNICAL_DATA,
+			SerializationTool.serializeObject(PER_TICKER_PER_DAY_TECHNICAL_DATA,
 					"TECHNICAL_DATA/OBJECTS/TECHDATAOBJ_" + NUM_DAYS_START
 							+ "_" + NUM_DAYS_END);
 

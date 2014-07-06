@@ -2,7 +2,7 @@ package harlequinmettle.finance.technicalanalysis.util;
 
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
-import harlequinmettle.utils.TimeRecord;
+import harlequinmettle.utils.timetools.TimeRecord;
 
 import java.util.Map.Entry;
 import java.util.TreeMap;

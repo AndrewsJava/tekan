@@ -1,9 +1,7 @@
 package harlequinmettle.finance.technicalanalysis.tickertech;
 
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
-import harlequinmettle.utils.filetools.SerializationTool;
 import harlequinmettle.utils.guitools.JLabelFactory;
-import harlequinmettle.utils.guitools.JScrollPanelledPane;
 import harlequinmettle.utils.guitools.PreferredJScrollPane;
 import harlequinmettle.utils.guitools.VerticalJPanel;
 
@@ -11,22 +9,16 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;

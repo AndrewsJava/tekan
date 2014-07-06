@@ -74,7 +74,7 @@ public class OptionsWindowOpenItemListener implements ItemListener {
 							model.myPreferences.put(sourceText, source.isSelected());
 							 
 							TickerTechView.tickertechviewaccess.repaint();
-							SerializationTool.serialize(model.myPreferences,
+							SerializationTool.serializeObject(model.myPreferences,
 									model.preferencesSerializedName);
 						}
 					}

@@ -1,10 +1,10 @@
 package harlequinmettle.finance.technicalanalysis.model.db;
 
-import harlequinmettle.utils.TimeRecord;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.filetools.sqlite.SQLiteTools;
 import harlequinmettle.utils.guitools.FilterPanel;
 import harlequinmettle.utils.numbertools.math.statistics.StatInfo;
+import harlequinmettle.utils.timetools.TimeRecord;
 
 import java.awt.geom.Point2D;
 import java.io.File;

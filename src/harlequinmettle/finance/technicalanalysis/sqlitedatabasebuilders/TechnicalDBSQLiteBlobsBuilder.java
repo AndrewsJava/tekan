@@ -1,9 +1,9 @@
 package harlequinmettle.finance.technicalanalysis.sqlitedatabasebuilders;
 
-import harlequinmettle.utils.TimeRecord;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.filetools.FileTools;
 import harlequinmettle.utils.filetools.sqlite.SQLiteTools;
+import harlequinmettle.utils.timetools.TimeRecord;
 
 import java.io.File;
 import java.sql.Connection;
@@ -23,7 +23,7 @@ public class TechnicalDBSQLiteBlobsBuilder {
 				/ 1000);
 	}
 
-	private void buildDB() {
+	public  void buildDB() {
 		Connection cn = SQLiteTools
 				.establishSQLiteConnection("BLOBTECHNICALSDATABASE");
 		if (cn != null) {

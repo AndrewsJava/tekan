@@ -1,13 +1,12 @@
 package harlequinmettle.finance.technicalanalysis.tickertech;
 
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
-import harlequinmettle.utils.numbertools.format.NumberFormater;
+import harlequinmettle.utils.numbertools.format.NumberTools;
 
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map.Entry;
@@ -34,12 +33,12 @@ public class TickerTechModelUtil extends TickerTechModelVars {
 					first = false;
 					dailyRecord.add(DATE_FORMAT.format(new Date((long) f * 24 * 3600 * 1000)));
 				} else {
-					dailyRecord.add(NumberFormater.floatToBMKTrunkated(f, 2));
+					dailyRecord.add(NumberTools.floatToBMKTrunkated(f, 2));
 				}
 			}
-			String percentChange = NumberFormater.formatCalculatePercentChange(dayData[1], dayData[4]);
+			String percentChange = NumberTools.formatCalculatePercentChange(dayData[1], dayData[4]);
 			dailyRecord.add(percentChange);
-			String percentRange = NumberFormater.formatCalculatePercentChange(dayData[3], dayData[2]);
+			String percentRange = NumberTools.formatCalculatePercentChange(dayData[3], dayData[2]);
 			dailyRecord.add(percentRange);
 		}
 	}

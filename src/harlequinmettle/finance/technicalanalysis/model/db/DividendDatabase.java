@@ -1,9 +1,9 @@
 package harlequinmettle.finance.technicalanalysis.model.db;
 
-import harlequinmettle.utils.TimeRecord;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.filetools.SerializationTool;
 import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;
+import harlequinmettle.utils.timetools.TimeRecord;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -40,7 +40,7 @@ public class DividendDatabase {
 	private void loadDividendData() {
 
 		if (new File("TECHNICAL_DATA/OBJECTS/DIVDATAOBJ_").exists()) {
-			PER_TICKER_DIVIDEND_DAY_MAP = SerializationTool.deserialize(
+			PER_TICKER_DIVIDEND_DAY_MAP = SerializationTool.deserializeObject(
 					PER_TICKER_DIVIDEND_DAY_MAP.getClass(),
 					"TECHNICAL_DATA/OBJECTS/DIVDATAOBJ_");
 		} else {
@@ -52,7 +52,7 @@ public class DividendDatabase {
 					loadDividendData(file);
 				}
 			}
-			SerializationTool.serialize(PER_TICKER_DIVIDEND_DAY_MAP,
+			SerializationTool.serializeObject(PER_TICKER_DIVIDEND_DAY_MAP,
 					"TECHNICAL_DATA/OBJECTS/DIVDATAOBJ_");
 
 		}

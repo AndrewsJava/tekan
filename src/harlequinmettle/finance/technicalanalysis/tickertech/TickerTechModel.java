@@ -5,8 +5,6 @@ import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseInterface;
 import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseSQLite;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;

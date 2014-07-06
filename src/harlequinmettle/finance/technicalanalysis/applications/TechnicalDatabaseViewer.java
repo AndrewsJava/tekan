@@ -8,9 +8,13 @@ import harlequinmettle.finance.technicalanalysis.util.DefaultRangeSettingItemLis
 import harlequinmettle.finance.technicalanalysis.util.DividendForecaster;
 import harlequinmettle.finance.technicalanalysis.view.FilePathButtonsScrollingPanel;
 import harlequinmettle.finance.technicalanalysis.view.InfoPanel;
+import harlequinmettle.finance.technicalanalysis.view.SQLitePaneledPane;
+import harlequinmettle.finance.technicalanalysis.view.SettingsManagementPane;
 import harlequinmettle.finance.technicalanalysis.view.TickerButtonsScrollingPanel;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
+import harlequinmettle.utils.filetools.SerializationTool;
 import harlequinmettle.utils.finance.ETFs;
+import harlequinmettle.utils.finance.updatedtickerset.CurrentSymbolsDatabase;
 import harlequinmettle.utils.guitools.FilterPanel;
 import harlequinmettle.utils.guitools.HorizontalJPanel;
 import harlequinmettle.utils.guitools.JButtonWithEnterKeyAction;
@@ -19,6 +23,7 @@ import harlequinmettle.utils.guitools.JSearchPanel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeMap;
 
@@ -31,6 +36,8 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 
 	public static final DividendDatabase DDB = new DividendDatabase();
 	public static final TechnicalDatabaseSQLite TDB = new TechnicalDatabaseSQLite();
+	public static final CurrentSymbolsDatabase TICKERSDB = new CurrentSymbolsDatabase(new SerializationTool());
+	public static final ArrayList<String> TICKERS = new ArrayList<String>(TICKERSDB.tickers.values());
 
 	// public static final TechnicalDatabaseSQLite TDB = new
 	// TechnicalDatabaseSQLite(2000);
@@ -38,10 +45,8 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 	public static void main(String[] arg) {
 		long time = System.currentTimeMillis();
 		TechnicalDatabaseViewer tdbviewer = new TechnicalDatabaseViewer();
-		System.out.println("TOTAL TIME TO LOAD ALL: "
-				+ (System.currentTimeMillis() - time) / 1000 + " sec");
-		System.out.println("MEMORY USED : "
-				+ (Runtime.getRuntime().totalMemory() / 1000000) + "   MB");
+		System.out.println("TOTAL TIME TO LOAD ALL: " + (System.currentTimeMillis() - time) / 1000 + " sec");
+		System.out.println("MEMORY USED : " + (Runtime.getRuntime().totalMemory() / 1000000) + "   MB");
 	}
 
 	public TechnicalDatabaseViewer() {
@@ -63,21 +68,24 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		final FilterPanel filter_three = new FilterPanel(fdb.subsetLabels);
 		final FilterPanel filter_four = new FilterPanel(fdb.subsetLabels);
 		final FilterPanel filter_five = new FilterPanel(fdb.subsetLabels);
-		final FilterPanel[] fundamentalIndicatorfilters = { filter_one,
-				filter_two, filter_three, filter_four, filter_five };
-		JButtonWithEnterKeyAction submit = new JButtonWithEnterKeyAction(
-				"apply filters for results");
+		final FilterPanel[] fundamentalIndicatorfilters = { filter_one, filter_two, filter_three, filter_four, filter_five };
+		JButtonWithEnterKeyAction submit = new JButtonWithEnterKeyAction("apply filters for results");
 
-		submit.addActionListener(doFilterListener(fdb,
-				fundamentalIndicatorfilters));
+		submit.addActionListener(doFilterListener(fdb, fundamentalIndicatorfilters));
+
 		JFrame container = new JFrame("Control Panel - Technical Analysis");
 		container.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		container.setSize(900, 500);
 		container.add(this);
 		container.setVisible(true);
 
+		JScrollPanelledPane rebuildSQLite = new SQLitePaneledPane();
+		JScrollPanelledPane settingsManager = new SettingsManagementPane();
+
 		JScrollPanelledPane controls = new JScrollPanelledPane();
 		this.add("controls", controls);
+		this.add("rebuild SQLite", rebuildSQLite);
+		this.add("manage settings", settingsManager);
 
 		JSearchPanel searchPanel = new JSearchPanel(45);
 		searchPanel.addSearchAction(doSearchActionListener(searchPanel));
@@ -93,7 +101,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		info.choices.addItemListener(new DefaultRangeSettingItemListener(info));
 		info.setFontSize(40);
 		controls.addComp(info);
-		// TODO: exec chromium htttp ticker
+
 		for (FilterPanel fp : fundamentalIndicatorfilters) {
 			fp.setFontSize(40);
 			controls.addComp(fp);
@@ -117,8 +125,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 			public void actionPerformed(ActionEvent arg0) {
 				String pathToObj = "technical_database_settings";
 				String key = "path to downloads folder";
-				ChooseFilePrompterPathSaved downloads = new ChooseFilePrompterPathSaved(
-						"application_settings", pathToObj);
+				ChooseFilePrompterPathSaved downloads = new ChooseFilePrompterPathSaved("application_settings", pathToObj);
 				String root = downloads.getSetting(key);
 
 				new FilePathButtonsScrollingPanel((root));
@@ -133,8 +140,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 
 		JButton tickerTechOpener = new JButton("with upcoming dividnes");
 		tickerPanel.add(tickerTechOpener);
-		tickerTechOpener
-				.addActionListener(makeUpcomingDividendsActionListener());
+		tickerTechOpener.addActionListener(makeUpcomingDividendsActionListener());
 		return tickerPanel;
 	}
 
@@ -143,9 +149,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				new TickerButtonsScrollingPanel(
-						new DividendForecaster().scannForUpcommingDividends(),
-						"ex div date soon");
+				new TickerButtonsScrollingPanel(new DividendForecaster().scannForUpcommingDividends(), "ex div date soon");
 
 			}
 
@@ -157,8 +161,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 
 		JButton tickerTechOpener = new JButton("Free Trade ETFs");
 		tickerPanel.add(tickerTechOpener);
-		tickerTechOpener
-				.addActionListener(makeFreeTradesOpenerActionListener());
+		tickerTechOpener.addActionListener(makeFreeTradesOpenerActionListener());
 		return tickerPanel;
 	}
 
@@ -167,32 +170,26 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				new TickerButtonsScrollingPanel(
-						Arrays.asList(ETFs.fidelityFreeTradeETFS),
-						"fidelity etfs");
+				new TickerButtonsScrollingPanel(Arrays.asList(ETFs.fidelityFreeTradeETFS), "fidelity etfs");
 
 			}
 
 		};
 	}
 
-	private ActionListener doFilterListener(
-			final CurrentFundamentalsSQLiteDatabase fdb,
-			final FilterPanel[] filters) {
+	private ActionListener doFilterListener(final CurrentFundamentalsSQLiteDatabase fdb, final FilterPanel[] filters) {
 
 		return new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				TreeMap<String, String> filterResults = fdb
-						.getFilterResults(filters);
+				TreeMap<String, String> filterResults = fdb.getFilterResults(filters);
 				String title = "";
 				for (FilterPanel fp : filters) {
 					if (fp.shouldFilterBeApplied())
 						title += " " + fp.getFilterName();
 				}
 
-				new TickerButtonsScrollingPanel(filterResults, "Filter(s): "
-						+ title);
+				new TickerButtonsScrollingPanel(filterResults, "Filter(s): " + title);
 			}
 
 		};
@@ -204,11 +201,9 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// getParent()
-				String text_from_search_panel_text_box = searchPanel
-						.getSearchText();
+				String text_from_search_panel_text_box = searchPanel.getSearchText();
 
-				new TickerTechView(text_from_search_panel_text_box.trim()
-						.toUpperCase());
+				new TickerTechView(text_from_search_panel_text_box.trim().toUpperCase());
 			}
 
 		};

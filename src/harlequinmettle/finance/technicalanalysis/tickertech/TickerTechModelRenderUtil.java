@@ -2,7 +2,7 @@ package harlequinmettle.finance.technicalanalysis.tickertech;
 
 import harlequinmettle.finance.technicalanalysis.model.db.DividendDatabase;
 import harlequinmettle.utils.guitools.CommonColors;
-import harlequinmettle.utils.numbertools.format.NumberFormater;
+import harlequinmettle.utils.numbertools.format.NumberTools;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -125,7 +125,7 @@ public class TickerTechModelRenderUtil extends TickerTechModelUtil {
 		float volume = minMaxVolume.y+volInterval;
 		for (int y: yVal) { 
 			volume-=volInterval;
-			  String displayVol =NumberFormater.floatToBMKTrunkated(volume);
+			  String displayVol =NumberTools.floatToBMKTrunkated(volume);
 			g.drawString(displayVol ,  left  ,y+23);
 		}
 	}
@@ -138,7 +138,7 @@ public class TickerTechModelRenderUtil extends TickerTechModelUtil {
 		float price = minMaxPrice.y+priceInterval;
 		for (int y: yVal) { 
 			  price-=priceInterval;
-			  String displayPrice =NumberFormater.floatToBMKTrunkated(price, 2);
+			  String displayPrice =NumberTools.floatToBMKTrunkated(price, 2);
 			g.drawString(displayPrice ,  left  ,y+23);
 		}
 	}

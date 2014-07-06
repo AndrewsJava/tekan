@@ -110,11 +110,11 @@ public class OptionsMenuChoicePanel extends HorizontalJPanel {
 						model.optionStates.add(state);
 						//System.out.println("\n\nshow is selected");
 						//state.print();
-						SerializationTool.serialize(model.optionStates,
+						SerializationTool.serializeObject(model.optionStates,
 								model.morePreferencesSerializedName);
 					} else {
 						model.optionStates.remove(state);
-						SerializationTool.serialize(model.optionStates,
+						SerializationTool.serializeObject(model.optionStates,
 								model.morePreferencesSerializedName);
 					}
 

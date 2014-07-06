@@ -3,7 +3,7 @@ package harlequinmettle.finance.technicalanalysis.tickertech;
 import harlequinmettle.finance.technicalanalysis.model.db.CurrentFundamentalsSQLiteDatabase;
 import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
 import harlequinmettle.utils.filetools.SerializationTool;
-import harlequinmettle.utils.numbertools.format.NumberFormater;
+import harlequinmettle.utils.numbertools.format.NumberTools;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,7 +15,7 @@ public class TickerTechModelSetupUtil extends TickerTechModelRenderUtil{
 
 	protected void restorePreferences() {
  
-		myPreferences = SerializationTool.deserialize(myPreferences.getClass(),
+		myPreferences = SerializationTool.deserializeObject(myPreferences.getClass(),
 				preferencesSerializedName);
 		if (myPreferences == null) {
 			myPreferences = new TreeMap<String, Boolean>();
@@ -25,7 +25,7 @@ public class TickerTechModelSetupUtil extends TickerTechModelRenderUtil{
 		}
 		//////////////////
 
-		optionStates = SerializationTool.deserialize(optionStates.getClass(),
+		optionStates = SerializationTool.deserializeObject(optionStates.getClass(),
 				morePreferencesSerializedName);
 		if (optionStates == null) {
 			optionStates = new ArrayList<OptionsMenuModel> ();
@@ -86,7 +86,7 @@ public class TickerTechModelSetupUtil extends TickerTechModelRenderUtil{
 						.get(CurrentFundamentalsSQLiteDatabase.forDisplaying[i]);
 				if (data != data || Float.isInfinite(data))
 					continue;
-				readabledata = NumberFormater.floatToBMKTrunkated(data);
+				readabledata = NumberTools.floatToBMKTrunkated(data);
 
 			} catch (Exception e) {
 				e.printStackTrace();

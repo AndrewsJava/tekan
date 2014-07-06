@@ -1,15 +1,5 @@
 package harlequinmettle.finance.technicalanalysis.legacy;
 
-import harlequinmettle.finance.database.DataUtil;
-import harlequinmettle.utils.filetools.ChooseFilePrompterPathSaved;
-import harlequinmettle.utils.filetools.SerializationTool;
-import harlequinmettle.utils.filetools.SerializationToolExplicit;
-import harlequinmettle.utils.finance.TickerSetWithETFsOptimized;
-import harlequinmettle.utils.guitools.FilterPanel;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.TreeMap;
 
 public class CurrentFundamentalsDatabase {

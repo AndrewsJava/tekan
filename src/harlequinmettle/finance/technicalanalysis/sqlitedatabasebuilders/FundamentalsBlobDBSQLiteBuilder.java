@@ -43,6 +43,9 @@ public class FundamentalsBlobDBSQLiteBuilder {
 			String rooty = new ChooseFilePrompterPathSaved(
 					"application_settings", "databasebuilter")
 					.getSetting("path to y");
+			String root_other = new ChooseFilePrompterPathSaved(
+					"application_settings", "databasebuilter")
+					.getSetting("path to suplemental files");
 			ArrayList<File> allSmallDBFiles = new ArrayList<File>();
 			allSmallDBFiles.addAll(Arrays.asList(new File(rootq).listFiles()));
 			allSmallDBFiles.addAll(Arrays.asList(new File(rooty).listFiles()));

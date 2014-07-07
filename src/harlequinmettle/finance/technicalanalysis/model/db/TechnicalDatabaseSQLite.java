@@ -100,6 +100,7 @@ public class TechnicalDatabaseSQLite implements TechnicalDatabaseInterface {
 			}
 			rs.close();
 		} catch (SQLException e) {
+			e.printStackTrace();
 		} finally {
 			// clean up resources
 			if (stmt != null) {

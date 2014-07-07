@@ -49,6 +49,7 @@ public class TechnicalDBSQLiteBlobsBuilder {
 			sqlStorageTypes.add(SQLiteTools.SQL_BYTES_ADD);
 			for (int i = 0; i < allCSVDataFiles.size(); i++) {
 				// for (int i = 0; i < 5; i++) {
+				Thread.yield();
 				ArrayList<Object> dbEntry = new ArrayList<Object>();
 				String fileName = allCSVDataFiles.get(i).getName();
 

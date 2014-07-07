@@ -1,6 +1,7 @@
 package harlequinmettle.finance.technicalanalysis.view;
 
 import harlequinmettle.finance.technicalanalysis.applications.TechnicalDatabaseViewer;
+import harlequinmettle.finance.technicalanalysis.model.db.TechnicalDatabaseSQLite;
 import harlequinmettle.finance.technicalanalysis.sqlitedatabasebuilders.TechnicalDBSQLiteBlobsBuilder;
 import harlequinmettle.finance.technicalanalysis.util.CollectTechnicalData;
 import harlequinmettle.utils.guitools.JScrollPanelledPane;
@@ -37,8 +38,13 @@ public class SQLitePaneledPane extends JScrollPanelledPane {
 			public void actionPerformed(ActionEvent arg0) {
 				
 				long time = System.currentTimeMillis();
-				TechnicalDBSQLiteBlobsBuilder buildDB = new TechnicalDBSQLiteBlobsBuilder();
-				buildDB.buildDB();
+				final TechnicalDBSQLiteBlobsBuilder buildDB = new TechnicalDBSQLiteBlobsBuilder();
+				new Thread(){
+				@Override
+				public void run(){
+					buildDB.buildDB();
+					TechnicalDatabaseViewer.TDB = new TechnicalDatabaseSQLite();
+				}}.start();
 				System.out.println("--time: " + (System.currentTimeMillis() - time)
 						/ 1000);
 				

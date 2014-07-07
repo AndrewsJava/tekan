@@ -1,13 +1,16 @@
 package harlequinmettle.finance.technicalanalysis.view;
 
+import harlequinmettle.finance.technicalanalysis.model.table.TickerListJTableModel;
 import harlequinmettle.finance.technicalanalysis.tickertech.TickerTechView;
 import harlequinmettle.utils.guitools.HorizontalJPanel;
 import harlequinmettle.utils.guitools.JScrollPanelledPane;
+import harlequinmettle.utils.guitools.PreferredJScrollPane;
 
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
@@ -16,14 +19,16 @@ import java.util.TreeMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JTable;
 
-public class TickerButtonsScrollingPanel {
+public class TickerButtonsScrollingPanel   {
 
 	public TickerButtonsScrollingPanel( ) { 
 	}
 	public TickerButtonsScrollingPanel(TreeMap<String, String> results,String title) {
 		JFrame display = init(title);
 		display.add(makeScrollingTickerButtonList(results));
+		initJTable(new ArrayList<String>(results.keySet()));
 	}
 
 	protected JFrame init(String title) { 
@@ -37,8 +42,27 @@ public class TickerButtonsScrollingPanel {
 	public TickerButtonsScrollingPanel(List<String> asList, String title) {
 		JFrame display = init(title);
 		display.add(makeScrollingTickerButtonList(asList));
+		initJTable(asList);
+		
 	}
 
+	private void initJTable(List<String> asList) {
+		JFrame display = new JFrame("JTable Ticker Data");
+		display.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		display.setSize(800, 400);
+		display.setVisible(true);
+		display.add(makeScrollingJTable(asList));
+	}
+	private Component makeScrollingJTable(List<String> asList) {
+
+		TickerListJTableModel tableModel = new TickerListJTableModel(asList);
+		
+		JTable table = new JTable(tableModel);
+		table.setAutoCreateRowSorter(true);
+		
+		PreferredJScrollPane scrollForTable = new PreferredJScrollPane(table); 
+		return scrollForTable;
+	}
 	private Component makeScrollingTickerButtonList(List<String> asList) {
 
 		JScrollPanelledPane scrollForButtons = new JScrollPanelledPane();

@@ -38,6 +38,10 @@ public class TickerListJTableModel extends AbstractTableModel {
 					d[i][J] = fundamentals.get(indicator);
 				else
 					d[i][J] = new Float(Float.NaN);
+				if(d[i][J]== null){
+					d[i][J] = new Float(Float.NaN);
+					
+				}
 				J++;
 			}
 			i++;

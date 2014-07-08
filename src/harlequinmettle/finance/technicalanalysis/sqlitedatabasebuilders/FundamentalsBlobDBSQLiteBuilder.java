@@ -49,6 +49,7 @@ public class FundamentalsBlobDBSQLiteBuilder {
 			ArrayList<File> allSmallDBFiles = new ArrayList<File>();
 			allSmallDBFiles.addAll(Arrays.asList(new File(rootq).listFiles()));
 			allSmallDBFiles.addAll(Arrays.asList(new File(rooty).listFiles()));
+			allSmallDBFiles.addAll(Arrays.asList(new File(root_other).listFiles()));
 			int NUMBER_ENTRIES = columnEntries.length;
 
 			ArrayList<Integer> sqlStorageTypes = new ArrayList<Integer>();
@@ -76,8 +77,7 @@ public class FundamentalsBlobDBSQLiteBuilder {
 	private ArrayList<ArrayList<Object>> buildDataForDatabaseTable(File file) {
 		ArrayList<ArrayList<Object>> fileResults = new ArrayList<ArrayList<Object>>();
 		try {
-			String dayNumber = file.getName().replace("nas_", "")
-					.replace("ny_", "").replace(".txt", "");
+			String dayNumber = file.getName().split("_")[1].replace(".txt", "");
 			String fileData = FileUtils.readFileToString(file);
 			String[] weeklyEntries = fileData.split("\\n");
 			for (String entry : weeklyEntries) {
@@ -99,17 +99,17 @@ public class FundamentalsBlobDBSQLiteBuilder {
 	}
 
 	private float[] extractFundamentalData(String data) {
-
 		final float[] values = new float[CurrentFundamentalsSQLiteDatabase.labels.length];
 		float[] rawData = DataUtil.validSmallDataSet(data, null);
 
+try{
 		for (int k = 0; k < 82; k++) {
 			values[k] = rawData[k];
 		}
 		values[82] = rawData[172];
 		values[83] = rawData[173];
 		values[84] = rawData[174];
-
+}catch(Exception e){}
 		return values;
 	}
 

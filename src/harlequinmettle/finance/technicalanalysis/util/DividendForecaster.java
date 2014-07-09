@@ -92,7 +92,7 @@ public class DividendForecaster {
 		float lastInterval = currentDate - lastDate;
 		float expected = currentDate + lastInterval;
 
-		if (expected < today + 15 && expected > today + 2) {
+		if (expected < today + 8 && expected > today + 4) {
 			return true;
 		}
 		return false;

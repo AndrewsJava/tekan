@@ -8,8 +8,12 @@ import harlequinmettle.utils.guitools.PreferredJScrollPane;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +24,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTable;
+import javax.swing.JViewport;
 
 public class TickerButtonsScrollingPanel   {
 
@@ -28,7 +33,7 @@ public class TickerButtonsScrollingPanel   {
 	public TickerButtonsScrollingPanel(TreeMap<String, String> results,String title) {
 		JFrame display = init(title);
 		display.add(makeScrollingTickerButtonList(results));
-		initJTable(new ArrayList<String>(results.keySet()));
+		initJTable(new ArrayList<String>(results.values()));
 	}
 
 	protected JFrame init(String title) { 
@@ -59,9 +64,21 @@ public class TickerButtonsScrollingPanel   {
 		
 		JTable table = new JTable(tableModel);
 		table.setAutoCreateRowSorter(true);
-		
-		PreferredJScrollPane scrollForTable = new PreferredJScrollPane(table); 
-		return scrollForTable;
+		 //  table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+	final PreferredJScrollPane scrollPane = new PreferredJScrollPane(table); 
+//        final JScrollPane scrollPane = new JScrollPane(table,
+//                JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+//                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            table.addMouseWheelListener(new MouseWheelListener() {
+                public void mouseWheelMoved(MouseWheelEvent e) {
+                    JTable t = (JTable)e.getSource();
+                    JViewport vport = scrollPane.getViewport();
+                    Point vp = vport.getViewPosition();
+                    vp.translate(0, e.getWheelRotation()*t.getRowHeight());
+                    t.scrollRectToVisible(new Rectangle(vp, vport.getSize()));
+                }
+            });
+		return scrollPane;
 	}
 	private Component makeScrollingTickerButtonList(List<String> asList) {
 

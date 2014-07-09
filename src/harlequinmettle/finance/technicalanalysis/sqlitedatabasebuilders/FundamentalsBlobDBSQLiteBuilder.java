@@ -21,35 +21,30 @@ public class FundamentalsBlobDBSQLiteBuilder {
 		long time = System.currentTimeMillis();
 		FundamentalsBlobDBSQLiteBuilder buildDB = new FundamentalsBlobDBSQLiteBuilder();
 		buildDB.buildDB();
-		System.out.println("--time: " + (System.currentTimeMillis() - time)
-				/ 1000);
+		System.out.println("--time: " + (System.currentTimeMillis() - time) / 1000);
 	}
 
 	private void buildDB() {
-		Connection cn = SQLiteTools
-				.establishSQLiteConnection("BLOBFUNDAMENTALSDATABASE");
+		Connection cn = SQLiteTools.establishSQLiteConnection("BLOBFUNDAMENTALSDATABASE");
 		if (cn != null) {
 			String tableName = "fundamentals";
 			String[] columnEntries = { "datenumber", "ticker", "data" };
 			String[] types = { "dayN", "T", "float[]" };
 
 			// Statement used for query
-			Statement stat = SQLiteTools.reinitializeTable(cn, tableName,
-					columnEntries, types);
+			Statement stat = SQLiteTools.reinitializeTable(cn, tableName, columnEntries, types);
 
-			String rootq = new ChooseFilePrompterPathSaved(
-					"application_settings", "databasebuilter")
-					.getSetting("path to q");
-			String rooty = new ChooseFilePrompterPathSaved(
-					"application_settings", "databasebuilter")
-					.getSetting("path to y");
-			String root_other = new ChooseFilePrompterPathSaved(
-					"application_settings", "databasebuilter")
-					.getSetting("path to suplemental files");
 			ArrayList<File> allSmallDBFiles = new ArrayList<File>();
+
+			String rootq = new ChooseFilePrompterPathSaved("application_settings", "databasebuilter").getSetting("path to q");
 			allSmallDBFiles.addAll(Arrays.asList(new File(rootq).listFiles()));
+
+			String rooty = new ChooseFilePrompterPathSaved("application_settings", "databasebuilter").getSetting("path to y");
 			allSmallDBFiles.addAll(Arrays.asList(new File(rooty).listFiles()));
-			allSmallDBFiles.addAll(Arrays.asList(new File(root_other).listFiles()));
+
+			String roots = new ChooseFilePrompterPathSaved("application_settings", "databasebuilter").getSetting("path to suplementals");
+			allSmallDBFiles.addAll(Arrays.asList(new File(roots).listFiles()));
+
 			int NUMBER_ENTRIES = columnEntries.length;
 
 			ArrayList<Integer> sqlStorageTypes = new ArrayList<Integer>();
@@ -61,13 +56,10 @@ public class FundamentalsBlobDBSQLiteBuilder {
 			sqlStorageTypes.add(SQLiteTools.SQL_BYTES_ADD);
 			for (int i = 0; i < allSmallDBFiles.size(); i++) {
 				// for (int i = 0; i <5; i++) {
-				ArrayList<ArrayList<Object>> allValues = buildDataForDatabaseTable(allSmallDBFiles
-						.get(i));
-				PreparedStatement prep = SQLiteTools.initPreparedStatement(cn,
-						NUMBER_ENTRIES, tableName);
+				ArrayList<ArrayList<Object>> allValues = buildDataForDatabaseTable(allSmallDBFiles.get(i));
+				PreparedStatement prep = SQLiteTools.initPreparedStatement(cn, NUMBER_ENTRIES, tableName);
 				for (ArrayList<Object> values : allValues)
-					SQLiteTools
-							.buildSQLStatement(prep, values, sqlStorageTypes);
+					SQLiteTools.buildSQLStatement(prep, values, sqlStorageTypes);
 				SQLiteTools.executeStatement(cn, prep);
 			}
 
@@ -84,10 +76,10 @@ public class FundamentalsBlobDBSQLiteBuilder {
 				ArrayList<Object> data = new ArrayList<Object>();
 				data.add(dayNumber);
 				String[] tickerDataPair = entry.split("\\^");
+				//System.out.println(Arrays.toString(tickerDataPair));
 				String ticker = tickerDataPair[0];
 				data.add(ticker);
 				float[] rawData = extractFundamentalData(tickerDataPair[1]);
-
 				data.add((rawData));
 
 				fileResults.add(data);
@@ -102,14 +94,15 @@ public class FundamentalsBlobDBSQLiteBuilder {
 		final float[] values = new float[CurrentFundamentalsSQLiteDatabase.labels.length];
 		float[] rawData = DataUtil.validSmallDataSet(data, null);
 
-try{
-		for (int k = 0; k < 82; k++) {
-			values[k] = rawData[k];
+		try {
+			for (int k = 0; k < 82; k++) {
+				values[k] = rawData[k];
+			}
+			values[82] = rawData[172];
+			values[83] = rawData[173];
+			values[84] = rawData[174];
+		} catch (Exception e) {
 		}
-		values[82] = rawData[172];
-		values[83] = rawData[173];
-		values[84] = rawData[174];
-}catch(Exception e){}
 		return values;
 	}
 

@@ -17,6 +17,7 @@ import harlequinmettle.utils.finance.updatedtickerset.CurrentSymbolsDatabase;
 import harlequinmettle.utils.guitools.FilterPanel;
 import harlequinmettle.utils.guitools.HorizontalJPanel;
 import harlequinmettle.utils.guitools.JButtonWithEnterKeyAction;
+import harlequinmettle.utils.guitools.JLabelFactory;
 import harlequinmettle.utils.guitools.JScrollPanelledPane;
 import harlequinmettle.utils.guitools.JSearchPanel;
 import harlequinmettle.utils.systemtools.SystemMemoryUseDisplay;
@@ -87,16 +88,16 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		submit.addActionListener(doFilterListener(FDB, fundamentalIndicatorfilters));
 
 		JFrame container = new JFrame("Control Panel - Technical Analysis");
-		container.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		container.setSize(900, 500);
-		container.add(this);
-		container.setVisible(true);
+
 
 		JScrollPanelledPane controls = new JScrollPanelledPane();
 		this.add("controls", controls);
 
 		JScrollPanelledPane rebuildSQLite = new SQLitePaneledPane();
 		this.add("rebuild SQLite", rebuildSQLite);
+		
+		JScrollPanelledPane technicalAnalysis = new TechnicalAnalysisPaneledPane();
+		this.add("technical analysis", technicalAnalysis);
 
 		// JScrollPanelledPane settingsManager = new SettingsManagementPane();
 		// this.add("manage settings", settingsManager);
@@ -122,6 +123,7 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 		}
 		controls.addComp(submit);
 
+		controls.addComp(JLabelFactory.doLightBluishJLabel("group result indicator display preferences"));
 		for (String label : FDB.subsetLabels) {
 			JCheckBox box = new JCheckBox(label);
 			if (displayPreferences.containsKey(label))
@@ -130,6 +132,12 @@ public class TechnicalDatabaseViewer extends JTabbedPane {
 			PREFS.add(box);
 			controls.addComp(box);
 		}
+		     
+		container.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		container.setSize(900, 500);
+		container.add(this);
+		container.setVisible(true);
+		
 	}
 
 	private ItemListener makePreferencesItemListener() {

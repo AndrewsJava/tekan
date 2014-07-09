@@ -75,7 +75,7 @@ public static void main(String arg[]){
 	static String collectAndExtractDataFromNetwork(String tk) {
 
 		StringBuilder sb = new StringBuilder();
-		sb.append(" ");
+		 
 		sb.append(cnnForecast(tk, true).trim());
 		sb.append(" ");
 		sb.append(analystEstimates(tk));
